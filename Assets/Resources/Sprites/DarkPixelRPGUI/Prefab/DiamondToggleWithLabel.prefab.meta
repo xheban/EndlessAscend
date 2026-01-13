@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 76489bed8be8be44f9ae3c90be419e06
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/DiamondToggleWithLabel.prefab
+  uploadId: 816794

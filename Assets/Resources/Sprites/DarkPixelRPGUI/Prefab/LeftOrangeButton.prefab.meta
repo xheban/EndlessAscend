@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0d1aa20e52cb33347a4ae76fa581bc18
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/LeftOrangeButton.prefab
+  uploadId: 816794

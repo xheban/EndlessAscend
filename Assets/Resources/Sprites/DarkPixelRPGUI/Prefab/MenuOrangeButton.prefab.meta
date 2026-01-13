@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8f60256f1d922b94dac15708207241b4
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/MenuOrangeButton.prefab
+  uploadId: 816794

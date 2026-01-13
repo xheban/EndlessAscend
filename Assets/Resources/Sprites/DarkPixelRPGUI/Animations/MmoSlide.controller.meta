@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: eaacc10afe31ca04fb2c509ae18cdd41
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Animations/MmoSlide.controller
+  uploadId: 816794

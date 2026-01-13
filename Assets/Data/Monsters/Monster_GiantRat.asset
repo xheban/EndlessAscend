@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 607c332bf9ba66e449068412553c7e4a, type: 3}
+  m_Name: Monster_GiantRat
+  m_EditorClassIdentifier: 
+  id: monster_giant_rat
+  displayName: Giant Rat
+  icon: {fileID: 21300000, guid: c21f1b4d114c87c4096079e6eabd1285, type: 3}
+  tier: 0
+  rarity: 0
+  baseStats:
+    agility: 3
+    intelligence: 1
+    strength: 3
+    spirit: 1
+    endurance: 2
+  baseExp: 4
+  baseGold: 2
+  spells:
+  - spellId: scratch
+    level: 1
+    weight: 1
+  - spellId: bite
+    level: 1
+    weight: 3
+  lootTable: []
+  tags: 1

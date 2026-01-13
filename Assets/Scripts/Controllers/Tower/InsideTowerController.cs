@@ -1,0 +1,594 @@
+using System;
+using MyGame.Run;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class InsideTowerController : MonoBehaviour, IScreenController
+{
+    private const int VisibleCount = 5;
+    private const int ShiftAmount = 5;
+
+    [SerializeField]
+    private VisualTreeAsset floorInfoCardTemplate;
+
+    [SerializeField]
+    private int maxDescendVisibility = 5;
+
+    [SerializeField]
+    private TowerDatabase towerDatabase;
+    private TowerDefinition _towerDef;
+
+    private InsideTowerContext _context;
+    private ScreenSwapper _swapper;
+
+    private Button _backButton;
+    private VisualElement _ascend;
+    private VisualElement _descend;
+
+    private IntegerField _floorNumberField;
+    private Button _goButton;
+
+    private VisualElement[] _slots;
+    private VisualElement[] _cards;
+
+    // The first floor shown in the 5-card window (1-based)
+    private int _windowStartFloor = 1;
+
+    private struct FloorData
+    {
+        public int floor;
+        public string monsterName;
+
+        // Stats (raw numbers)
+        public int str;
+        public int agi;
+        public int intel;
+        public int end;
+        public int spr;
+
+        // Rewards (raw numbers)
+        public int exp;
+        public int gold;
+
+        // Icons
+        public Sprite monsterIcon;
+
+        // Drops
+        public Sprite[] skills; // 0..6
+        public Sprite[] loot; // 0..8
+    }
+
+    private sealed class CardClickData
+    {
+        public int floor;
+        public bool locked;
+    }
+
+    public void Bind(VisualElement screenHost, ScreenSwapper swapper, object context)
+    {
+        _swapper = swapper;
+        _context = context as InsideTowerContext;
+
+        if (_context == null)
+        {
+            Debug.LogError("InsideTower opened without context.");
+            return;
+        }
+
+        _towerDef = towerDatabase.GetById(_context.towerId);
+
+        if (_towerDef == null)
+        {
+            Debug.LogError($"No tower definition found for '{_context.towerId}'.");
+        }
+
+        // --- Back button ---
+        _backButton = screenHost.Q<Button>("back");
+        _backButton.clicked += OnBackClicked;
+
+        // --- Slots ---
+        _slots = new[]
+        {
+            screenHost.Q<VisualElement>("FloorSlot1"),
+            screenHost.Q<VisualElement>("FloorSlot2"),
+            screenHost.Q<VisualElement>("FloorSlot3"),
+            screenHost.Q<VisualElement>("FloorSlot4"),
+            screenHost.Q<VisualElement>("FloorSlot5"),
+        };
+
+        // --- Instantiate 5 cards once, keep references ---
+        _cards = new VisualElement[VisibleCount];
+        for (int i = 0; i < VisibleCount; i++)
+        {
+            _slots[i].Clear();
+            _cards[i] = floorInfoCardTemplate.Instantiate();
+            _slots[i].Add(_cards[i]);
+
+            MakeCardClickable(_cards[i]);
+        }
+
+        // --- Move controls ---
+        _ascend = screenHost.Q<VisualElement>("Ascend");
+        _descend = screenHost.Q<VisualElement>("Descend");
+
+        _floorNumberField = screenHost.Q<IntegerField>("FloorNumber");
+        _goButton = screenHost.Q<Button>("Go");
+
+        // Make VisualElements clickable like buttons
+        MakeClickable(_ascend, OnAscendClicked);
+        MakeClickable(_descend, OnDescendClicked);
+
+        _goButton.clicked += OnGoClicked;
+
+        // Initial view
+        // If you have a "current floor" in context, use it here:
+        // CenterOnFloor(_context.CurrentFloor);
+        CenterOnFloor(GetCurrentTowerFloor());
+        UpdateArrowInteractivity();
+    }
+
+    public void Unbind()
+    {
+        if (_backButton != null)
+            _backButton.clicked -= OnBackClicked;
+        if (_goButton != null)
+            _goButton.clicked -= OnGoClicked;
+
+        // Clickable manipulators don’t need explicit unsubscribe (we attach a manipulator instance),
+        // but you can Clear() if you want to be strict.
+
+        _context = null;
+        _swapper = null;
+        _backButton = null;
+        _ascend = null;
+        _descend = null;
+        _floorNumberField = null;
+        _goButton = null;
+        _slots = null;
+        _cards = null;
+    }
+
+    private void OnBackClicked()
+    {
+        _swapper.ShowScreen("tower");
+    }
+
+    private static string FormatNumber(int value)
+    {
+        if (value >= 1_000_000)
+            return (value / 1_000_000f).ToString("0.00") + "M";
+
+        if (value >= 1_000)
+        {
+            float k = value / 1_000f;
+            if (k >= 1000f)
+                return (k / 1000f).ToString("0.00") + "M";
+
+            return k.ToString("0.00") + "K";
+        }
+
+        return value.ToString();
+    }
+
+    private void OnDescendClicked()
+    {
+        int maxStart = GetMaxWindowStartAllowed();
+
+        // clamp shift so we move as far as possible (maybe less than 5)
+        int newStart = Mathf.Min(_windowStartFloor + ShiftAmount, maxStart);
+
+        if (newStart == _windowStartFloor)
+        {
+            UpdateArrowInteractivity();
+            return;
+        }
+
+        _windowStartFloor = newStart;
+        RefreshVisibleCards();
+        UpdateMiddleFloorField();
+        UpdateArrowInteractivity();
+    }
+
+    private void OnAscendClicked()
+    {
+        int newStart = Mathf.Max(1, _windowStartFloor - ShiftAmount);
+
+        if (newStart == _windowStartFloor)
+        {
+            UpdateArrowInteractivity();
+            return;
+        }
+
+        _windowStartFloor = newStart;
+        RefreshVisibleCards();
+        UpdateMiddleFloorField();
+        UpdateArrowInteractivity();
+    }
+
+    private void OnGoClicked()
+    {
+        int requested = _floorNumberField.value;
+
+        int currentFloor = GetCurrentFloor();
+        int maxReachable = Mathf.Min(GetMaxFloor(), currentFloor + maxDescendVisibility);
+
+        int clamped = Mathf.Clamp(requested, 1, maxReachable);
+
+        // Optional: reflect the clamp back into the input field so player sees it
+        _floorNumberField.SetValueWithoutNotify(clamped);
+
+        CenterOnFloor(clamped);
+    }
+
+    private void ShiftWindow(int delta)
+    {
+        int newStart = _windowStartFloor + delta;
+        newStart = ClampWindowStart(newStart);
+
+        _windowStartFloor = newStart;
+        RefreshVisibleCards();
+        UpdateMiddleFloorField();
+        UpdateArrowInteractivity(); // ✅ add
+    }
+
+    private void CenterOnFloor(int targetFloor)
+    {
+        int newStart = targetFloor - 2;
+        newStart = ClampWindowStart(newStart);
+
+        _windowStartFloor = newStart;
+        RefreshVisibleCards();
+        UpdateMiddleFloorField();
+        UpdateArrowInteractivity(); // ✅ add
+    }
+
+    private int ClampWindowStart(int start)
+    {
+        int maxFloor = GetMaxFloor();
+        int maxStart = Mathf.Max(1, maxFloor - (VisibleCount - 1));
+
+        if (start < 1)
+            start = 1;
+        if (start > maxStart)
+            start = maxStart;
+
+        return start;
+    }
+
+    private int GetCurrentTowerFloor()
+    {
+        if (!RunSession.IsInitialized)
+            return 1;
+
+        // If missing for any reason, default to 1
+        return RunSession.Towers.GetFloor(_context.towerId);
+    }
+
+    private int GetMaxFloor()
+    {
+        return _towerDef != null ? _towerDef.MaxFloor : 1;
+    }
+
+    private void RefreshVisibleCards()
+    {
+        int currentFloor = GetCurrentFloor();
+        int maxInfoFloor = currentFloor;
+
+        for (int i = 0; i < VisibleCount; i++)
+        {
+            int floorNumber = _windowStartFloor + i;
+            bool locked = floorNumber > maxInfoFloor;
+
+            // Use FloorTile for consistent click/hover behavior
+            var tile = _cards[i].Q<VisualElement>("FloorTile") ?? _cards[i];
+
+            // Store click payload where click handler reads it
+            tile.userData = new CardClickData { floor = floorNumber, locked = locked };
+
+            // ✅ Only unlocked cards are clickable + hoverable
+            SetCardInteractable(_cards[i], interactable: !locked);
+
+            SetCardLocked(_cards[i], locked);
+
+            if (locked)
+                PopulateLockedCard(_cards[i], floorNumber);
+            else
+                PopulateCard(_cards[i], GetFloorData(floorNumber));
+        }
+    }
+
+    private int GetCurrentFloor()
+    {
+        if (_context == null)
+            return 1;
+
+        if (!RunSession.IsInitialized)
+            return 1;
+
+        return RunSession.Towers.GetFloor(_context.towerId);
+    }
+
+    private void PopulateLockedCard(VisualElement cardRoot, int floorNumber)
+    {
+        var root = cardRoot.Q<VisualElement>("FloorTile") ?? cardRoot;
+
+        var floorLabel = root.Q<Label>("Floor");
+        if (floorLabel != null)
+            floorLabel.text = $"FLOOR {floorNumber}";
+    }
+
+    private void UpdateMiddleFloorField()
+    {
+        // Middle of 5 cards is index 2
+        int middleFloor = _windowStartFloor + 2;
+
+        // Avoid triggering any potential change callbacks (if you add them later)
+        _floorNumberField.SetValueWithoutNotify(middleFloor);
+    }
+
+    // -------------------------
+    // Helpers
+    // -------------------------
+
+    private void MakeClickable(VisualElement ve, System.Action onClick)
+    {
+        if (ve == null)
+            return;
+
+        ve.focusable = true;
+        ve.pickingMode = PickingMode.Position;
+
+        // Clickable gives you proper "button-like" clicking in UI Toolkit
+        ve.AddManipulator(new Clickable(() => onClick?.Invoke()));
+    }
+
+    // -------------------------
+    // Data + Populate (replace later)
+    // -------------------------
+
+    private FloorData GetFloorData(int floorNumber)
+    {
+        // Safe fallback so UI never explodes
+        if (_towerDef == null)
+        {
+            return new FloorData
+            {
+                floor = floorNumber,
+                monsterName = "???",
+                str = 0,
+                agi = 0,
+                intel = 0,
+                end = 0,
+                spr = 0,
+                exp = 0,
+                gold = 0,
+                monsterIcon = null,
+                skills = Array.Empty<Sprite>(),
+                loot = Array.Empty<Sprite>(),
+            };
+        }
+
+        var entry = _towerDef.GetFloor(floorNumber);
+        if (entry == null || entry.monster == null)
+        {
+            return new FloorData
+            {
+                floor = floorNumber,
+                monsterName = "MISSING DATA",
+                str = 0,
+                agi = 0,
+                intel = 0,
+                end = 0,
+                spr = 0,
+                exp = 0,
+                gold = 0,
+                monsterIcon = null,
+                skills = Array.Empty<Sprite>(),
+                loot = Array.Empty<Sprite>(),
+            };
+        }
+
+        var m = entry.monster;
+        var s = m.BaseStats;
+
+        // exp/gold: if you set overrides on the floor, use them; otherwise monster base
+        int exp = entry.expOverride > 0 ? entry.expOverride : m.BaseExp;
+        int gold = entry.goldOverride > 0 ? entry.goldOverride : m.BaseGold;
+
+        // For now keep empty previews (as you requested)
+        Sprite[] skillsPreview = Array.Empty<Sprite>();
+        Sprite[] lootPreview = Array.Empty<Sprite>();
+
+        return new FloorData
+        {
+            floor = floorNumber,
+            monsterName = m.DisplayName,
+
+            // If your MonsterStats fields are lowercase, change these accordingly:
+            str = s.strength,
+            agi = s.agility,
+            intel = s.intelligence,
+            end = s.endurance,
+            spr = s.spirit,
+
+            exp = exp,
+            gold = gold,
+
+            monsterIcon = m.Icon,
+
+            skills = skillsPreview,
+            loot = lootPreview,
+        };
+    }
+
+    private void PopulateCard(VisualElement cardRoot, FloorData data)
+    {
+        var root = cardRoot.Q<VisualElement>("FloorTile") ?? cardRoot;
+
+        root.Q<Label>("Floor").text = $"FLOOR {data.floor}";
+        root.Q<Label>("MonsterName").text = data.monsterName;
+
+        root.Q<Label>("StrValue").text = FormatNumber(data.str);
+        root.Q<Label>("AgiValue").text = FormatNumber(data.agi);
+        root.Q<Label>("IntValue").text = FormatNumber(data.intel);
+        root.Q<Label>("EndValue").text = FormatNumber(data.end);
+        root.Q<Label>("SprValue").text = FormatNumber(data.spr);
+
+        PopulateMonsterIcon(root, data.monsterIcon);
+        PopulateExpGold(root, data.exp, data.gold);
+        PopulateSkills(root, data.skills);
+        PopulateLoot(root, data.loot);
+    }
+
+    private void PopulateExpGold(VisualElement root, int exp, int gold)
+    {
+        var expLabel = root.Q<Label>("ExpValue");
+        if (expLabel != null)
+            expLabel.text = FormatNumber(exp);
+
+        var goldLabel = root.Q<Label>("GoldValue");
+        if (goldLabel != null)
+            goldLabel.text = FormatNumber(gold);
+    }
+
+    private void PopulateMonsterIcon(VisualElement root, Sprite iconSprite)
+    {
+        var icon = root.Q<VisualElement>("MonsterIcon");
+        if (icon != null && iconSprite != null)
+            icon.style.backgroundImage = new StyleBackground(iconSprite);
+    }
+
+    private void PopulateSkills(VisualElement root, Sprite[] skills)
+    {
+        skills ??= Array.Empty<Sprite>();
+
+        for (int i = 1; i <= 6; i++)
+        {
+            var slot = root.Q<VisualElement>($"Skill{i}");
+            if (slot == null)
+                continue;
+
+            slot.style.display = i <= skills.Length ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    private void PopulateLoot(VisualElement root, Sprite[] loot)
+    {
+        loot ??= Array.Empty<Sprite>();
+
+        for (int i = 1; i <= 8; i++)
+        {
+            var slot = root.Q<VisualElement>($"Loot{i}");
+            if (slot == null)
+                continue;
+
+            slot.style.display = i <= loot.Length ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    private void SetCardInteractable(VisualElement cardRoot, bool interactable)
+    {
+        // Use FloorTile if it exists so hover styling targets the visible tile
+        var tile = cardRoot.Q<VisualElement>("FloorTile") ?? cardRoot;
+
+        // Pointer events ON/OFF (this controls hover + click)
+        tile.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
+
+        // Optional: allow keyboard focus only when interactable
+        tile.focusable = interactable;
+
+        // Toggle a class for hover styling
+        tile.EnableInClassList("floor-card--clickable", interactable);
+
+        // Optional: cursor hint (Unity 6 supports this)
+        // tile.style.cursor = interactable ? new StyleCursor(MouseCursor.Link) : StyleKeyword.None;
+    }
+
+    private void UpdateArrowInteractivity()
+    {
+        int maxStart = GetMaxWindowStartAllowed();
+
+        bool canGoUp = _windowStartFloor > 1;
+        bool canGoDown = _windowStartFloor < maxStart;
+
+        _ascend?.SetEnabled(canGoUp);
+        _descend?.SetEnabled(canGoDown);
+
+        // if you want to fully prevent hover/click
+        if (_ascend != null)
+            _ascend.pickingMode = canGoUp ? PickingMode.Position : PickingMode.Ignore;
+        if (_descend != null)
+            _descend.pickingMode = canGoDown ? PickingMode.Position : PickingMode.Ignore;
+    }
+
+    private int GetMaxWindowStartAllowed()
+    {
+        int currentFloor = GetCurrentFloor();
+        int maxReachable = Mathf.Min(GetMaxFloor(), currentFloor + maxDescendVisibility);
+
+        // VisibleCount = 5, so last visible = start + 4
+        int maxStart = maxReachable - (VisibleCount - 1);
+        return Mathf.Max(1, maxStart);
+    }
+
+    private void MakeCardClickable(VisualElement cardRoot)
+    {
+        if (cardRoot == null)
+            return;
+
+        var tile = cardRoot.Q<VisualElement>("FloorTile") ?? cardRoot;
+
+        tile.focusable = true;
+        tile.pickingMode = PickingMode.Position;
+
+        tile.AddManipulator(new Clickable(() => OnCardClicked(tile)));
+    }
+
+    private void OnCardClicked(VisualElement tile)
+    {
+        if (tile == null || _context == null || _swapper == null)
+            return;
+
+        if (tile.userData is not CardClickData cd)
+            return;
+
+        if (cd.locked)
+            return;
+
+        _swapper.ShowScreen("combat_tower", new CombatTowerContext(_context.towerId, cd.floor));
+    }
+
+    private void SetCardLocked(VisualElement cardRoot, bool locked)
+    {
+        // Card root may be the template wrapper or FloorTile itself
+        var root = cardRoot.Q<VisualElement>("FloorTile") ?? cardRoot;
+
+        var monsterName = root.Q<VisualElement>("MonsterName");
+        var decorativeLine = root.Q<VisualElement>("DecorativeLine");
+        var monsterInfo = root.Q<VisualElement>("MonsterInfo");
+        var lockVe = root.Q<VisualElement>("Lock");
+
+        if (locked)
+        {
+            if (monsterName != null)
+                monsterName.style.display = DisplayStyle.None;
+            if (decorativeLine != null)
+                decorativeLine.style.display = DisplayStyle.None;
+            if (monsterInfo != null)
+                monsterInfo.style.display = DisplayStyle.None;
+            if (lockVe != null)
+                lockVe.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            if (monsterName != null)
+                monsterName.style.display = DisplayStyle.Flex;
+            if (decorativeLine != null)
+                decorativeLine.style.display = DisplayStyle.Flex;
+            if (monsterInfo != null)
+                monsterInfo.style.display = DisplayStyle.Flex;
+            if (lockVe != null)
+                lockVe.style.display = DisplayStyle.None;
+        }
+    }
+}

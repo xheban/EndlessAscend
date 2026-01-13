@@ -1,0 +1,124 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenu/LoadGame.uss?fileID=7433441132597879392&amp;guid=9343313fe2879954093fa77033eb78dd&amp;type=3#LoadGame" />
+    <engine:VisualElement name="Holder" style="flex-grow: 0; height: 720px;">
+        <engine:VisualElement name="Modal" style="flex-grow: 1; width: 640px; height: auto; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256.png?fileID=1422470188&amp;guid=79edde4c35b3a5a4aa4a5455f0b557a5&amp;type=3#Frame_square_256_0&quot;); margin-top: 32px;">
+            <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 64px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px;">
+                <engine:Button name="SaveSlot1" class="saveFile">
+                    <engine:VisualElement name="EmptyContainer" style="flex-grow: 1; display: flex; align-self: auto; align-content: auto; justify-content: center;">
+                        <engine:Label text="--Empty slot--" class="label-1" style="color: rgb(255, 255, 255);" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="FilledContainer" style="flex-grow: 1; display: none;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:Label text="Testovaci character" name="Name" class="label-1" style="flex-grow: 1; -unity-text-align: middle-left;" />
+                            <engine:Label text="Level" class="label-1" style="margin-left: 32px;" />
+                            <engine:Label text="4" name="Level" triple-click-selects-line="false" class="label-1" />
+                        </engine:VisualElement>
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                                <engine:Label text="Play time " name="PlayTimeLabel" class="label-2" style="margin-right: 8px;" />
+                                <engine:Label text="4" name="TotalPlayTime" triple-click-selects-line="false" class="label-2" style="flex-grow: 0; align-self: auto; align-items: flex-start; justify-content: flex-start; -unity-text-align: middle-left;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+                                <engine:Label text="Last Saved:" name="SavedLabel" triple-click-selects-line="false" class="label-2" style="flex-grow: 0;" />
+                                <engine:Label text="12/14/2025" name="LastSavedAt" triple-click-selects-line="false" class="label-2" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:Button>
+                <engine:Button name="SaveSlot2" class="saveFile">
+                    <engine:VisualElement name="EmptyContainer" style="flex-grow: 1; justify-content: center;">
+                        <engine:Label text="--Empty slot--" class="label-1" style="color: rgb(255, 255, 255);" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="FilledContainer" style="flex-grow: 1; display: none;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:Label text="Testovaci character" name="Name" class="label-1" style="flex-grow: 1; -unity-text-align: middle-left;" />
+                            <engine:Label text="Level" class="label-1" style="margin-left: 32px;" />
+                            <engine:Label text="4" name="Level" triple-click-selects-line="false" class="label-1" />
+                        </engine:VisualElement>
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                                <engine:Label text="Play time" name="PlayTimeLabel" class="label-2" style="margin-right: 8px;" />
+                                <engine:Label text="4" name="TotalPlayTime" triple-click-selects-line="false" class="label-2" style="flex-grow: 0; align-self: auto; align-items: flex-start; justify-content: flex-start; -unity-text-align: middle-left;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+                                <engine:Label text="Last Saved:" name="SavedLabel" triple-click-selects-line="false" class="label-2" style="flex-grow: 0;" />
+                                <engine:Label text="12/14/2025" name="LastSavedAt" triple-click-selects-line="false" class="label-2" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:Button>
+                <engine:Button name="SaveSlot3" class="saveFile">
+                    <engine:VisualElement name="EmptyContainer" style="flex-grow: 1; justify-content: center;">
+                        <engine:Label text="--Empty slot--" class="label-1" style="color: rgb(255, 255, 255);" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="FilledContainer" style="flex-grow: 1; display: none;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:Label text="Testovaci character" name="Name" class="label-1" style="flex-grow: 1; -unity-text-align: middle-left;" />
+                            <engine:Label text="Level" class="label-1" style="margin-left: 32px;" />
+                            <engine:Label text="4" name="Level" triple-click-selects-line="false" class="label-1" />
+                        </engine:VisualElement>
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                                <engine:Label text="Play time" name="PlayTimeLabel" class="label-2" style="margin-right: 8px;" />
+                                <engine:Label text="4" name="TotalPlayTime" triple-click-selects-line="false" class="label-2" style="flex-grow: 0; align-self: auto; align-items: flex-start; justify-content: flex-start; -unity-text-align: middle-left;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+                                <engine:Label text="Last Saved:" name="SavedLabel" triple-click-selects-line="false" class="label-2" style="flex-grow: 0;" />
+                                <engine:Label text="12/14/2025" name="LastSavedAt" triple-click-selects-line="false" class="label-2" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:Button>
+                <engine:Button name="SaveSlot4" class="saveFile">
+                    <engine:VisualElement name="EmptyContainer" style="flex-grow: 1; justify-content: center;">
+                        <engine:Label text="--Empty slot--" class="label-1" style="color: rgb(255, 255, 255);" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="FilledContainer" style="flex-grow: 1; display: none;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:Label text="Testovaci character" name="Name" class="label-1" style="flex-grow: 1; -unity-text-align: middle-left;" />
+                            <engine:Label text="Level" class="label-1" style="margin-left: 32px;" />
+                            <engine:Label text="4" name="Level" triple-click-selects-line="false" class="label-1" />
+                        </engine:VisualElement>
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                                <engine:Label text="Play time" name="PlayTimeLabel" class="label-2" style="margin-right: 8px;" />
+                                <engine:Label text="4" name="TotalPlayTime" triple-click-selects-line="false" class="label-2" style="flex-grow: 0; align-self: auto; align-items: flex-start; justify-content: flex-start; -unity-text-align: middle-left;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+                                <engine:Label text="Last Saved:" name="SavedLabel" triple-click-selects-line="false" class="label-2" style="flex-grow: 0;" />
+                                <engine:Label text="12/14/2025" name="LastSavedAt" triple-click-selects-line="false" class="label-2" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:Button>
+                <engine:Button name="SaveSlot5" class="saveFile">
+                    <engine:VisualElement name="EmptyContainer" style="flex-grow: 1; justify-content: center;">
+                        <engine:Label text="--Empty slot--" class="label-1" style="color: rgb(255, 255, 255);" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="FilledContainer" style="flex-grow: 1; display: none;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:Label text="Testovaci character" name="Name" class="label-1" style="flex-grow: 1; -unity-text-align: middle-left;" />
+                            <engine:Label text="Level" class="label-1" style="margin-left: 32px;" />
+                            <engine:Label text="4" name="Level" triple-click-selects-line="false" class="label-1" />
+                        </engine:VisualElement>
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                                <engine:Label text="Play time" name="PlayTimeLabel" class="label-2" style="margin-right: 8px;" />
+                                <engine:Label text="4" name="TotalPlayTime" triple-click-selects-line="false" class="label-2" style="flex-grow: 0; align-self: auto; align-items: flex-start; justify-content: flex-start; -unity-text-align: middle-left;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+                                <engine:Label text="Last Saved:" name="SavedLabel" triple-click-selects-line="false" class="label-2" style="flex-grow: 0;" />
+                                <engine:Label text="12/14/2025" name="LastSavedAt" triple-click-selects-line="false" class="label-2" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:Button>
+            </engine:VisualElement>
+            <engine:Button name="Exit" class="exit-button" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Header" style="flex-grow: 0; height: 66px; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 232px; position: absolute; top: 1px; left: 205px; right: 204px; bottom: auto; justify-content: flex-end;">
+            <engine:Label text="Load Game" name="Title" class="header-2" style="align-self: center; margin-top: 0; -unity-text-align: upper-left; margin-bottom: 6px; color: rgb(164, 164, 164);" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

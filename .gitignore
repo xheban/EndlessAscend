@@ -1,0 +1,43 @@
+# ===============================
+# Unity generated folders
+# ===============================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# ===============================
+# IDE / Editor files
+# ===============================
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+
+# ===============================
+# OS junk
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Unity cache / meta safety
+# ===============================
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+
+# ===============================
+# Explicitly allow what you want
+# ===============================
+!Assets/**/*.cs
+!Assets/**/*.uxml
+!Assets/**/*.uss
+!Assets/**/*.meta

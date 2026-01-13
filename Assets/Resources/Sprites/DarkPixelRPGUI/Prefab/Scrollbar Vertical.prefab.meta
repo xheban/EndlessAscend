@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 59eb33551129f43429b0f1176b5b0d06
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/Scrollbar Vertical.prefab
+  uploadId: 816794

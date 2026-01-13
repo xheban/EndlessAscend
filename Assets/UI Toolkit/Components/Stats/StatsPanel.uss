@@ -1,0 +1,53 @@
+#StatsPanel {
+    -unity-font-definition: resource('Fonts & Materials/PixellariRaster');
+}
+
+.stats-panel__points-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-bottom: 0;
+}
+
+.stat-row {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 4px;
+}
+
+.stat-btn {
+    width: 32px;
+    height: 32px;
+    border-width: 0;
+    background-size: 100% 100%;
+}
+
+.stat-btn--minus {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/1_minus.png?fileID=21300000&guid=dc83c941fbdcd3441878fd2f42a0e5ef&type=3#1_minus");
+}
+
+.stat-btn--plus {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/1_plus.png?fileID=21300000&guid=6b1c39a6ee4c20541a65d720c65bb85c&type=3#1_plus");
+}
+
+.stat-text {
+    flex-grow: 1;
+}
+
+.stat-values {
+    flex-direction: row;
+    margin-top: 8px;
+}
+
+.stat-icon-frame {
+    width: 64px;
+    height: 64px;
+    margin-right: 16px;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Frame.png?fileID=21300000&guid=eb69f99d99bd33649ae3a298a1d81646&type=3#Icon_Frame");
+    background-size: 100% 100%;
+    padding-top: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    padding-left: 8px;
+}

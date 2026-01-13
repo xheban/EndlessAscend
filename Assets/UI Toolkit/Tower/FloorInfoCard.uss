@@ -1,0 +1,26 @@
+.skill {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory.png?fileID=21300000&guid=9f9cc416a40aa4849beeac947437ad01&type=3#Icon_inventory");
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.loot {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory.png?fileID=21300000&guid=9f9cc416a40aa4849beeac947437ad01&type=3#Icon_inventory");
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.bg {}
+
+.bg.floor-card--clickable:hover {
+    background-color: rgba(255, 255, 255, 0);
+    -unity-background-image-tint-color: var(--color-hover-success);
+}

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 607c332bf9ba66e449068412553c7e4a, type: 3}
+  m_Name: Monster_Bat
+  m_EditorClassIdentifier: 
+  id: monster_bat
+  displayName: Bat
+  icon: {fileID: 21300000, guid: 17696ad53e7e0af4ba33aff03cc15183, type: 3}
+  tier: 0
+  rarity: 0
+  baseStats:
+    agility: 5
+    intelligence: 2
+    strength: 2
+    spirit: 1
+    endurance: 1
+  baseExp: 3
+  baseGold: 2
+  spells:
+  - spellId: scratch
+    level: 2
+    weight: 1
+  - spellId: bite
+    level: 2
+    weight: 2
+  - spellId: screech
+    level: 0
+    weight: 0
+  lootTable: []
+  tags: 1

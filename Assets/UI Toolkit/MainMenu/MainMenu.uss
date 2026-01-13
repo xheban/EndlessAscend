@@ -1,0 +1,24 @@
+.button {
+    font-size: 24px;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    width: 300px;
+    height: 60px;
+    align-self: center;
+    margin-bottom: 16px;
+    -unity-font-definition: url("project://database/Assets/Sprites/DarkPixelRPGUI/Fonts/PixelSplitter-Bold.ttf?fileID=12800000&guid=2e3a5aea1f0dd0c4ebc494cd10e14c02&type=3#PixelSplitter-Bold");
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/1_violet_button.png?fileID=21300000&guid=9c435796e90a49345ab2c4822551231a&type=3#1_violet_button");
+    color: rgb(255, 255, 255);
+    transition-duration: 0.3s;
+}
+
+.button:hover {
+    scale: 1.2 1.2;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/1_violet_button_pick.png?fileID=2800000&guid=d3541c23df621ad4ab6c710ade40fe5a&type=3#1_violet_button_pick");
+}

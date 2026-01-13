@@ -1,0 +1,14 @@
+.saveFile {
+    flex-grow: 1;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Skill_paper.png?fileID=21300000&guid=7fe85b16ac5e01042b04c33f8db000e3&type=3#Skill_paper");
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    margin-bottom: 8px;
+}
+
+.saveFile:hover {
+    background-color: rgba(255, 255, 255, 0);
+    -unity-background-image-tint-color: var(--color-hover-success);
+}

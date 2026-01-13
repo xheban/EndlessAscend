@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bbe37a7bc442cc143ae398ff03487af4
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/XBigButton.prefab
+  uploadId: 816794

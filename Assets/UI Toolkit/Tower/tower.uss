@@ -1,0 +1,17 @@
+.towerName {
+    background-image: resource('Icons/PaperRibbon');
+    position: absolute;
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
+    -unity-text-align: upper-center;
+}
+
+.buttonEnter {
+    width: 100px;
+    height: 48px;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/1_orange_button.png?fileID=21300000&guid=e6989eb00b9d34e47be8dcc487fc4af7&type=3#1_orange_button");
+    -unity-font-definition: url("project://database/Assets/Sprites/DarkPixelRPGUI/Fonts/PixelSplitter-Bold.ttf?fileID=12800000&guid=2e3a5aea1f0dd0c4ebc494cd10e14c02&type=3#PixelSplitter-Bold");
+    position: absolute;
+}

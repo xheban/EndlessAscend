@@ -1,0 +1,68 @@
+.pixel-bar {
+    position: relative;
+    height: 45px;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Hp_frame_bright_full.png?fileID=21300000&guid=627c0e557af8d1c4b8f224471f32e063&type=3#Hp_frame_bright_full");
+    background-size: 100% 100%;
+}
+
+.pixel-bar__mask {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 3px;
+    bottom: 3px;
+    overflow: hidden;
+}
+
+.pixel-bar__fill {
+    height: 100%;
+    background-size: 100% 100%;
+}
+
+.pixel-bar.fill-red .pixel-bar__fill {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Hp_red.png?fileID=21300000&guid=8339e3e4917569d4badd9c54084d17a7&type=3#Hp_red");
+}
+
+.pixel-bar.fill-blue .pixel-bar__fill {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Hp_blue.png?fileID=21300000&guid=aeebf32194058704d8059579bf457978&type=3#Hp_blue");
+}
+
+.pixel-bar.fill-green .pixel-bar__fill {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Hp_green.png?fileID=21300000&guid=6dec5def357124449a7e26f291d8d62f&type=3#Hp_green");
+}
+
+.pixel-bar.fill-orange .pixel-bar__fill {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Hp_orange.png?fileID=21300000&guid=d32f794b09cd617479e7d3015e812fd6&type=3#Hp_orange");
+}
+
+.pixel-bar__text-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.pixel-bar__text-label {
+    color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgba(0, 0, 0, 0.75);
+    -unity-text-outline-width: 1px;
+}
+
+.pixel-bar__text-value {
+    color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgba(0, 0, 0, 0.75);
+    -unity-text-outline-width: 1px;
+}
+
+.pixel-bar__text-sep {
+    color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgba(0, 0, 0, 0.75);
+    -unity-text-outline-width: 1px;
+}
+
+.colorBlack {
+}

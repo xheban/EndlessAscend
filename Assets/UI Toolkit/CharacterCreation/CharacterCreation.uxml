@@ -1,0 +1,89 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="StatsPanel" src="project://database/Assets/UI%20Toolkit/Components/Stats/StatsPanel.uxml?fileID=9197481963319205126&amp;guid=789217c166764fa4f81181e32ee135fd&amp;type=3#StatsPanel" />
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/CharacterCreation/CharacterCreation.uss?fileID=7433441132597879392&amp;guid=d4ed41b299cb3f14bb997a63841fa433&amp;type=3#CharacterCreation" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Stats/StatsPanel.uss?fileID=7433441132597879392&amp;guid=d37957ba35e3a0247a1716fea4225156&amp;type=3#StatsPanel" />
+    <engine:VisualElement name="Canvas" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/unlimited_tower.png?fileID=-1796747440384222005&amp;guid=1149dba4da9a8284c8733f1146732b6e&amp;type=3#unlimited_tower_0&quot;); justify-content: center; align-items: center; width: auto; height: auto;">
+        <engine:VisualElement name="MainFrame" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256.png?fileID=1422470188&amp;guid=79edde4c35b3a5a4aa4a5455f0b557a5&amp;type=3#Frame_square_256_0&quot;); padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px; width: 1300px; height: 864px;">
+            <engine:VisualElement name="Body" style="flex-grow: 1; flex-direction: row; align-self: auto; align-content: flex-start;">
+                <engine:VisualElement name="CharacterPanel" class="insidePanel">
+                    <engine:Label text="Character" name="Label" class="label-3-bold" style="align-self: center; flex-shrink: 1;" />
+                    <engine:VisualElement name="Body" style="flex-grow: 1; align-self: center; display: flex; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; align-items: center;">
+                        <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 16px;">
+                            <engine:Label text="Name" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 8px;" />
+                        </engine:VisualElement>
+                        <engine:TextField password="false" max-length="16" name="Name" class="text-field" style="width: 80%; align-self: center; height: 48px; margin-top: 8px; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                        <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 24px;">
+                            <engine:Label text="Class" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 16px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="ClassSelection" style="flex-grow: 0; flex-direction: row; margin-right: 0; padding-right: 0; margin-top: 0; -unity-slice-bottom: 0; flex-shrink: 0;">
+                            <engine:Button name="Class1" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label text="&#10;" name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                            <engine:Button name="Class2" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                            <engine:Button name="Class3" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 24px;">
+                            <engine:Label text="Specialization" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 16px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="SpecSelection" style="flex-grow: 0; flex-direction: row; margin-right: 0; padding-right: 0; margin-top: 0; -unity-slice-bottom: 0; flex-shrink: 0;">
+                            <engine:Button name="Subclass1" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                            <engine:Button name="Subclass2" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="StatsSection" class="insidePanel" style="align-self: auto;">
+                    <engine:Label text="Stats &amp; Spell&#10;" name="Label" class="label-3-bold" style="align-self: center; flex-shrink: 1;" />
+                    <engine:VisualElement name="Body" style="flex-grow: 1; align-self: center; display: flex; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; align-items: center;">
+                        <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 16px;">
+                            <engine:Label text="Stats" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 8px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Stats" style="flex-grow: 0;">
+                            <engine:Instance template="StatsPanel" style="flex-grow: 0; width: 320px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 16px; margin-bottom: 8px;">
+                            <engine:Label text="Starting SPell" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 8px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="StartingSpells" style="flex-grow: 0; flex-direction: row; margin-right: 0; padding-right: 0; margin-top: 0; -unity-slice-bottom: 0; flex-shrink: 0;">
+                            <engine:Button name="Spell1" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label text="&#10;" name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                            <engine:Button name="Spell2" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                            <engine:Button name="Spell3" class="spec-select-button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; background-size: 80% 80%; width: 64px; height: 64px; -unity-text-align: middle-center; align-self: center;" />
+                                <engine:Label name="Label" class="select-label" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:Button>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:Button text="Create" name="Create" class="button" style="margin-top: 24px; margin-bottom: 0;" />
+        </engine:VisualElement>
+        <engine:Button text="&lt;- Back" name="Back" class="button" style="width: 150px; position: absolute; top: 24px; left: auto; right: 24px;" />
+        <engine:VisualElement name="Header" style="flex-grow: 0; height: 66px; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 348px; position: absolute; top: 82px; left: 787px; right: 786px; bottom: auto; justify-content: flex-end;">
+            <engine:Label name="title" text="Create Character" class="header-2" style="align-self: center; margin-top: 0; -unity-text-align: upper-left; margin-bottom: 6px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

@@ -1,0 +1,116 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Tower/FloorInfoCard.uss?fileID=7433441132597879392&amp;guid=324f4b1692191904ba5ad32092de16eb&amp;type=3#FloorInfoCard" />
+    <engine:VisualElement name="FloorTile" class="bg" style="flex-grow: 0; background-size: 100% 100%; width: 498px; height: 127px; position: relative; top: 0; left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Skill_paper2.png?fileID=2800000&amp;guid=20aeda57407555247bb17105520f16e7&amp;type=3#Skill_paper2&quot;); flex-direction: column; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 4px; padding-bottom: 4px; padding-left: 4px;">
+        <engine:VisualElement name="Header" style="flex-grow: 0; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
+            <engine:Label text="FLOOR 1" name="Floor" class="header-3" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            <engine:Label text="Giant RAT" name="MonsterName" class="header-3" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-text-align: upper-center; flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="DecorativeLine" style="flex-grow: 1; background-image: resource(&apos;Icons/MyAssets/decorativeLine&apos;); height: 3px; -unity-background-scale-mode: scale-to-fit; background-repeat: repeat no-repeat; margin-bottom: 2px;" />
+        <engine:VisualElement name="MonsterInfo" style="flex-grow: 1; flex-direction: row;">
+            <engine:VisualElement name="MonsterIconFrame" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Decorated_bar.png?fileID=2800000&amp;guid=b31566610f7bd834996d9729526d39de&amp;type=3#Decorated_bar&quot;); background-size: 100% 100%; width: 86px; height: 86px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 6px; margin-bottom: 0; margin-left: 6px;">
+                <engine:VisualElement name="MonsterIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/26_apple.png?fileID=2800000&amp;guid=5c99ae1e6ada67540bb7da32fb57884d&amp;type=3#26_apple&quot;); margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="MonsterStats" style="flex-grow: 0; width: 120px;">
+                <engine:VisualElement name="Str" style="flex-grow: 1; flex-direction: row;">
+                    <engine:Label text="Str" name="StrLabel" class="label-4-black" style="width: 36px;" />
+                    <engine:Label text="8" name="StrValue" class="label-4-black" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Agi" style="flex-grow: 1; flex-direction: row;">
+                    <engine:Label text="Int" name="AgiLabel" class="label-4-black" style="width: 36px;" />
+                    <engine:Label text="12" name="AgiValue" class="label-4-black" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Int" style="flex-grow: 1; flex-direction: row;">
+                    <engine:Label text="Agi" name="IntLabel" class="label-4-black" style="width: 36px;" />
+                    <engine:Label text="132" name="IntValue" class="label-4-black" />
+                </engine:VisualElement>
+                <engine:VisualElement name="End" style="flex-grow: 1; flex-direction: row;">
+                    <engine:Label text="End" name="EndLabel" class="label-4-black" style="width: 36px;" />
+                    <engine:Label text="1.2K" name="EndValue" class="label-4-black" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Vit" style="flex-grow: 1; flex-direction: row;">
+                    <engine:Label text="Spr" name="SprLabel" class="label-4-black" style="width: 36px;" />
+                    <engine:Label text="1.45M" name="SprValue" class="label-4-black" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="MonsterSkillsDrops" style="flex-grow: 1; flex-direction: row;">
+                <engine:VisualElement name="Skills" style="flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0;">
+                    <engine:Label text="Skills" class="label-3-bold-black" style="-unity-text-align: upper-center;" />
+                    <engine:VisualElement name="SkillsList" style="flex-grow: 1; -unity-text-align: upper-left; align-self: center;">
+                        <engine:VisualElement name="Row1" style="flex-grow: 1; flex-direction: row; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px; align-self: flex-start;">
+                            <engine:VisualElement name="Skill1" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Skill2" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Skill3" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Row2" style="flex-grow: 1; flex-direction: row; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px; align-self: flex-start;">
+                            <engine:VisualElement name="Skill4" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Skill5" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Skill6" class="skill">
+                                <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Drops" style="flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0;">
+                    <engine:Label text=" Loot" class="label-3-bold-black" style="-unity-text-align: upper-center;" />
+                    <engine:VisualElement name="LootList" style="flex-grow: 1;">
+                        <engine:VisualElement name="ExpCurrency" style="flex-grow: 0; flex-direction: row; align-self: center;">
+                            <engine:VisualElement name="Exp" style="flex-grow: 0; flex-direction: row; margin-right: 8px;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; width: 20px; height: 20px; flex-shrink: 0; background-image: resource(&apos;Icons/MyAssets/Exp2&apos;); margin-right: 4px;" />
+                                <engine:Label text="124" name="ExpValue" class="label-4-black" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Gold" style="flex-grow: 1; flex-direction: row;">
+                                <engine:VisualElement name="Icon" style="flex-grow: 0; width: 20px; height: 20px; flex-shrink: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/32_coin.png?fileID=21300000&amp;guid=a06a1561cf0f7a54386a58a724397049&amp;type=3#32_coin&quot;);" />
+                                <engine:Label text="13" name="GoldValue" class="label-4-black" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Loot" style="flex-grow: 1;">
+                            <engine:VisualElement name="LootList" style="flex-grow: 1; -unity-text-align: upper-left; align-self: center;">
+                                <engine:VisualElement name="Row1" style="flex-grow: 1; flex-direction: row; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px; align-self: flex-start;">
+                                    <engine:VisualElement name="Loot1" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot2" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot3" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot4" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Row2" style="flex-grow: 1; flex-direction: row; margin-top: 2px; margin-right: 2px; margin-bottom: 2px; margin-left: 2px; align-self: flex-start;">
+                                    <engine:VisualElement name="Loot5" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot6" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot7" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="Loot8" class="loot">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/08_gem_green.png?fileID=21300000&amp;guid=ffb523c0500edb24b9876f28b9101459&amp;type=3#08_gem_green&quot;); margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="Lock" style="flex-grow: 1;">
+            <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Downloaded/Pixel Art Padlock Pack - Animated/Pixel Art Padlock Pack - Animated/Old Padlock/BLACK/Sprites/Old Padlock - BLACK - 0015&apos;); -unity-background-scale-mode: scale-to-fit; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

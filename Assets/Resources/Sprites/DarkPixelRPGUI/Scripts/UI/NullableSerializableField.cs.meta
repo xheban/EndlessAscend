@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 12d79ce1cec44aa3a843bb132192b040
+timeCreated: 1674335588
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Scripts/UI/NullableSerializableField.cs
+  uploadId: 816794

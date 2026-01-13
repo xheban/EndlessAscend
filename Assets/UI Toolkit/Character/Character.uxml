@@ -1,0 +1,132 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" xmlns:my="MyGame.UI" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="StatsPanel" src="project://database/Assets/UI%20Toolkit/Components/Stats/StatsPanel.uxml?fileID=9197481963319205126&amp;guid=789217c166764fa4f81181e32ee135fd&amp;type=3#StatsPanel" />
+    <engine:Template name="Footer" src="project://database/Assets/UI%20Toolkit/Components/Footer.uxml?fileID=9197481963319205126&amp;guid=51ecaeee97a9196409e3b9656ec1fd17&amp;type=3#Footer" />
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/Character/Character.uss?fileID=7433441132597879392&amp;guid=c3f65bb4d1e1ff04ebe6147c5f032b6a&amp;type=3#Character" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelProgressBar/pixelStyle.uss?fileID=7433441132597879392&amp;guid=376b38c98fa84a74c9509e7f58f1adff&amp;type=3#pixelStyle" />
+    <engine:VisualElement name="MainCanvas" style="flex-grow: 1; min-height: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/unlimited_tower.png?fileID=-1796747440384222005&amp;guid=1149dba4da9a8284c8733f1146732b6e&amp;type=3#unlimited_tower_0&quot;);">
+        <engine:VisualElement name="TopPart" style="flex-grow: 1; min-height: 0; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px;">
+            <engine:VisualElement name="MainFrame" style="flex-grow: 1; min-height: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_bg_big_and_title.png?fileID=21300000&amp;guid=3ae6fb90d0f420f4c878f3710d3071d1&amp;type=3#Frame_bg_big_and_title&quot;);">
+                <engine:VisualElement name="Header" style="flex-grow: 0; background-size: 100% 64px; height: 32px; flex-direction: row; justify-content: center; padding-top: 8px; padding-bottom: 6px;">
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="CharacterTab" class="panel-picked header-item" style="flex-grow: 0; display: flex;">
+                        <engine:Label text="Character" class="label-3-bold" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 8px; padding-bottom: 0; padding-left: 8px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="SpellsTab" class="header-item" style="flex-grow: 0; display: flex;">
+                        <engine:Label text="SPELLS" class="label-3-bold" style="padding-right: 8px; padding-left: 8px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="InventoryTab" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="Inventory" class="label-3-bold" style="padding-right: 8px; padding-left: 8px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="TalentsTab" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="Talents" name="Label" class="label-3-bold" style="padding-right: 8px; padding-left: 8px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; min-height: 0;">
+                    <engine:VisualElement name="CharacterPanel" style="flex-grow: 1; flex-direction: row; display: flex; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                        <engine:VisualElement name="BasicInfo" style="flex-grow: 0; margin-left: 24px; margin-right: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256_vert.png?fileID=21300000&amp;guid=74c905db5119d7545bff9cb1839f5ec9&amp;type=3#Frame_square_256_vert&quot;); width: 460px; padding-top: 8px; padding-right: 24px; padding-bottom: 8px; padding-left: 24px; align-items: stretch; margin-top: 24px; margin-bottom: 24px;">
+                            <engine:VisualElement name="HeaderInfoLevelName" style="flex-grow: 0; flex-direction: row; margin-top: 0; margin-right: 0; margin-bottom: 8px; margin-left: 0; height: 48px;">
+                                <engine:Label text="Anonim" name="CharName" class="label-1" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: lower-left; margin-left: 0; margin-right: 16px;" />
+                                <engine:Label text="Level 17" name="Level" class="label-1" style="-unity-text-align: lower-left;" />
+                            </engine:VisualElement>
+                            <my:PixelProgressBar name="ExpBar" _fill="Green" _min="0" _max="100" _value="22" _heightPx="30" _labelText="EXP" style="margin-bottom: 8px;" />
+                            <my:PixelProgressBar name="CurrentHp" _fill="Red" _min="0" _max="100" _value="100" _heightPx="30" _labelText="HP" style="margin-bottom: 8px;" />
+                            <my:PixelProgressBar name="CurrentMana" _fill="Blue" _min="0" _max="100" _value="22" _heightPx="30" _labelText="MP" style="margin-bottom: 8px;" />
+                            <engine:VisualElement name="VisualElement" style="flex-grow: 0;" />
+                            <engine:VisualElement name="Stats" style="flex-grow: 0;">
+                                <engine:Instance template="StatsPanel" style="flex-grow: 0; width: auto; margin-top: 8px;" />
+                            </engine:VisualElement>
+                            <engine:Button text="Add Points" name="AddPoints" class="button-2" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 16px; margin-right: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 4px; margin-bottom: 8px;" />
+                        <engine:VisualElement name="Equipment" style="width: 518px; padding-top: 24px; padding-right: 0; padding-bottom: 24px; padding-left: 0; height: 100%; flex-grow: 0;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="SpellsPanel" style="flex-grow: 1; min-height: 0; display: none; flex-direction: row;">
+                        <engine:VisualElement name="AllSpells" style="min-height: 0; flex-grow: 0; justify-content: flex-start; margin-right: 0; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; width: 600px;">
+                            <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 0; align-self: center; margin-bottom: 16px; flex-shrink: 0;">
+                                <engine:Label text="Learned Spells" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                                <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 0;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="Filter" style="flex-grow: 0; flex-direction: row; flex-shrink: 0;">
+                                <engine:Label text="Search &#10;" name="Label" class="label-2" style="height: 32px; margin-right: 8px; justify-content: flex-start; align-content: auto; -unity-text-align: lower-left;" />
+                                <engine:TextField style="height: 32px; width: auto; flex-grow: 1;" />
+                                <engine:Button text="Open filter" name="Filter" class="button-2" style="height: 32px;" />
+                            </engine:VisualElement>
+                            <engine:ScrollView name="SpellList" focusable="false" style="min-height: 0; flex-grow: 1; width: auto; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_316.png?fileID=21300000&amp;guid=f93be2a7f6c09194abd09cff60d2cce7&amp;type=3#Frame_square_316&quot;); padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 16px; margin-right: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 4px; margin-bottom: 8px;" />
+                        <engine:VisualElement name="ActiveSpells" style="min-height: 0; flex-grow: 0; justify-content: flex-start; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; width: 600px;">
+                            <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 0; align-self: center; margin-bottom: 16px;">
+                                <engine:Label text="Active Spells" name="NameLabel" class="label-3-bold" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                                <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 0;" />
+                            </engine:VisualElement>
+                            <engine:VisualElement name="ActiveSpellsHolder" style="flex-grow: 1; flex-direction: column;">
+                                <engine:VisualElement name="Row1" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                                    <engine:VisualElement name="ActiveSpellSlot1" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot2" class="active-spell-slot disabled-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot3" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot4" class="active-spell-slot" style="height: 128px; margin-right: 0;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Row2" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                                    <engine:VisualElement name="ActiveSpellSlot5" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot6" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/27_Skull.png?fileID=21300000&amp;guid=18edabe7d38f9f44490d91ae11b5757a&amp;type=3#27_Skull&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot7" class="active-spell-slot disabled-spell-slot" style="height: 128px; margin-right: 12px; -unity-background-image-tint-color: rgb(223, 57, 57);">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot8" class="active-spell-slot" style="height: 128px; margin-right: 0;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Row3" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                                    <engine:VisualElement name="ActiveSpellSlot9" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot10" class="active-spell-slot" style="height: 128px; margin-right: 12px;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/27_Skull.png?fileID=21300000&amp;guid=18edabe7d38f9f44490d91ae11b5757a&amp;type=3#27_Skull&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot11" class="active-spell-slot disabled-spell-slot" style="height: 128px; margin-right: 12px; -unity-background-image-tint-color: rgb(223, 57, 57);">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                    <engine:VisualElement name="ActiveSpellSlot12" class="active-spell-slot" style="height: 128px; margin-right: 0;">
+                                        <engine:VisualElement name="Icon" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/38_sword.png?fileID=21300000&amp;guid=b259bce8f8c0e374f80aada828bcba93&amp;type=3#38_sword&quot;);" />
+                                        <engine:Label text="Test spell 1" name="Name" class="label-3" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement name="InventoryPanel" style="flex-grow: 1; display: none;" />
+                    <engine:VisualElement name="TalentsPanel" style="flex-grow: 1; display: none;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:Instance template="Footer" name="Footer" />
+    </engine:VisualElement>
+</engine:UXML>

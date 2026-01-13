@@ -1,0 +1,41 @@
+#MainCanvas {
+    -unity-font-definition: resource('Fonts & Materials/PixellariRaster');
+}
+
+.panel-picked {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_pickzone.png?fileID=2800000&guid=fb7e760734747bd48be14ef642fb6303&type=3#Frame_title_pickzone");
+}
+
+.header-item:hover {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_pickzone.png?fileID=2800000&guid=fb7e760734747bd48be14ef642fb6303&type=3#Frame_title_pickzone");
+    -unity-background-image-tint-color: rgb(160, 160, 160);
+}
+
+.active-spell-slot {
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory.png?fileID=21300000&guid=9f9cc416a40aa4849beeac947437ad01&type=3#Icon_inventory");
+    width: 128px;
+    height: 140px;
+    padding-top: 12px;
+    padding-right: 12px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    margin-right: 0;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-grow: 0;
+}
+
+#Equipment {
+    height: 100%;
+    flex-grow: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+    background-image: url("project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/BAR_Equipment.png?fileID=21300000&guid=ba12c099425d9444f90fe0c21ccd11f4&type=3#BAR_Equipment");
+}
+
+.disabled-spell-slot {
+    -unity-background-image-tint-color: rgb(223, 57, 57);
+}

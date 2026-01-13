@@ -1,0 +1,35 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" xmlns:my="MyGame.UI" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Footer" src="project://database/Assets/UI%20Toolkit/Components/Footer.uxml?fileID=9197481963319205126&amp;guid=51ecaeee97a9196409e3b9656ec1fd17&amp;type=3#Footer" />
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelProgressBar/pixelStyle.uss?fileID=7433441132597879392&amp;guid=376b38c98fa84a74c9509e7f58f1adff&amp;type=3#pixelStyle" />
+    <Style src="project://database/Assets/UI%20Toolkit/Tower/tower.uss?fileID=7433441132597879392&amp;guid=f9b1b16e969829c4ca8dbe12986f25fc&amp;type=3#tower" />
+    <engine:VisualElement name="MainCanvas" style="flex-grow: 1; min-height: 0; background-image: url(&quot;project://database/Assets/Images/ChatGPT%20Image%20Jan%207,%202026,%2010_29_08%20PM.png?fileID=21300000&amp;guid=fd5544e72122fb441b413969adc73a9c&amp;type=3#ChatGPT Image Jan 7, 2026, 10_29_08 PM&quot;);">
+        <engine:VisualElement name="TopPart" style="flex-grow: 1; min-height: 0; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px; background-image: none;">
+            <engine:VisualElement name="Name_TowerOfBeginnings" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 248px; height: 48px; position: absolute; top: 520px; left: 720px;">
+                <engine:Label text="Tower of Beginnings" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Name_EndlessTower" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 214px; height: 48px; top: 158px; left: 833px;">
+                <engine:Label text="Endless Tower" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Name_TowerOfLife" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 196px; height: 48px; top: 67px; left: 1360px;">
+                <engine:Label text="Tower of life" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Name_TowerOfHardship" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 249px; height: 48px; top: 39px; left: 326px;">
+                <engine:Label text="Tower of Hardship" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Name_TowerOfWisdom" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 204px; height: 48px; top: 355px; left: 224px;">
+                <engine:Label text="Tower of Wisdom" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Name_TowerOfDeath" class="towerName" style="flex-grow: 0; flex-shrink: 0; width: 196px; height: 48px; top: 391px; left: 1477px;">
+                <engine:Label text="Tower of Death" class="label-3-bold-black" />
+            </engine:VisualElement>
+            <engine:Button text="ENTER" name="Enter_TowerOfLife" class="buttonEnter colorBlack button-2-variant-o" style="position: absolute; top: 257px; left: 1340px;" />
+            <engine:Button text="ENTER" name="Enter_TowerOfDeath" class="buttonEnter colorBlack button-2-variant-o" style="position: absolute; top: 589px; left: 1448px;" />
+            <engine:Button text="ENTER" name="Enter_TowerOfBeginnings" class="buttonEnter colorBlack button-2-variant-o" style="top: 670px; left: 847px; position: absolute;" />
+            <engine:Button text="ENTER" name="Enter_EndlessTower" class="buttonEnter colorBlack button-2-variant-o" style="top: 450px; left: 847px; position: absolute;" />
+            <engine:Button text="ENTER" name="Enter_TowerOfHardship" class="buttonEnter colorBlack button-2-variant-o" style="position: absolute; top: 241px; left: 318px;" />
+            <engine:Button text="ENTER" name="Enter_TowerOfWisdom" class="buttonEnter colorBlack button-2-variant-o" style="position: absolute; top: 551px; left: 254px;" />
+        </engine:VisualElement>
+        <engine:Instance template="Footer" name="Footer" />
+    </engine:VisualElement>
+</engine:UXML>

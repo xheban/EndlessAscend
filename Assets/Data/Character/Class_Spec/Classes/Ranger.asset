@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dfc6a8bb0b51d148868ef238b09a09e, type: 3}
+  m_Name: Ranger
+  m_EditorClassIdentifier: 
+  id: ranger
+  displayName: Ranger
+  icon: {fileID: 21300000, guid: e2716e5920328714587eabc2bed3f88d, type: 3}
+  baseStats:
+    agility: 4
+    intelligence: 3
+    strength: 3
+    spirit: 2
+    endurance: 3
+  spec:
+  - {fileID: 11400000, guid: 60d0ba03b7c871445ab30f6c7372a3ad, type: 2}
+  - {fileID: 11400000, guid: 72221e92f49821d4390e790fd6c13c57, type: 2}

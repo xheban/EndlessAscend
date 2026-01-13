@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 43e29144da9084842b11631c97ecb1e9
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/Slider5WithLabel.prefab
+  uploadId: 816794

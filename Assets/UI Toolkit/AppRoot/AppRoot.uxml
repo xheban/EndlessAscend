@@ -1,0 +1,21 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" xmlns:my="MyGame.UI" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/AppRoot/appRoot.uss?fileID=7433441132597879392&amp;guid=f38e901fd1db58c41af1db7bcd9eae2c&amp;type=3#appRoot" />
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <engine:VisualElement name="app-root" style="flex-grow: 1;">
+        <engine:VisualElement name="screen-host" style="flex-grow: 1;" />
+        <engine:VisualElement name="overlay-host" style="flex-grow: 1;">
+            <engine:VisualElement name="overlay-backdrop" style="flex-grow: 1;" />
+            <engine:VisualElement name="overlay-content" style="flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="modal-host" picking-mode="Ignore" style="flex-grow: 1;">
+            <engine:VisualElement name="modal-backdrop" style="flex-grow: 1;" />
+            <engine:VisualElement name="modal-content" style="flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="tooltip-host" picking-mode="Ignore" style="flex-grow: 1;">
+            <engine:VisualElement name="tooltip-content" picking-mode="Ignore" style="flex-grow: 1;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="autosave" picking-mode="Ignore" style="flex-grow: 1; position: absolute; bottom: 40px; right: 40px; width: 48px; height: 48px; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/01_Scroll.png?fileID=21300000&amp;guid=1b377990f17040948b6450eb367704af&amp;type=3#01_Scroll&quot;); padding-top: 0; padding-right: 0; padding-bottom: 8px; padding-left: 12px;">
+            <engine:VisualElement name="quill" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/quill.png?fileID=21300000&amp;guid=b6b89c34d6b9aaa41bba28bf68d042da&amp;type=3#quill&quot;); width: 24px; height: 24px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

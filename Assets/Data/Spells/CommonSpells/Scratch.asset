@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0231aa55bd3a84eb427efb064502e3, type: 3}
+  m_Name: Scratch
+  m_EditorClassIdentifier: 
+  spellId: scratch
+  displayName: Scratch
+  icon: {fileID: 3853547303424480938, guid: 8ec61f0cee630d44b98e1b373f62d749, type: 3}
+  allowedClasses: -1
+  allowedSpecs: -1
+  rarity: 0
+  manaCost: 2
+  cooldownTurns: 0
+  maxLevel: 10
+  baseDamage: 6
+  damageKind: 1
+  damageTag: 
+  tier: 0
+  ignoreDefenseFlat: 0
+  ignoreDefensePercent: 0
+  hitChance: 100
+  baseUseSpeed: 100
+  damageScalingType: 0
+  damageScalingValue: 2
+  onHitEffects: []

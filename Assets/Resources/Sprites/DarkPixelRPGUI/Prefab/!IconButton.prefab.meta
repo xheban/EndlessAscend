@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d863ffe4363c90749a16c40280d8815a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 246642
+  packageName: Dark Pixel UI
+  packageVersion: 1.1
+  assetPath: Assets/DarkPixelRPGUI/Prefab/!IconButton.prefab
+  uploadId: 816794
