@@ -1,3 +1,7 @@
+using System;
+using System.Diagnostics;
+using MyGame.Common;
+
 namespace MyGame.Combat
 {
     public sealed class ApplyEffectsRule : IEffectRule
@@ -11,20 +15,26 @@ namespace MyGame.Combat
 
         public void Apply(ActionContext ctx)
         {
-            if (ctx == null || _effects == null)
+            if (_effects == null || ctx == null)
                 return;
 
-            if (ctx.effectInstancesToApply == null || ctx.effectInstancesToApply.Length == 0)
+            if (ctx.attacker == null || ctx.defender == null || ctx.spell == null)
                 return;
 
+            var instances = ctx.effectInstancesToApply;
+            if (instances == null || instances.Length == 0)
+                return;
+
+            int spellLevel = Math.Max(1, ctx.spellLevel);
+            int lastDamageDealt = Math.Max(0, ctx.lastDamageDealt);
             _effects.ApplyEffects(
                 attacker: ctx.attacker,
                 defender: ctx.defender,
                 spell: ctx.spell,
-                spellLevel: ctx.spellLevel,
-                instances: ctx.effectInstancesToApply,
+                spellLevel: spellLevel,
+                instances: instances,
                 rng: ctx.rng,
-                lastDamageDealt: ctx.lastDamageDealt
+                lastDamageDealt: lastDamageDealt
             );
         }
     }

@@ -1,22 +1,21 @@
 using System;
-using MyGame.Common;
-using UnityEngine;
 
-[Serializable]
-public struct EffectInstanceScaledIntValues
+namespace MyGame.Common
 {
-    [Range(0, 100)]
-    public int chancePercent;
+    [Serializable]
+    public struct EffectInstanceScaledIntValues
+    {
+        public int chancePercent;
+        public int durationTurns;
 
-    public int durationTurns;
+        public int magnitudeFlat;
+        public int magnitudePercent;
 
-    public int magnitudeFlat;
+        public EffectMagnitudeBasis magnitudeBasis;
 
-    [Range(0, 100)]
-    public int magnitudePercent;
+        public bool stackable;
+        public bool mergeable;
 
-    public EffectMagnitudeBasis magnitudeBasis;
-
-    public bool stackable;
-    public int maxStacks;
+        public int maxStacks;
+    }
 }

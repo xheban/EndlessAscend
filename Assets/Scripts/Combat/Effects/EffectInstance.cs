@@ -10,19 +10,25 @@ public class EffectInstance
 
     [Header("Base (ALL INT)")]
     [Range(0, 100)]
-    public int chancePercent = 20; // 0..100
+    public int chancePercent = 20;
 
     [Min(1)]
     public int durationTurns = 2;
 
-    public int magnitudeFlat = 0; // e.g. +20 flat
+    public int magnitudeFlat = 0;
 
     [Range(0, 100)]
-    public int magnitudePercent = 0; // e.g. 50 = 50%
+    public int magnitudePercent = 0;
 
     public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
 
+    [Header("Stacking / Merging")]
     public bool stackable = true;
+
+    [Tooltip(
+        "If true, different sources fuse into one bucket (same effectId). If false, each source gets a separate bucket."
+    )]
+    public bool mergeable = true;
 
     public EffectTarget target = EffectTarget.Enemy;
 
@@ -36,10 +42,6 @@ public class EffectInstance
     public IntScalingChoice magnitudePercentScaling;
     public IntScalingChoice maxStacksScaling;
 
-    /// <summary>
-    /// Produces final integer values for runtime use,
-    /// based on spell level.
-    /// </summary>
     public EffectInstanceScaledIntValues GetScaled(int spellLevel)
     {
         int chance =
@@ -65,9 +67,6 @@ public class EffectInstance
         int stacks =
             maxStacksScaling != null ? maxStacksScaling.Evaluate(spellLevel, maxStacks) : maxStacks;
 
-        // -------------------------
-        // Safety clamps
-        // -------------------------
         chance = Mathf.Clamp(chance, 0, 100);
         duration = Mathf.Max(1, duration);
         flat = Mathf.Max(0, flat);
@@ -84,8 +83,9 @@ public class EffectInstance
             durationTurns = duration,
             magnitudeFlat = flat,
             magnitudePercent = percent,
-            magnitudeBasis = magnitudeBasis, // ✅ IMPORTANT FIX
+            magnitudeBasis = magnitudeBasis,
             stackable = stackable,
+            mergeable = mergeable,
             maxStacks = stacks,
         };
     }

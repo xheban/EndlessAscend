@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
 using MyGame.Common;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 
 namespace MyGame.Combat
 {
     public sealed class CombatEffectSystem
     {
-        // You already created an EffectDatabase. Inject it here.
         private readonly EffectDatabase _db;
 
         public CombatEffectSystem(EffectDatabase db)
@@ -41,11 +42,6 @@ namespace MyGame.Combat
         // =========================
         // PUBLIC API
         // =========================
-
-        /// <summary>
-        /// Called when an actor CHOOSES an action (your definition of "new turn").
-        /// Ticks periodic effects on that actor and decrements durations.
-        /// </summary>
         public List<PeriodicTickResult> OnActionChosen(CombatState state, CombatActorType actorType)
         {
             var results = new List<PeriodicTickResult>();
@@ -59,6 +55,34 @@ namespace MyGame.Combat
 
             TickAndExpireEffects(owner, results);
             return results;
+        }
+
+        public void ApplyEffects(
+            CombatActorState attacker,
+            CombatActorState defender,
+            ResolvedSpell spell,
+            int spellLevel,
+            EffectInstance[] instances,
+            IRng rng,
+            int lastDamageDealt
+        )
+        {
+            if (instances == null || instances.Length == 0)
+                return;
+
+            Debug.Log("aplying instances of effects");
+            for (int i = 0; i < instances.Length; i++)
+            {
+                ApplyEffectInstance(
+                    attacker: attacker,
+                    defender: defender,
+                    spell: spell,
+                    spellLevel: spellLevel,
+                    inst: instances[i],
+                    rng: rng,
+                    lastDamageDealt: lastDamageDealt
+                );
+            }
         }
 
         public void ApplyEffectInstance(
@@ -85,18 +109,25 @@ namespace MyGame.Combat
             if (string.IsNullOrWhiteSpace(def.effectId))
                 return;
 
-            // choose target based on instance setting
+            // Choose target based on instance setting
             CombatActorState target = inst.target == EffectTarget.Self ? attacker : defender;
-
             target.activeEffects ??= new List<ActiveEffectState>();
-
-            // Cache caster power once per call (you can optimize later)
-            int casterFinalAP = ComputeFinalAttackPower(attacker);
-            int casterFinalMP = ComputeFinalMagicPower(attacker);
 
             var scaled = inst.GetScaled(spellLevel);
 
-            // ✅ guard: basis-based stat modifiers must be Flat
+            if (scaled.chancePercent <= 0)
+                return;
+
+            int roll = rng.RangeInt(1, 101);
+            Debug.Log("effect rolled for hit:" + roll);
+            if (roll > scaled.chancePercent)
+                return;
+
+            // Cache caster power once per call
+            int casterFinalAP = ComputeFinalAttackPower(attacker);
+            int casterFinalMP = ComputeFinalMagicPower(attacker);
+
+            // Guard: basis-based stat modifiers must be Flat (we materialize percent-of-basis into flat)
             if (
                 def.kind == EffectKind.StatModifier
                 && scaled.magnitudeBasis != EffectMagnitudeBasis.None
@@ -109,28 +140,22 @@ namespace MyGame.Combat
                 return;
             }
 
-            if (scaled.chancePercent <= 0)
-                return;
-
-            int roll = rng.RangeInt(1, 101);
-            if (roll > scaled.chancePercent)
-                return;
-
-            // periodic contribution only for DOT/HOT
+            // Periodic tick contribution only for DOT/HOT
             int computedPeriodicContribution = 0;
             if (def.kind == EffectKind.DamageOverTime || def.kind == EffectKind.HealOverTime)
             {
                 computedPeriodicContribution = ComputeInitialPeriodicTick(
-                    def: def,
                     scaled: scaled,
                     spell: spell,
                     casterFinalAP: casterFinalAP,
                     casterFinalMP: casterFinalMP,
                     lastDamageDealt: lastDamageDealt
                 );
+
+                Debug.Log("computed periodic damge is: " + computedPeriodicContribution);
             }
 
-            // materialize basis for stat modifiers (if you implemented that earlier)
+            // Materialize basis for stat modifiers: percent-of-basis becomes flat ON APPLY
             int materializedFlatFromBasis = 0;
             if (
                 def.kind == EffectKind.StatModifier
@@ -149,9 +174,11 @@ namespace MyGame.Combat
                 materializedFlatFromBasis = Mathf.RoundToInt(basisValue * pct);
             }
 
-            ApplyResult apply = AddOrRefreshEffect(
+            // Apply to runtime state, receive the delta that must be applied to StatModifiers NOW
+            ApplyDelta delta = AddOrRefreshEffect(
                 list: target.activeEffects,
                 def: def,
+                inst: inst,
                 sourceActor: attacker.actorType,
                 sourceSpellId: spell.spellId,
                 scaled: scaled,
@@ -159,86 +186,41 @@ namespace MyGame.Combat
                 materializedFlatFromBasis: materializedFlatFromBasis
             );
 
-            // StatModifier apply/undo against TARGET modifiers
-            if (def.kind == EffectKind.StatModifier)
+            // Apply StatModifier delta to target modifiers
+            if (def.kind == EffectKind.StatModifier && target.modifiers != null)
             {
-                if (apply.overwritten)
-                {
-                    UndoModifierDelta(
-                        target.modifiers,
-                        def,
-                        apply.oldTotalsFlat,
-                        apply.oldTotalsPercent,
-                        apply.oldBasis
-                    );
-                }
-
-                if (apply.addedFlat != 0 || apply.addedPercent != 0)
+                if (delta.deltaFlat != 0 || delta.deltaPercent != 0)
                 {
                     ApplyModifierDelta(
-                        target.modifiers,
-                        def,
-                        apply.addedFlat,
-                        apply.addedPercent,
-                        scaled.magnitudeBasis
+                        mods: target.modifiers,
+                        def: def,
+                        addFlat: delta.deltaFlat,
+                        addPercent: delta.deltaPercent
                     );
                 }
             }
         }
 
-        /// <summary>
-        /// Apply effects produced by a spell to the defender (or attacker if your spell targets self).
-        /// This implementation assumes you pass the correct target (attacker/defender) from the phase.
-        /// </summary>
-        public void ApplyEffects(
-            CombatActorState attacker,
-            CombatActorState defender,
-            ResolvedSpell spell,
-            int spellLevel,
-            EffectInstance[] instances,
-            IRng rng,
-            int lastDamageDealt
-        )
-        {
-            if (instances == null || instances.Length == 0)
-                return;
+        // =========================
+        // INTERNALS: MERGE + STACK + DELTAS
+        // =========================
 
-            for (int i = 0; i < instances.Length; i++)
+        private readonly struct ApplyDelta
+        {
+            public readonly int deltaFlat;
+            public readonly int deltaPercent;
+
+            public ApplyDelta(int deltaFlat, int deltaPercent)
             {
-                ApplyEffectInstance(
-                    attacker: attacker,
-                    defender: defender,
-                    spell: spell,
-                    spellLevel: spellLevel,
-                    inst: instances[i],
-                    rng: rng,
-                    lastDamageDealt: lastDamageDealt
-                );
+                this.deltaFlat = deltaFlat;
+                this.deltaPercent = deltaPercent;
             }
         }
 
-        // =========================
-        // INTERNALS
-        // =========================
-
-        private struct ApplyResult
-        {
-            public bool createdNew;
-            public bool overwritten;
-
-            // what we added THIS application (delta)
-            public int addedFlat;
-            public int addedPercent;
-
-            // for overwrite undo
-            public int oldTotalsFlat;
-            public int oldTotalsPercent;
-            public EffectMagnitudeBasis oldBasis;
-        }
-
-        private ApplyResult AddOrRefreshEffect(
+        private ApplyDelta AddOrRefreshEffect(
             List<ActiveEffectState> list,
             EffectDefinition def,
+            EffectInstance inst,
             CombatActorType sourceActor,
             string sourceSpellId,
             EffectInstanceScaledIntValues scaled,
@@ -246,193 +228,277 @@ namespace MyGame.Combat
             int materializedFlatFromBasis
         )
         {
-            ApplyResult result = default;
+            if (list == null || def == null || inst == null)
+                return default;
+            Debug.Log("adding or refreshing effect");
+            // 1) Find/create bucket:
+            // - mergeable => one bucket per effectId
+            // - non-mergeable => separate bucket per source
+            ActiveEffectState bucket = FindOrCreateBucket(
+                list: list,
+                effectId: def.effectId,
+                kind: def.kind,
+                mergeable: scaled.mergeable, // ✅ FINAL PATCH: use scaled snapshot
+                sourceActor: sourceActor,
+                sourceSpellId: sourceSpellId,
+                scaled: scaled
+            );
 
-            ActiveEffectState existing = FindById(list, def.effectId);
+            Debug.Log("bucket is : " + bucket.effectId);
 
-            // ---------
-            // CREATE NEW
-            // ---------
-            if (existing == null)
+            bucket.EnsureContributionBacked();
+
+            // 2) Find contribution in bucket for this source
+            var contrib = FindContribution(bucket, sourceActor, sourceSpellId);
+
+            bool createdNewContribution = false;
+            if (contrib == null)
             {
-                var state = new ActiveEffectState(
-                    effectId: def.effectId,
-                    durationTurns: scaled.durationTurns,
-                    stackable: scaled.stackable,
-                    maxStacks: scaled.maxStacks,
-                    sourceActor: sourceActor,
-                    sourceSpellId: sourceSpellId,
-                    kind: def.kind
-                );
-
-                // totals start at first contribution
-                int baseFlat = Mathf.Max(0, scaled.magnitudeFlat);
-
-                // ✅ If basis is used for StatModifier, we convert percent-of-basis into flat once.
-                // We store it in totalMagnitudeFlat so undo is exact later.
-                int appliedFlat = baseFlat;
-                int appliedPercent = Mathf.Max(0, scaled.magnitudePercent);
-
-                if (
-                    def.kind == EffectKind.StatModifier
-                    && scaled.magnitudeBasis != EffectMagnitudeBasis.None
-                )
+                contrib = new ActiveEffectState.EffectContributionState
                 {
-                    appliedFlat += Mathf.Max(0, materializedFlatFromBasis);
-                    appliedPercent = 0; // ✅ percent was consumed into flat
-                }
+                    sourceActor = sourceActor,
+                    sourceSpellId = sourceSpellId,
+                    remainingTurns = Mathf.Max(1, scaled.durationTurns),
+                    stacks = 1,
+                    stackable = scaled.stackable,
+                    maxStacks = Mathf.Max(1, scaled.maxStacks),
 
-                state.totalMagnitudeFlat = appliedFlat;
-                state.totalMagnitudePercent = appliedPercent;
-                state.magnitudeBasis = scaled.magnitudeBasis;
+                    totalMagnitudeFlat = 0,
+                    totalMagnitudePercent = 0,
+                    magnitudeBasis = scaled.magnitudeBasis,
 
-                state.periodicTickContributions ??= new List<int>();
+                    periodicTickContributions = new List<int>(),
+                };
+
+                bucket.contributions.Add(contrib);
+                createdNewContribution = true;
+            }
+
+            // 3) Apply duration rule per contribution (even if DoNothingIfPresent)
+            if (!createdNewContribution)
+            {
+                ApplyDurationStacking(contrib, scaled.durationTurns, def);
+            }
+            // 4) Compute base magnitudes for THIS application (one stack contribution)
+            int addFlat = Mathf.Max(0, scaled.magnitudeFlat);
+            int addPct = Mathf.Max(0, scaled.magnitudePercent);
+
+            // StatModifier + basis: consume percent into flat once
+            if (
+                def.kind == EffectKind.StatModifier
+                && scaled.magnitudeBasis != EffectMagnitudeBasis.None
+            )
+            {
+                addFlat += Mathf.Max(0, materializedFlatFromBasis);
+                addPct = 0;
+            }
+
+            // 5) Creation: always apply first contribution
+            if (createdNewContribution)
+            {
+                contrib.totalMagnitudeFlat = addFlat;
+                contrib.totalMagnitudePercent = addPct;
+                contrib.magnitudeBasis = scaled.magnitudeBasis;
 
                 if (def.kind == EffectKind.DamageOverTime || def.kind == EffectKind.HealOverTime)
                 {
                     int tick = Mathf.Max(0, computedPeriodicContribution);
-                    state.periodicTickContributions.Add(tick);
-                    state.stacks =
-                        state.periodicTickContributions != null
-                            ? Mathf.Max(1, state.periodicTickContributions.Count)
-                            : 1;
+                    contrib.periodicTickContributions.Add(tick);
+                    contrib.stacks = Mathf.Max(1, contrib.periodicTickContributions.Count);
+                }
+                else
+                {
+                    contrib.stacks = 1;
                 }
 
-                list.Add(state);
-                result.createdNew = true;
-                result.addedFlat = state.totalMagnitudeFlat;
-                result.addedPercent = state.totalMagnitudePercent;
-                return result;
+                bucket.RebuildLegacyFromContributions();
+                return new ApplyDelta(addFlat, addPct);
             }
 
-            // Always apply duration rule first
-            ApplyDurationStacking(existing, scaled.durationTurns, def);
-
-            // Then apply reapply rule
+            // 6) Reapply rules (apply to THIS source contribution)
             switch (def.reapplyRule)
             {
                 case EffectReapplyRule.DoNothingIfPresent:
                 {
-                    // duration may have changed, but no magnitude changes
-                    return result;
+                    bucket.RebuildLegacyFromContributions();
+                    return default;
                 }
 
                 case EffectReapplyRule.AddOnTop:
                 {
-                    // If not stackable, treat like "refresh-only"
-                    if (!scaled.stackable)
-                        return result;
-
-                    int beforeStacks = existing.stacks;
-                    int newStacks = Mathf.Min(existing.stacks + 1, Mathf.Max(1, scaled.maxStacks));
-                    existing.stacks = newStacks;
-
-                    int gained = existing.stacks - beforeStacks;
-                    if (gained <= 0)
-                        return result; // at max stacks, no growth
-
-                    // ✅ Accumulate totals (NO overwrite)
-                    int addFlat = Mathf.Max(0, scaled.magnitudeFlat);
-                    int addPct = Mathf.Max(0, scaled.magnitudePercent);
-
-                    if (
-                        def.kind == EffectKind.StatModifier
-                        && scaled.magnitudeBasis != EffectMagnitudeBasis.None
-                    )
+                    if (!scaled.stackable || !contrib.stackable)
                     {
-                        addFlat += Mathf.Max(0, materializedFlatFromBasis);
-                        addPct = 0; // ✅ consumed into flat
+                        bucket.RebuildLegacyFromContributions();
+                        return default;
                     }
 
-                    existing.totalMagnitudeFlat += addFlat;
-                    existing.totalMagnitudePercent += addPct;
+                    int maxStacks = Mathf.Max(1, Mathf.Min(contrib.maxStacks, scaled.maxStacks));
+                    int beforeStacks = contrib.stacks;
 
-                    result.addedFlat = addFlat;
-                    result.addedPercent = addPct;
+                    int nextStacks = Mathf.Min(beforeStacks + 1, maxStacks);
+                    int gained = nextStacks - beforeStacks;
 
-                    // basis handling
-                    if (existing.magnitudeBasis == EffectMagnitudeBasis.None)
-                        existing.magnitudeBasis = scaled.magnitudeBasis;
+                    if (gained <= 0)
+                    {
+                        bucket.RebuildLegacyFromContributions();
+                        return default;
+                    }
 
-                    // periodic: add the computed contribution
-                    existing.periodicTickContributions ??= new List<int>();
+                    contrib.stacks = nextStacks;
+                    contrib.maxStacks = maxStacks;
 
-                    int tick = Mathf.Max(0, computedPeriodicContribution);
-                    existing.periodicTickContributions.Add(tick);
-                    existing.stacks = Mathf.Max(1, existing.periodicTickContributions.Count);
+                    // StatModifier totals scale with stacks (store exact totals)
+                    contrib.totalMagnitudeFlat += addFlat;
+                    contrib.totalMagnitudePercent += addPct;
 
-                    // update snapshot config
-                    existing.stackable = true;
-                    existing.maxStacks = Mathf.Max(existing.maxStacks, scaled.maxStacks);
-                    existing.sourceActor = sourceActor;
-                    existing.sourceSpellId = sourceSpellId;
+                    // DOT/HOT: add tick contribution for new stack
+                    if (
+                        def.kind == EffectKind.DamageOverTime
+                        || def.kind == EffectKind.HealOverTime
+                    )
+                    {
+                        int tick = Mathf.Max(0, computedPeriodicContribution);
+                        contrib.periodicTickContributions.Add(tick);
+                        contrib.stacks = Mathf.Max(1, contrib.periodicTickContributions.Count);
+                    }
 
-                    result.addedFlat = addFlat;
-                    result.addedPercent = addPct;
-                    return result;
+                    bucket.RebuildLegacyFromContributions();
+                    return new ApplyDelta(addFlat, addPct);
                 }
 
                 case EffectReapplyRule.OverwriteIfStronger:
                 {
-                    bool stronger = IsNewStronger(existing, def, scaled);
+                    bool stronger = IsNewStronger_Contribution(contrib, def, scaled);
                     if (!stronger)
-                        return result;
+                    {
+                        bucket.RebuildLegacyFromContributions();
+                        return default;
+                    }
 
-                    // capture old totals for undo if needed (StatModifier)
-                    result.overwritten = true;
-                    result.oldTotalsFlat = existing.totalMagnitudeFlat;
-                    result.oldTotalsPercent = existing.totalMagnitudePercent;
-                    result.oldBasis = existing.magnitudeBasis;
+                    int oldFlat = contrib.totalMagnitudeFlat;
+                    int oldPct = contrib.totalMagnitudePercent;
 
-                    // overwrite everything
-                    existing.stacks = 1;
-                    existing.totalMagnitudeFlat = Mathf.Max(0, scaled.magnitudeFlat);
-                    existing.totalMagnitudePercent = Mathf.Max(0, scaled.magnitudePercent);
-                    existing.magnitudeBasis = scaled.magnitudeBasis;
+                    contrib.stacks = 1;
+                    contrib.stackable = scaled.stackable;
+                    contrib.maxStacks = Mathf.Max(1, scaled.maxStacks);
 
-                    existing.periodicTickContributions ??= new List<int>();
-                    existing.periodicTickContributions.Clear();
+                    contrib.totalMagnitudeFlat = addFlat;
+                    contrib.totalMagnitudePercent = addPct;
+                    contrib.magnitudeBasis = scaled.magnitudeBasis;
 
-                    int tick = Mathf.Max(0, computedPeriodicContribution);
-                    existing.periodicTickContributions.Add(tick);
-                    existing.stacks = Mathf.Max(1, existing.periodicTickContributions.Count);
+                    contrib.periodicTickContributions ??= new List<int>();
+                    contrib.periodicTickContributions.Clear();
 
-                    existing.stackable = scaled.stackable;
-                    existing.maxStacks = Mathf.Max(1, scaled.maxStacks);
+                    if (
+                        def.kind == EffectKind.DamageOverTime
+                        || def.kind == EffectKind.HealOverTime
+                    )
+                    {
+                        int tick = Mathf.Max(0, computedPeriodicContribution);
+                        contrib.periodicTickContributions.Add(tick);
+                        contrib.stacks = Mathf.Max(1, contrib.periodicTickContributions.Count);
+                    }
 
-                    existing.sourceActor = sourceActor;
-                    existing.sourceSpellId = sourceSpellId;
-
-                    result.addedFlat = existing.totalMagnitudeFlat;
-                    result.addedPercent = existing.totalMagnitudePercent;
-                    return result;
+                    bucket.RebuildLegacyFromContributions();
+                    return new ApplyDelta(
+                        contrib.totalMagnitudeFlat - oldFlat,
+                        contrib.totalMagnitudePercent - oldPct
+                    );
                 }
             }
 
-            return result;
+            bucket.RebuildLegacyFromContributions();
+            return default;
         }
 
-        private static ActiveEffectState FindById(List<ActiveEffectState> list, string effectId)
+        private static ActiveEffectState FindOrCreateBucket(
+            List<ActiveEffectState> list,
+            string effectId,
+            EffectKind kind,
+            bool mergeable,
+            CombatActorType sourceActor,
+            string sourceSpellId,
+            EffectInstanceScaledIntValues scaled
+        )
         {
-            if (list == null || string.IsNullOrWhiteSpace(effectId))
+            ActiveEffectState found = null;
+
+            if (mergeable)
+            {
+                // one bucket per effectId
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var e = list[i];
+                    if (e != null && e.effectId == effectId)
+                    {
+                        found = e;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // separate bucket per source
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var e = list[i];
+                    if (e == null || e.effectId != effectId)
+                        continue;
+
+                    e.EnsureContributionBacked();
+                    var c = FindContribution(e, sourceActor, sourceSpellId);
+                    if (c != null)
+                    {
+                        found = e;
+                        break;
+                    }
+                }
+            }
+
+            if (found != null)
+                return found;
+
+            var created = new ActiveEffectState(
+                effectId: effectId,
+                durationTurns: Mathf.Max(1, scaled.durationTurns),
+                stackable: scaled.stackable,
+                maxStacks: Mathf.Max(1, scaled.maxStacks),
+                sourceActor: sourceActor,
+                sourceSpellId: sourceSpellId,
+                kind: kind
+            );
+
+            created.EnsureContributionBacked();
+            list.Add(created);
+            return created;
+        }
+
+        private static ActiveEffectState.EffectContributionState FindContribution(
+            ActiveEffectState bucket,
+            CombatActorType sourceActor,
+            string sourceSpellId
+        )
+        {
+            if (bucket == null || bucket.contributions == null)
                 return null;
 
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < bucket.contributions.Count; i++)
             {
-                var e = list[i];
-                if (e != null && e.effectId == effectId)
-                    return e;
+                var c = bucket.contributions[i];
+                if (c != null && c.sourceActor == sourceActor && c.sourceSpellId == sourceSpellId)
+                    return c;
             }
+
             return null;
         }
 
         private static void ApplyDurationStacking(
-            ActiveEffectState existing,
+            ActiveEffectState.EffectContributionState c,
             int newDuration,
             EffectDefinition def
         )
         {
-            if (existing == null || def == null)
+            if (c == null || def == null)
                 return;
 
             int d = Mathf.Max(1, newDuration);
@@ -443,31 +509,38 @@ namespace MyGame.Combat
                     return;
 
                 case DurationStackMode.Prolong:
-                    existing.remainingTurns += d;
+                    c.remainingTurns += d;
                     return;
 
                 case DurationStackMode.Refresh:
                 default:
                     if (def.refreshOverridesRemaining)
-                        existing.remainingTurns = d;
+                        c.remainingTurns = d;
                     else
-                        existing.remainingTurns = Mathf.Max(existing.remainingTurns, d);
+                        c.remainingTurns = Mathf.Max(c.remainingTurns, d);
                     return;
             }
         }
 
-        private bool IsNewStronger(
-            ActiveEffectState existing,
+        private bool IsNewStronger_Contribution(
+            ActiveEffectState.EffectContributionState existingContribution,
             EffectDefinition newDef,
             EffectInstanceScaledIntValues scaled
         )
         {
-            if (existing == null || newDef == null)
+            if (existingContribution == null || newDef == null)
                 return true;
 
-            var oldDef = _db.GetById(existing.effectId);
+            var oldDef = _db != null ? _db.GetById(newDef.effectId) : null;
             if (oldDef == null)
-                return true;
+            {
+                int oldScoreFallback =
+                    existingContribution.totalMagnitudeFlat
+                    + existingContribution.totalMagnitudePercent;
+                int newScoreFallback =
+                    Mathf.Max(0, scaled.magnitudeFlat) + Mathf.Max(0, scaled.magnitudePercent);
+                return newScoreFallback > oldScoreFallback;
+            }
 
             switch (newDef.compareMode)
             {
@@ -476,14 +549,123 @@ namespace MyGame.Combat
 
                 case EffectStrengthCompareMode.ByComputedMagnitude:
                 default:
-                    int oldScore = existing.totalMagnitudeFlat + existing.totalMagnitudePercent;
-
+                    int oldScore =
+                        existingContribution.totalMagnitudeFlat
+                        + existingContribution.totalMagnitudePercent;
                     int newScore =
                         Mathf.Max(0, scaled.magnitudeFlat) + Mathf.Max(0, scaled.magnitudePercent);
-
                     return newScore > oldScore;
             }
         }
+
+        // =========================
+        // TICK + EXPIRE (per contribution)
+        // =========================
+
+        private void TickAndExpireEffects(CombatActorState owner, List<PeriodicTickResult> results)
+        {
+            if (owner == null || owner.activeEffects == null)
+                return;
+
+            for (int i = owner.activeEffects.Count - 1; i >= 0; i--)
+            {
+                var bucket = owner.activeEffects[i];
+                if (bucket == null)
+                {
+                    owner.activeEffects.RemoveAt(i);
+                    continue;
+                }
+
+                bucket.EnsureContributionBacked();
+
+                int bucketTickTotal = 0;
+
+                for (int cIndex = bucket.contributions.Count - 1; cIndex >= 0; cIndex--)
+                {
+                    var c = bucket.contributions[cIndex];
+                    if (c == null)
+                    {
+                        bucket.contributions.RemoveAt(cIndex);
+                        continue;
+                    }
+
+                    // Tick periodic for this contribution
+                    if (
+                        bucket.kind == EffectKind.DamageOverTime
+                        || bucket.kind == EffectKind.HealOverTime
+                    )
+                    {
+                        if (c.periodicTickContributions != null)
+                        {
+                            for (int k = 0; k < c.periodicTickContributions.Count; k++)
+                                bucketTickTotal += Mathf.Max(0, c.periodicTickContributions[k]);
+                        }
+                    }
+
+                    // Decrement duration
+                    c.remainingTurns--;
+
+                    // Expire contribution
+                    if (c.remainingTurns <= 0)
+                    {
+                        // Undo stat modifiers for THIS contribution only
+                        if (
+                            bucket.kind == EffectKind.StatModifier
+                            && owner.modifiers != null
+                            && _db != null
+                        )
+                        {
+                            var def = _db.GetById(bucket.effectId);
+                            if (def != null)
+                            {
+                                UndoModifierDelta(
+                                    mods: owner.modifiers,
+                                    def: def,
+                                    oldFlat: c.totalMagnitudeFlat,
+                                    oldPercent: c.totalMagnitudePercent
+                                );
+                            }
+                        }
+
+                        bucket.contributions.RemoveAt(cIndex);
+                    }
+                }
+
+                // Remove empty bucket
+                if (bucket.contributions.Count == 0)
+                {
+                    owner.activeEffects.RemoveAt(i);
+                    continue;
+                }
+
+                // Rebuild summary fields
+                bucket.RebuildLegacyFromContributions();
+
+                // Emit merged tick once per bucket
+                if (
+                    bucketTickTotal > 0
+                    && (
+                        bucket.kind == EffectKind.DamageOverTime
+                        || bucket.kind == EffectKind.HealOverTime
+                    )
+                )
+                {
+                    results?.Add(
+                        new PeriodicTickResult(
+                            source: bucket.sourceActor, // summary source (first contribution)
+                            target: owner.actorType,
+                            kind: bucket.kind,
+                            amount: bucketTickTotal,
+                            effectId: bucket.effectId
+                        )
+                    );
+                }
+            }
+        }
+
+        // =========================
+        // Basis + periodic math
+        // =========================
 
         private static int ComputeBasisValue(
             EffectMagnitudeBasis basis,
@@ -498,18 +680,12 @@ namespace MyGame.Combat
                 EffectMagnitudeBasis.Power => (spell.damageKind == DamageKind.Magical)
                     ? casterFinalMP
                     : casterFinalAP,
-
                 EffectMagnitudeBasis.DamageDealt => Mathf.Max(0, lastDamageDealt),
-
                 _ => 0,
             };
         }
 
-        /// <summary>
-        /// Compute initial periodic tick amount ONCE and store it into ActiveEffectState.
-        /// </summary>
         private static int ComputeInitialPeriodicTick(
-            EffectDefinition def,
             EffectInstanceScaledIntValues scaled,
             ResolvedSpell spell,
             int casterFinalAP,
@@ -520,94 +696,17 @@ namespace MyGame.Combat
             int flat = Mathf.Max(0, scaled.magnitudeFlat);
             float pct = Mathf.Clamp(scaled.magnitudePercent, 0, 100) / 100f;
 
-            int basisValue;
-
-            switch (scaled.magnitudeBasis)
+            int basisValue = scaled.magnitudeBasis switch
             {
-                case EffectMagnitudeBasis.Power:
-                    basisValue =
-                        (spell.damageKind == DamageKind.Magical) ? casterFinalMP : casterFinalAP;
-                    break;
-
-                case EffectMagnitudeBasis.DamageDealt:
-                    basisValue = Mathf.Max(0, lastDamageDealt);
-                    break;
-
-                case EffectMagnitudeBasis.None:
-                default:
-                    basisValue = 0;
-                    break;
-            }
+                EffectMagnitudeBasis.Power => (spell.damageKind == DamageKind.Magical)
+                    ? casterFinalMP
+                    : casterFinalAP,
+                EffectMagnitudeBasis.DamageDealt => Mathf.Max(0, lastDamageDealt),
+                _ => 0,
+            };
 
             int percentPart = Mathf.RoundToInt(basisValue * pct);
-            int total = flat + percentPart;
-
-            return Mathf.Max(0, total);
-        }
-
-        private void TickAndExpireEffects(CombatActorState owner, List<PeriodicTickResult> results)
-        {
-            if (owner == null || owner.activeEffects == null)
-                return;
-
-            for (int i = owner.activeEffects.Count - 1; i >= 0; i--)
-            {
-                var e = owner.activeEffects[i];
-                if (e == null)
-                {
-                    owner.activeEffects.RemoveAt(i);
-                    continue;
-                }
-
-                // 1) Periodic tick -> produce a result (do NOT change HP here)
-                int tickTotal = 0;
-                if (e.periodicTickContributions != null)
-                {
-                    for (int k = 0; k < e.periodicTickContributions.Count; k++)
-                        tickTotal += Mathf.Max(0, e.periodicTickContributions[k]);
-                }
-
-                if (
-                    tickTotal > 0
-                    && (e.kind == EffectKind.DamageOverTime || e.kind == EffectKind.HealOverTime)
-                )
-                {
-                    results?.Add(
-                        new PeriodicTickResult(
-                            source: e.sourceActor,
-                            target: owner.actorType,
-                            kind: e.kind,
-                            amount: tickTotal,
-                            effectId: e.effectId
-                        )
-                    );
-                }
-
-                // 2) Duration decrement
-                e.remainingTurns--;
-
-                // 3) Expire
-                if (e.remainingTurns <= 0)
-                {
-                    owner.activeEffects.RemoveAt(i);
-                    if (e.kind == EffectKind.StatModifier && owner.modifiers != null && _db != null)
-                    {
-                        var def = _db.GetById(e.effectId);
-                        if (def != null)
-                        {
-                            UndoModifierDelta(
-                                owner.modifiers,
-                                def,
-                                e.totalMagnitudeFlat,
-                                e.totalMagnitudePercent,
-                                e.magnitudeBasis
-                            );
-                        }
-                    }
-
-                    // StatModifier undo fix comes later (next bug)
-                }
-            }
+            return Mathf.Max(0, flat + percentPart);
         }
 
         // =========================
@@ -645,30 +744,212 @@ namespace MyGame.Combat
         }
 
         // =========================
-        // Stat modifier application/undo (minimal placeholders)
-        // You already have StatModifiers class; wire your exact mapping here.
+        // Stat modifier application/undo (mapping to StatModifiers)
         // =========================
 
         private static void ApplyModifierDelta(
             StatModifiers mods,
             EffectDefinition def,
             int addFlat,
-            int addPercent,
-            EffectMagnitudeBasis basis
+            int addPercent
         )
         {
             if (mods == null || def == null)
                 return;
 
-            // Example: only implementing "damageFlat" as a demo
-            // Extend this to your full stat/op system.
-            if (def.stat == EffectStat.DamageAll && def.op == EffectOp.Flat)
+            float pct = Mathf.Clamp(addPercent, 0, 100) / 100f;
+
+            switch (def.stat)
             {
-                mods.damageFlat += addFlat;
-            }
-            if (def.stat == EffectStat.DamageAll && def.op == EffectOp.MorePercent)
-            {
-                mods.AddDamageMorePercent(addPercent / 100f);
+                case EffectStat.None:
+                    return;
+
+                // Damage
+                case EffectStat.DamageAll:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.damageFlat += v,
+                        addMoreAction: p => mods.AddDamageMorePercent(p),
+                        addLessAction: p => mods.AddDamageLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DamagePhysical:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.attackDamageFlat += v,
+                        addMoreAction: p => mods.AddPhysicalDamageMorePercent(p),
+                        addLessAction: p => mods.AddPhysicalDamageLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DamageMagic:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.magicDamageFlat += v,
+                        addMoreAction: p => mods.AddMagicDamageMorePercent(p),
+                        addLessAction: p => mods.AddMagicDamageLessPercent(p)
+                    );
+                    return;
+
+                // Power
+                case EffectStat.PowerAll:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.powerFlat += v,
+                        addMoreAction: p => mods.AddPowerMorePercent(p),
+                        addLessAction: p => mods.AddPowerLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.PowerAttack:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.attackPowerFlat += v,
+                        addMoreAction: p => mods.AddAttackPowerMorePercent(p),
+                        addLessAction: p => mods.AddAttackPowerLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.PowerMagic:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.magicPowerFlat += v,
+                        addMoreAction: p => mods.AddMagicPowerMorePercent(p),
+                        addLessAction: p => mods.AddMagicPowerLessPercent(p)
+                    );
+                    return;
+
+                // Spell base damage
+                case EffectStat.SpellBaseAll:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.AddSpellBaseFlat(v),
+                        addMoreAction: p => mods.AddSpellBaseMorePercent(p),
+                        addLessAction: p => mods.AddSpellBaseLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.SpellBasePhysical:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.AddPhysicalSpellBaseFlat(v),
+                        addMoreAction: p => mods.AddPhysicalSpellBaseMorePercent(p),
+                        addLessAction: p => mods.AddPhysicalSpellBaseLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.SpellBaseMagic:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.AddMagicSpellBaseFlat(v),
+                        addMoreAction: p => mods.AddMagicSpellBaseMorePercent(p),
+                        addLessAction: p => mods.AddMagicSpellBaseLessPercent(p)
+                    );
+                    return;
+
+                // Hit / speeds
+                case EffectStat.HitChance:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: null,
+                        addMoreAction: p => mods.AddHitChanceMorePercent(p),
+                        addLessAction: p => mods.AddHitChanceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.AttackSpeed:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.attackSpeedFlat += v,
+                        addMoreAction: p => mods.AddAttackSpeedMorePercent(p),
+                        addLessAction: p => mods.AddAttackSpeedLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.CastingSpeed:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.castingSpeedFlat += v,
+                        addMoreAction: p => mods.AddCastingSpeedMorePercent(p),
+                        addLessAction: p => mods.AddCastingSpeedLessPercent(p)
+                    );
+                    return;
+
+                // Defence
+                case EffectStat.DefenceAll:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.defenceFlat += v,
+                        addMoreAction: p => mods.AddDefenceMorePercent(p),
+                        addLessAction: p => mods.AddDefenceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DefencePhysical:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.physicalDefenseFlat += v,
+                        addMoreAction: p => mods.AddPhysicalDefenceMorePercent(p),
+                        addLessAction: p => mods.AddPhysicalDefenceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DefenceMagic:
+                    ApplyFlatOrMult(
+                        def.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.magicDefenseFlat += v,
+                        addMoreAction: p => mods.AddMagicDefenceMorePercent(p),
+                        addLessAction: p => mods.AddMagicDefenceLessPercent(p)
+                    );
+                    return;
+
+                // Type-based layers (uses def.damageType[])
+                case EffectStat.AttackerBonusByType:
+                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.AttackerBonus);
+                    return;
+
+                case EffectStat.DefenderVulnerabilityByType:
+                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.DefenderVuln);
+                    return;
+
+                case EffectStat.AttackerWeakenByType:
+                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.AttackerWeaken);
+                    return;
+
+                case EffectStat.DefenderResistByType:
+                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.DefenderResist);
+                    return;
             }
         }
 
@@ -676,21 +957,349 @@ namespace MyGame.Combat
             StatModifiers mods,
             EffectDefinition def,
             int oldFlat,
-            int oldPercent,
-            EffectMagnitudeBasis oldBasis
+            int oldPercent
         )
         {
             if (mods == null || def == null)
                 return;
 
-            // Example undo matching ApplyModifierDelta demo above
-            if (def.stat == EffectStat.DamageAll && def.op == EffectOp.Flat)
+            float pct = Mathf.Clamp(oldPercent, 0, 100) / 100f;
+
+            switch (def.stat)
             {
-                mods.damageFlat -= oldFlat;
+                case EffectStat.None:
+                    return;
+
+                case EffectStat.DamageAll:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.damageFlat -= v,
+                        removeMoreAction: p => mods.RemoveDamageMorePercent(p),
+                        removeLessAction: p => mods.RemoveDamageLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DamagePhysical:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.attackDamageFlat -= v,
+                        removeMoreAction: p => mods.RemovePhysicalDamageMorePercent(p),
+                        removeLessAction: p => mods.RemovePhysicalDamageLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DamageMagic:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.magicDamageFlat -= v,
+                        removeMoreAction: p => mods.RemoveMagicDamageMorePercent(p),
+                        removeLessAction: p => mods.RemoveMagicDamageLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.PowerAll:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.powerFlat -= v,
+                        removeMoreAction: p => mods.RemovePowerMorePercent(p),
+                        removeLessAction: p => mods.RemovePowerLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.PowerAttack:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.attackPowerFlat -= v,
+                        removeMoreAction: p => mods.RemoveAttackPowerMorePercent(p),
+                        removeLessAction: p => mods.RemoveAttackPowerLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.PowerMagic:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.magicPowerFlat -= v,
+                        removeMoreAction: p => mods.RemoveMagicPowerMorePercent(p),
+                        removeLessAction: p => mods.RemoveMagicPowerLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.SpellBaseAll:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.AddSpellBaseFlat(-v),
+                        removeMoreAction: p => mods.spellBaseMult.RemoveMore(p),
+                        removeLessAction: p => mods.spellBaseMult.RemoveLess(p)
+                    );
+                    return;
+
+                case EffectStat.SpellBasePhysical:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.AddPhysicalSpellBaseFlat(-v),
+                        removeMoreAction: p => mods.physicalSpellBaseMult.RemoveMore(p),
+                        removeLessAction: p => mods.physicalSpellBaseMult.RemoveLess(p)
+                    );
+                    return;
+
+                case EffectStat.SpellBaseMagic:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.AddMagicSpellBaseFlat(-v),
+                        removeMoreAction: p => mods.magicSpellBaseMult.RemoveMore(p),
+                        removeLessAction: p => mods.magicSpellBaseMult.RemoveLess(p)
+                    );
+                    return;
+
+                case EffectStat.HitChance:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: null,
+                        removeMoreAction: p => mods.RemoveHitChanceMorePercent(p),
+                        removeLessAction: p => mods.RemoveHitChanceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.AttackSpeed:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.attackSpeedFlat -= v,
+                        removeMoreAction: p => mods.RemoveAttackSpeedMorePercent(p),
+                        removeLessAction: p => mods.RemoveAttackSpeedLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.CastingSpeed:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.castingSpeedFlat -= v,
+                        removeMoreAction: p => mods.RemoveCastingSpeedMorePercent(p),
+                        removeLessAction: p => mods.RemoveCastingSpeedLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DefenceAll:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.defenceFlat -= v,
+                        removeMoreAction: p => mods.RemoveDefenceMorePercent(p),
+                        removeLessAction: p => mods.RemoveDefenceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DefencePhysical:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.physicalDefenseFlat -= v,
+                        removeMoreAction: p => mods.RemovePhysicalDefenceMorePercent(p),
+                        removeLessAction: p => mods.RemovePhysicalDefenceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.DefenceMagic:
+                    UndoFlatOrMult(
+                        def.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.magicDefenseFlat -= v,
+                        removeMoreAction: p => mods.RemoveMagicDefenceMorePercent(p),
+                        removeLessAction: p => mods.RemoveMagicDefenceLessPercent(p)
+                    );
+                    return;
+
+                case EffectStat.AttackerBonusByType:
+                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.AttackerBonus);
+                    return;
+
+                case EffectStat.DefenderVulnerabilityByType:
+                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.DefenderVuln);
+                    return;
+
+                case EffectStat.AttackerWeakenByType:
+                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.AttackerWeaken);
+                    return;
+
+                case EffectStat.DefenderResistByType:
+                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.DefenderResist);
+                    return;
             }
-            if (def.stat == EffectStat.DamageAll && def.op == EffectOp.MorePercent)
+        }
+
+        private static void ApplyFlatOrMult(
+            EffectOp op,
+            int addFlat,
+            float pct,
+            System.Action<int> addFlatAction,
+            System.Action<float> addMoreAction,
+            System.Action<float> addLessAction
+        )
+        {
+            switch (op)
             {
-                mods.RemoveDamageMorePercent(oldPercent / 100f);
+                case EffectOp.Flat:
+                    addFlatAction?.Invoke(addFlat);
+                    return;
+                case EffectOp.MorePercent:
+                    addMoreAction?.Invoke(pct);
+                    return;
+                case EffectOp.LessPercent:
+                    addLessAction?.Invoke(pct);
+                    return;
+            }
+        }
+
+        private static void UndoFlatOrMult(
+            EffectOp op,
+            int oldFlat,
+            float pct,
+            System.Action<int> removeFlatAction,
+            System.Action<float> removeMoreAction,
+            System.Action<float> removeLessAction
+        )
+        {
+            switch (op)
+            {
+                case EffectOp.Flat:
+                    removeFlatAction?.Invoke(oldFlat);
+                    return;
+                case EffectOp.MorePercent:
+                    removeMoreAction?.Invoke(pct);
+                    return;
+                case EffectOp.LessPercent:
+                    removeLessAction?.Invoke(pct);
+                    return;
+            }
+        }
+
+        private enum TypeMode
+        {
+            AttackerBonus,
+            DefenderVuln,
+            DefenderResist,
+            AttackerWeaken,
+        }
+
+        private static void ApplyTypeBased(
+            EffectDefinition def,
+            StatModifiers mods,
+            int addFlat,
+            float pct,
+            TypeMode mode
+        )
+        {
+            if (def.damageType == null || def.damageType.Length == 0)
+                return;
+
+            for (int i = 0; i < def.damageType.Length; i++)
+            {
+                var t = def.damageType[i];
+
+                switch (mode)
+                {
+                    case TypeMode.AttackerBonus:
+                        if (def.op == EffectOp.Flat)
+                            mods.AddAttackerBonusFlat(t, addFlat);
+                        else if (def.op == EffectOp.MorePercent)
+                            mods.AddAttackerBonusMorePercent(t, pct);
+                        break;
+
+                    case TypeMode.DefenderVuln:
+                        if (def.op == EffectOp.Flat)
+                            mods.AddDefenderVulnFlat(t, addFlat);
+                        else if (def.op == EffectOp.MorePercent)
+                            mods.AddDefenderVulnMorePercent(t, pct);
+                        break;
+
+                    case TypeMode.DefenderResist:
+                        if (def.op == EffectOp.Flat)
+                            mods.AddDefenderResistFlat(t, addFlat);
+                        else if (def.op == EffectOp.LessPercent)
+                            mods.AddDefenderResistLessPercent(t, pct);
+                        break;
+
+                    case TypeMode.AttackerWeaken:
+                        if (def.op == EffectOp.Flat)
+                            mods.AddAttackerWeakenFlat(t, addFlat);
+                        else if (def.op == EffectOp.LessPercent)
+                            mods.AddAttackerWeakenLessPercent(t, pct);
+                        break;
+                }
+            }
+        }
+
+        private static void UndoTypeBased(
+            EffectDefinition def,
+            StatModifiers mods,
+            int oldFlat,
+            float pct,
+            TypeMode mode
+        )
+        {
+            if (def.damageType == null || def.damageType.Length == 0)
+                return;
+
+            for (int i = 0; i < def.damageType.Length; i++)
+            {
+                var t = def.damageType[i];
+
+                switch (mode)
+                {
+                    case TypeMode.AttackerBonus:
+                        if (def.op == EffectOp.Flat)
+                            mods.RemoveAttackerBonusFlat(t, oldFlat);
+                        else if (def.op == EffectOp.MorePercent)
+                            mods.RemoveAttackerBonusMorePercent(t, pct);
+                        break;
+
+                    case TypeMode.DefenderVuln:
+                        if (def.op == EffectOp.Flat)
+                            mods.RemoveDefenderVulnFlat(t, oldFlat);
+                        else if (def.op == EffectOp.MorePercent)
+                            mods.RemoveDefenderVulnMorePercent(t, pct);
+                        break;
+
+                    case TypeMode.DefenderResist:
+                        if (def.op == EffectOp.Flat)
+                            mods.RemoveDefenderResistFlat(t, oldFlat);
+                        else if (def.op == EffectOp.LessPercent)
+                            mods.RemoveDefenderResistLessPercent(t, pct);
+                        break;
+
+                    case TypeMode.AttackerWeaken:
+                        if (def.op == EffectOp.Flat)
+                            mods.RemoveAttackerWeakenFlat(t, oldFlat);
+                        else if (def.op == EffectOp.LessPercent)
+                            mods.RemoveAttackerWeakenLessPercent(t, pct);
+                        break;
+                }
             }
         }
     }

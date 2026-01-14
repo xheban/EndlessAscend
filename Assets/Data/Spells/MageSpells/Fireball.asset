@@ -20,7 +20,7 @@ MonoBehaviour:
   allowedSpecs: -1
   rarity: 0
   manaCost: 1
-  cooldownTurns: 3
+  cooldownTurns: 0
   maxLevel: 10
   baseDamage: 10
   damageKind: 1
@@ -36,11 +36,13 @@ MonoBehaviour:
   onHitEffects:
   - effect: {fileID: 11400000, guid: f7b94d16f1700794c95564bc3dfdbd25, type: 2}
     chancePercent: 100
-    durationTurns: 2
+    durationTurns: 5
     magnitudeFlat: 5
     magnitudePercent: 0
     magnitudeBasis: 0
     stackable: 1
+    mergeable: 1
+    target: 0
     maxStacks: 3
     chanceScaling:
       type: 1

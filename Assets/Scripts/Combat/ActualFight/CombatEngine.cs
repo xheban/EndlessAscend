@@ -18,74 +18,51 @@ namespace MyGame.Combat
         private readonly HitPhase _hitPhase;
         private readonly DamagePhase _damagePhase;
         private readonly EffectPhase _effectPhase;
-        private readonly EffectDatabase _effectDb;
         private readonly CombatEffectSystem _effects;
+
         public CombatState State { get; private set; }
 
         public CombatEngine(ICombatSpellResolver spellResolver, EffectDatabase effectDb)
         {
             _spellResolver = spellResolver;
-            _effectDb = effectDb;
 
             _effects = new CombatEffectSystem(effectDb);
-            // -------------------------
+
             // RNG (centralized)
-            // -------------------------
-            // Later you can pass a seeded RNG here for deterministic runs/replays.
             _rng = new UnityRng();
 
-            // -------------------------
             // HIT PHASE: mount hit rules
-            // -------------------------
             _hitPhase = new HitPhase(
                 new IHitRule[]
                 {
-                    // 1) Level/tier suppression affects hit chance (weaker attacker -> lower hit chance)
                     new LevelTierSuppressionHitRule(
                         levelPenaltyPerLevel: 3f,
                         tierPenaltyPerTier: 20f
                     ),
-                    // 2) Accuracy vs Evasion (diminishing returns)
-                    // Later:
-                    // new BuffDebuffHitRule(),
-                    // new GuaranteedHitRule(),
-                    // new MinimumHitChanceRule(0.10f),
-                    // new MaximumHitChanceRule(0.95f),
                 }
             );
 
-            // -------------------------
             // DAMAGE PHASE: mount damage rules
-            // -------------------------
             _damagePhase = new DamagePhase(
                 new IDamageRule[]
                 {
-                    // 1) Update spell base Damage
                     new SpellBaseDamageBonusRule(),
-                    // 1) Spell scaling from attacker stats (attackPower/magicPower -> flat bonus)
                     new PowerScalingDamageRule(percentOfPower: 0.50f),
-                    // 2) Damage Type bonuses / mitigations from Types [Fire, Piercing etc]
                     new AttackerTypeBonusDamageRule(),
                     new DefenderVulnerabilityDamageRule(),
                     new AttackerWeakenMitigationDamageRule(),
                     new DefenderResistanceMitigationDamageRule(),
-                    // 4) Defence Mitigation
                     new DefenseMitigationDamageRule(),
-                    // 5) Level/tier suppression affects damage (bidirectional, weaker -> less, stronger -> more)
                     new LevelTierSuppressionDamageRule(
                         levelFactor: 0.03f,
                         tierFactor: 0.20f,
                         minMult: 0.05f
                     ),
-                    // 5) BonusDamage simple bonus to final damage and final damage mult
                     new DamageBonusRule(),
-                    // 6) Random variance at the end (±20%)
                     new RandomVarianceDamageRule(pct: 0.20f),
-
-                    // Later:
-                    // new CritDamageRule(),
                 }
             );
+
             _effectPhase = new EffectPhase(new IEffectRule[] { new ApplyEffectsRule(_effects) });
         }
 
@@ -154,7 +131,8 @@ namespace MyGame.Combat
                 waitingForPlayerInput = false,
                 isFinished = false,
             };
-            //Build monster spellbbok into ombatState
+
+            // Build monster spellbook into CombatState
             State.enemySpellbook = new EnemySpellbookRuntime();
 
             var monsterSpells = monsterDef.Spells;
@@ -178,6 +156,7 @@ namespace MyGame.Combat
                     $"Encounter starts: {State.player.displayName} vs {State.enemy.displayName}"
                 )
             );
+
             Emit(
                 new HpChangedEvent(
                     CombatActorType.Player,
@@ -237,15 +216,10 @@ namespace MyGame.Combat
                     return;
                 }
 
-                // Ensure enemy always has a queued spell
-                //if (!State.enemy.HasQueuedSpell)
-                //    EnemyQueueNextSpell();
-
                 if (State.waitingForEnemyDecision)
                     return;
 
-                // If enemy has no queued spell, request one (but don't auto-queue here).
-                // This makes enemy decision fully controlled by controller timing.
+                // If enemy has no queued spell, request one (controller decides timing)
                 if (!State.enemy.HasQueuedSpell)
                 {
                     State.waitingForEnemyDecision = true;
@@ -263,7 +237,7 @@ namespace MyGame.Combat
                 float pMissing = TURN_THRESHOLD - State.player.turnMeter;
                 float eMissing = TURN_THRESHOLD - State.enemy.turnMeter;
 
-                // If someone already ready (should be rare), fire immediately
+                // If someone already ready, fire immediately
                 if (pMissing <= 0.001f)
                 {
                     FireQueuedSpell(CombatActorType.Player, playerQueued);
@@ -288,7 +262,7 @@ namespace MyGame.Combat
                 float newPMeter = State.player.turnMeter + (pSpeed * t);
                 float newEMeter = State.enemy.turnMeter + (eSpeed * t);
 
-                // Snap winner to threshold (avoid 99.9999 issues)
+                // Snap to threshold (avoid 99.9999 issues)
                 if (Mathf.Abs(newPMeter - TURN_THRESHOLD) < 0.001f)
                     newPMeter = TURN_THRESHOLD;
                 if (Mathf.Abs(newEMeter - TURN_THRESHOLD) < 0.001f)
@@ -297,19 +271,18 @@ namespace MyGame.Combat
                 SetTurnMeter(CombatActorType.Player, newPMeter);
                 SetTurnMeter(CombatActorType.Enemy, newEMeter);
 
-                // Decide who fires (tie -> player, deterministic)
+                // Decide who fires (tie -> player)
                 bool pReady = State.player.turnMeter >= TURN_THRESHOLD - 0.001f;
                 bool eReady = State.enemy.turnMeter >= TURN_THRESHOLD - 0.001f;
 
                 CombatActorType next;
                 if (pReady && eReady)
-                    next = CombatActorType.Player; // tie-break
+                    next = CombatActorType.Player;
                 else if (pReady)
                     next = CombatActorType.Player;
                 else
                     next = CombatActorType.Enemy;
 
-                // Fire and loop again (enemy may fire multiple times before player)
                 if (next == CombatActorType.Player)
                 {
                     FireQueuedSpell(CombatActorType.Player, playerQueued);
@@ -334,6 +307,7 @@ namespace MyGame.Combat
             ApplyPeriodicTicks(ticks);
             if (State.isFinished)
                 return;
+
             State.enemy.queuedSpellId = chosen;
             Emit(new SpellQueuedEvent(CombatActorType.Enemy, State.enemy.displayName, chosen));
         }
@@ -356,7 +330,7 @@ namespace MyGame.Combat
                 if (
                     !_spellResolver.TryResolve(
                         s.spellId,
-                        s.level, // ✅ monster spell level
+                        s.level,
                         State.enemy.derived,
                         out var resolved
                     )
@@ -451,7 +425,7 @@ namespace MyGame.Combat
                 return false;
             }
 
-            _effects.OnActionChosen(State, CombatActorType.Player);
+            // ✅ tick/decrement effects ONCE per chosen action
             var ticks = _effects.OnActionChosen(State, CombatActorType.Player);
             ApplyPeriodicTicks(ticks);
 
@@ -459,6 +433,7 @@ namespace MyGame.Combat
                 return false;
 
             State.player.queuedSpellId = spellId;
+
             Emit(
                 new SpellQueuedEvent(
                     CombatActorType.Player,
@@ -466,9 +441,9 @@ namespace MyGame.Combat
                     resolved.displayName
                 )
             );
-            // End player turn and continue
+
+            // End player decision; simulation continues
             State.waitingForPlayerInput = false;
-            //EndTurn(CombatActorType.Player);
 
             if (!State.isFinished)
                 AdvanceUntilPlayerInputOrEnd();
@@ -477,11 +452,7 @@ namespace MyGame.Combat
         }
 
         // -------------------------
-        // Enemy actions
-        // -------------------------
-
-        // -------------------------
-        // ✅ THE IMPORTANT PART: Phases mounted above are used here
+        // ✅ The important part: phases used here
         // -------------------------
 
         private void ResolveAction(
@@ -492,7 +463,6 @@ namespace MyGame.Combat
             ResolvedSpell spell
         )
         {
-            // 1) Create action context (shared scratchpad for all phases)
             var ctx = new ActionContext
             {
                 attacker = attacker,
@@ -500,13 +470,12 @@ namespace MyGame.Combat
                 spell = spell,
                 spellLevel = spell.level,
                 rng = _rng,
-
-                // Start from spell base hit chance (your question earlier)
                 hitChance = spell.hitChance,
             };
-            // -------------------------
+
+            Debug.Log("resolving spell action");
+
             // 0) ON-CAST EFFECTS
-            // -------------------------
             if (spell.onCastEffects != null && spell.onCastEffects.Length > 0)
             {
                 ctx.effectInstancesToApply = spell.onCastEffects;
@@ -517,7 +486,8 @@ namespace MyGame.Combat
             bool requiresHitCheck = (
                 spell.intent == SpellIntent.Damage || spell.intent == SpellIntent.Heal
             );
-            // 2) HIT PHASE
+
+            // 1) HIT
             if (requiresHitCheck)
             {
                 _hitPhase.Resolve(ctx);
@@ -534,15 +504,12 @@ namespace MyGame.Combat
             }
             else
             {
-                // Buff/Debuff/Utility: treat as successful
                 ctx.hit = true;
             }
 
             Emit(new CombatLogEvent($"{attacker.displayName} uses {spell.displayName}!"));
 
-            // -------------------------
             // 2) DAMAGE / HEAL / SKIP
-            // -------------------------
             if (spell.intent == SpellIntent.Damage)
             {
                 _damagePhase.Resolve(ctx);
@@ -550,20 +517,18 @@ namespace MyGame.Combat
             }
             else if (spell.intent == SpellIntent.Heal)
             {
-                // Minimal: treat resolved damage as "healing amount" OR add dedicated heal amount later
-                // For now: you can reuse ctx.finalDamage as "final heal amount" if you build a HealPhase later.
-                // We'll keep it simple and heal by spell.damage.
                 ApplyHeal(source, target, Mathf.Max(0, spell.damage));
+                ctx.finalDamage = Mathf.Max(0, spell.damage); // treat as "amount" if needed
             }
             else
             {
                 ctx.finalDamage = 0;
             }
-            ctx.lastDamageDealt = ctx.finalDamage;
 
-            // -------------------------
+            // This is the value that DamageDealt-basis effects need
+            ctx.lastDamageDealt = Mathf.Max(0, ctx.finalDamage);
+
             // 3) ON-HIT EFFECTS (after successful hit and after damage/heal)
-            // -------------------------
             if (ctx.hit && spell.onHitEffects != null && spell.onHitEffects.Length > 0)
             {
                 ctx.effectInstancesToApply = spell.onHitEffects;
@@ -571,12 +536,14 @@ namespace MyGame.Combat
                 ctx.effectInstancesToApply = null;
             }
 
+            // XP for player spell
             if (source == CombatActorType.Player)
             {
                 int xpPerHit =
                     1
                     + ctx.defender.level
-                        * HelperFunctions.TierToFlatBonusMultiplier(ctx.defender.tier); // your rule
+                        * HelperFunctions.TierToFlatBonusMultiplier(ctx.defender.tier);
+
                 int levelsGained = State.playerSpellbook.GrantExperience(spell.spellId, xpPerHit);
 
                 if (levelsGained > 0)
@@ -617,9 +584,7 @@ namespace MyGame.Combat
             Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
 
             if (t.hp <= 0)
-            {
                 FinishCombat(source);
-            }
         }
 
         private void ApplyHeal(CombatActorType source, CombatActorType target, int amount)
@@ -632,7 +597,6 @@ namespace MyGame.Combat
             t.hp = Clamp(t.hp + amount, 0, t.derived.maxHp);
 
             int delta = t.hp - before; // positive on heal
-
             if (delta <= 0)
                 return;
 
@@ -656,7 +620,6 @@ namespace MyGame.Combat
             a.mana = Clamp(a.mana + delta, 0, a.derived.maxMana);
 
             int realDelta = a.mana - before;
-
             Emit(new ManaChangedEvent(actor, a.mana, a.derived.maxMana, realDelta));
         }
 
@@ -677,6 +640,7 @@ namespace MyGame.Combat
 
             float clamped = Mathf.Clamp(value, 0f, TURN_THRESHOLD);
             a.turnMeter = clamped;
+
             Emit(
                 new TurnMeterChangedEvent(
                     actor,
@@ -692,10 +656,8 @@ namespace MyGame.Combat
                 queuedSpell.damageKind == DamageKind.Magical
                     ? actor.derived.castSpeed
                     : actor.derived.attackSpeed;
-            // TODO pridať sem modifiery na cast/attackSpeed
 
             float speed = queuedSpell.baseUseSpeed + bonus;
-
             if (speed < 1f)
                 speed = 1f;
 
@@ -715,9 +677,7 @@ namespace MyGame.Combat
             if (string.IsNullOrWhiteSpace(actor.queuedSpellId))
                 throw new InvalidOperationException($"{actor.actorType} has no queued spell.");
 
-            // -------------------------
             // PLAYER
-            // -------------------------
             if (actor.actorType == CombatActorType.Player)
             {
                 var entry = State.playerSpellbook?.Get(actor.queuedSpellId);
@@ -741,10 +701,7 @@ namespace MyGame.Combat
                 return resolvedPlayer;
             }
 
-            // -------------------------
             // ENEMY
-            // -------------------------
-            // If enemy spellbook exists, try resolve using monster-defined spell level.
             var enemyBook = State.enemySpellbook;
             EnemySpellState enemySpellState = null;
 
@@ -761,20 +718,14 @@ namespace MyGame.Combat
                         out var resolvedEnemy
                     )
                 )
-                {
                     return resolvedEnemy;
-                }
 
                 throw new InvalidOperationException(
                     $"Could not resolve enemy spell '{enemySpellState.spellId}' (Lv {enemySpellState.level})."
                 );
             }
 
-            // -------------------------
-            // FALLBACK (placeholder)
-            // -------------------------
-            // If enemy spellbook is missing OR queued id is not in it, fallback to basic attack.
-            // This prevents combat hard-crashing while you're still wiring content.
+            // FALLBACK
             return new ResolvedSpell(
                 spellId: "enemy_attack",
                 displayName: $"{State.enemy.displayName} Attack",
@@ -799,6 +750,8 @@ namespace MyGame.Combat
             var attacker = State.Get(actorType);
             var defender = State.GetOpponent(actorType);
 
+            Debug.Log("firing spell");
+
             if (actorType == CombatActorType.Player)
             {
                 State.playerSpellbook.TickCooldowns();
@@ -811,15 +764,13 @@ namespace MyGame.Combat
             else
             {
                 State.enemySpellbook?.TickCooldowns();
-                // Spend enemy mana
                 ChangeMana(CombatActorType.Enemy, -resolvedQueuedSpell.manaCost);
-
-                // Apply cooldown to the spell just used
                 State.enemySpellbook?.StartCooldown(
                     resolvedQueuedSpell.spellId,
                     resolvedQueuedSpell.cooldownTurns
                 );
             }
+
             Emit(new SpellFiredEvent(actorType));
 
             ResolveAction(
@@ -846,15 +797,12 @@ namespace MyGame.Combat
 
             if (actorType == CombatActorType.Enemy)
             {
-                // Enemy immediately queues next spell and we continue looping
                 State.waitingForEnemyDecision = true;
                 Emit(new EnemyDecisionRequestedEvent(State.enemy.displayName));
             }
             else
             {
-                // Player must choose next spell -> stop simulation here
                 State.waitingForPlayerInput = true;
-                //Emit(new CombatLogEvent("Choose your next spell."));
             }
         }
 
@@ -888,7 +836,6 @@ namespace MyGame.Combat
 
             remainingTurns = Mathf.Max(0, entry.cooldownRemainingTurns);
 
-            // Resolve to get the design-time cooldownTurns (max)
             if (
                 !_spellResolver.TryResolve(
                     spellId,
@@ -898,16 +845,12 @@ namespace MyGame.Combat
                 )
             )
             {
-                // If we can't resolve, we still can show remaining as "some cooldown",
-                // but we don't know max. Use remaining as max so bar doesn't break.
                 maxTurns = Mathf.Max(1, remainingTurns);
                 return true;
             }
 
             maxTurns = Mathf.Max(1, resolved.cooldownTurns);
 
-            // Safety: if remaining is bigger than max for any reason, clamp max upward
-            // so visuals still make sense.
             if (remainingTurns > maxTurns)
                 maxTurns = remainingTurns;
 
@@ -928,6 +871,8 @@ namespace MyGame.Combat
 
                 if (t.kind == EffectKind.DamageOverTime)
                 {
+                    Debug.Log("Tick dealing damage:" + t.effectId);
+                    Debug.Log("Damage is:" + t.amount);
                     DealDamage(source: t.source, target: t.target, amount: amount);
                 }
                 else if (t.kind == EffectKind.HealOverTime)
@@ -935,7 +880,6 @@ namespace MyGame.Combat
                     ApplyHeal(source: t.source, target: t.target, amount: amount);
                 }
 
-                // If combat ended from DOT damage, stop processing remaining ticks
                 if (State.isFinished)
                     return;
             }
