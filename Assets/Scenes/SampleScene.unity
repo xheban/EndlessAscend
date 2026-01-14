@@ -771,6 +771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spellDatabase: {fileID: 11400000, guid: 467fb10c8af1c5a4ab2eb00d9ce7e148, type: 2}
+  effectDatabase: {fileID: 11400000, guid: 06e45474940100d468e8bcf1ef1f4837, type: 2}
   spellProgression: {fileID: 11400000, guid: 20ba0ea94467da746bf55cb4258bb1b4, type: 2}
   startingSpellConfig: {fileID: 11400000, guid: e4e8a20bfe9fe7943ac71ff7933c425f, type: 2}
   playerIconDatabase: {fileID: 11400000, guid: 8a1272959b9ac6447bd6217bf97b5456, type: 2}

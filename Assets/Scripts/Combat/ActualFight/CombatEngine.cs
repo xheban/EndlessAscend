@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MyGame.Common;
 using MyGame.Helpers;
 using MyGame.Save;
 using MyGame.Spells;
@@ -16,12 +17,17 @@ namespace MyGame.Combat
         private readonly IRng _rng;
         private readonly HitPhase _hitPhase;
         private readonly DamagePhase _damagePhase;
-
+        private readonly EffectPhase _effectPhase;
+        private readonly EffectDatabase _effectDb;
+        private readonly CombatEffectSystem _effects;
         public CombatState State { get; private set; }
 
-        public CombatEngine(ICombatSpellResolver spellResolver)
+        public CombatEngine(ICombatSpellResolver spellResolver, EffectDatabase effectDb)
         {
             _spellResolver = spellResolver;
+            _effectDb = effectDb;
+
+            _effects = new CombatEffectSystem(effectDb);
             // -------------------------
             // RNG (centralized)
             // -------------------------
@@ -80,6 +86,7 @@ namespace MyGame.Combat
                     // new CritDamageRule(),
                 }
             );
+            _effectPhase = new EffectPhase(new IEffectRule[] { new ApplyEffectsRule(_effects) });
         }
 
         // -------------------------
@@ -323,6 +330,10 @@ namespace MyGame.Combat
             if (string.IsNullOrWhiteSpace(chosen))
                 chosen = "enemy_attack"; // fallback if no candidates
 
+            var ticks = _effects.OnActionChosen(State, CombatActorType.Enemy);
+            ApplyPeriodicTicks(ticks);
+            if (State.isFinished)
+                return;
             State.enemy.queuedSpellId = chosen;
             Emit(new SpellQueuedEvent(CombatActorType.Enemy, State.enemy.displayName, chosen));
         }
@@ -440,6 +451,13 @@ namespace MyGame.Combat
                 return false;
             }
 
+            _effects.OnActionChosen(State, CombatActorType.Player);
+            var ticks = _effects.OnActionChosen(State, CombatActorType.Player);
+            ApplyPeriodicTicks(ticks);
+
+            if (State.isFinished)
+                return false;
+
             State.player.queuedSpellId = spellId;
             Emit(
                 new SpellQueuedEvent(
@@ -480,32 +498,78 @@ namespace MyGame.Combat
                 attacker = attacker,
                 defender = defender,
                 spell = spell,
+                spellLevel = spell.level,
                 rng = _rng,
 
                 // Start from spell base hit chance (your question earlier)
                 hitChance = spell.hitChance,
             };
-
-            // 2) HIT PHASE
-            _hitPhase.Resolve(ctx);
-
-            if (!ctx.hit)
+            // -------------------------
+            // 0) ON-CAST EFFECTS
+            // -------------------------
+            if (spell.onCastEffects != null && spell.onCastEffects.Length > 0)
             {
-                Emit(
-                    new CombatLogEvent(
-                        $"{attacker.displayName} uses {spell.displayName}, but it misses!"
-                    )
-                );
-                return;
+                ctx.effectInstancesToApply = spell.onCastEffects;
+                _effectPhase.Resolve(ctx);
+                ctx.effectInstancesToApply = null;
+            }
+
+            bool requiresHitCheck = (
+                spell.intent == SpellIntent.Damage || spell.intent == SpellIntent.Heal
+            );
+            // 2) HIT PHASE
+            if (requiresHitCheck)
+            {
+                _hitPhase.Resolve(ctx);
+
+                if (!ctx.hit)
+                {
+                    Emit(
+                        new CombatLogEvent(
+                            $"{attacker.displayName} uses {spell.displayName}, but it misses!"
+                        )
+                    );
+                    return;
+                }
+            }
+            else
+            {
+                // Buff/Debuff/Utility: treat as successful
+                ctx.hit = true;
             }
 
             Emit(new CombatLogEvent($"{attacker.displayName} uses {spell.displayName}!"));
 
-            // 3) DAMAGE PHASE
-            _damagePhase.Resolve(ctx);
+            // -------------------------
+            // 2) DAMAGE / HEAL / SKIP
+            // -------------------------
+            if (spell.intent == SpellIntent.Damage)
+            {
+                _damagePhase.Resolve(ctx);
+                DealDamage(source, target, ctx.finalDamage);
+            }
+            else if (spell.intent == SpellIntent.Heal)
+            {
+                // Minimal: treat resolved damage as "healing amount" OR add dedicated heal amount later
+                // For now: you can reuse ctx.finalDamage as "final heal amount" if you build a HealPhase later.
+                // We'll keep it simple and heal by spell.damage.
+                ApplyHeal(source, target, Mathf.Max(0, spell.damage));
+            }
+            else
+            {
+                ctx.finalDamage = 0;
+            }
+            ctx.lastDamageDealt = ctx.finalDamage;
 
-            // 4) Apply damage to target
-            DealDamage(source, target, ctx.finalDamage);
+            // -------------------------
+            // 3) ON-HIT EFFECTS (after successful hit and after damage/heal)
+            // -------------------------
+            if (ctx.hit && spell.onHitEffects != null && spell.onHitEffects.Length > 0)
+            {
+                ctx.effectInstancesToApply = spell.onHitEffects;
+                _effectPhase.Resolve(ctx);
+                ctx.effectInstancesToApply = null;
+            }
 
             if (source == CombatActorType.Player)
             {
@@ -556,6 +620,32 @@ namespace MyGame.Combat
             {
                 FinishCombat(source);
             }
+        }
+
+        private void ApplyHeal(CombatActorType source, CombatActorType target, int amount)
+        {
+            amount = Math.Max(0, amount);
+
+            var t = State.Get(target);
+            int before = t.hp;
+
+            t.hp = Clamp(t.hp + amount, 0, t.derived.maxHp);
+
+            int delta = t.hp - before; // positive on heal
+
+            if (delta <= 0)
+                return;
+
+            Emit(
+                new CombatAdvancedLogEvent(
+                    $"{State.Get(source).displayName} heals",
+                    delta,
+                    $"HP for {t.displayName}",
+                    CombatLogType.Heal
+                )
+            );
+
+            Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
         }
 
         private void ChangeMana(CombatActorType actor, int delta)
@@ -696,7 +786,11 @@ namespace MyGame.Combat
                 ignoreDefensePercent: 0,
                 hitChance: 90,
                 baseUseSpeed: 50,
-                damageTypes: new[] { DamageType.Slashing }
+                damageTypes: new[] { DamageType.Slashing },
+                onHitEffects: Array.Empty<EffectInstance>(),
+                onCastEffects: Array.Empty<EffectInstance>(),
+                intent: SpellIntent.Damage,
+                level: 1
             );
         }
 
@@ -707,7 +801,7 @@ namespace MyGame.Combat
 
             if (actorType == CombatActorType.Player)
             {
-                TickPlayerCooldownsOnce();
+                State.playerSpellbook.TickCooldowns();
                 ChangeMana(CombatActorType.Player, -resolvedQueuedSpell.manaCost);
                 State.playerSpellbook.StartCooldown(
                     resolvedQueuedSpell.spellId,
@@ -717,7 +811,6 @@ namespace MyGame.Combat
             else
             {
                 State.enemySpellbook?.TickCooldowns();
-
                 // Spend enemy mana
                 ChangeMana(CombatActorType.Enemy, -resolvedQueuedSpell.manaCost);
 
@@ -821,12 +914,31 @@ namespace MyGame.Combat
             return true;
         }
 
-        private void TickPlayerCooldownsOnce()
+        private void ApplyPeriodicTicks(List<CombatEffectSystem.PeriodicTickResult> ticks)
         {
-            if (State?.playerSpellbook == null)
+            if (ticks == null || ticks.Count == 0)
                 return;
 
-            State.playerSpellbook.TickCooldowns();
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                var t = ticks[i];
+                int amount = Mathf.Max(0, t.amount);
+                if (amount <= 0)
+                    continue;
+
+                if (t.kind == EffectKind.DamageOverTime)
+                {
+                    DealDamage(source: t.source, target: t.target, amount: amount);
+                }
+                else if (t.kind == EffectKind.HealOverTime)
+                {
+                    ApplyHeal(source: t.source, target: t.target, amount: amount);
+                }
+
+                // If combat ended from DOT damage, stop processing remaining ticks
+                if (State.isFinished)
+                    return;
+            }
         }
 
         private void DebugLogDerivedStats()

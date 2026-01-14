@@ -22,7 +22,7 @@ MonoBehaviour:
     intelligence: 1
     strength: 3
     spirit: 1
-    endurance: 2
+    endurance: 200
   baseExp: 4
   baseGold: 2
   spells:

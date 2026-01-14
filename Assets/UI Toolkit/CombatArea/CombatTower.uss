@@ -1,0 +1,20 @@
+.BuffSlot {
+    width: 56px;
+    height: 56px;
+    background-image: resource('Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Frame');
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.BuffIcon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: 40px;
+    height: 40px;
+    background-image: resource('Sprites/DarkPixelRPGUI/Artwok/Icons/11_cross');
+}

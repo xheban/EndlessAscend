@@ -14,15 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellId: fireball
   displayName: Fireball
+  description: Burn them all.
   icon: {fileID: 21300000, guid: a050ffea4f29eff488a6e6f312eac7a2, type: 3}
   allowedClasses: 1
   allowedSpecs: -1
   rarity: 0
-  manaCost: 5
-  cooldownTurns: 5
+  manaCost: 1
+  cooldownTurns: 3
   maxLevel: 10
   baseDamage: 10
   damageKind: 1
+  intent: 0
   damageTag: 01000000
   tier: 0
   ignoreDefenseFlat: 0
@@ -33,7 +35,7 @@ MonoBehaviour:
   damageScalingValue: 3
   onHitEffects:
   - effect: {fileID: 11400000, guid: f7b94d16f1700794c95564bc3dfdbd25, type: 2}
-    chancePercent: 20
+    chancePercent: 100
     durationTurns: 2
     magnitudeFlat: 5
     magnitudePercent: 0
@@ -104,3 +106,4 @@ MonoBehaviour:
       useMinMax: 0
       minValue: 0
       maxValue: 0
+  onCastEffects: []

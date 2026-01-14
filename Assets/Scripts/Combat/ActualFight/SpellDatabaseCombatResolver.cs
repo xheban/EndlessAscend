@@ -54,7 +54,11 @@ namespace MyGame.Combat
                 ignoreDefensePercent: ignorePct,
                 hitChance: def.hitChance,
                 damageTypes: def.damageTag,
-                baseUseSpeed: def.baseUseSpeed
+                baseUseSpeed: def.baseUseSpeed,
+                onHitEffects: def.onHitEffects,
+                onCastEffects: def.onCastEffects,
+                intent: def.intent,
+                level: spellLevel
             );
 
             return true;

@@ -565,6 +565,33 @@ namespace MyGame.Combat
             attackerWeakenMultByType[Idx(t)] /= f;
         }
 
+        // -------------------------
+        // Type flat REMOVE helpers (NEW)
+        // -------------------------
+        public void RemoveAttackerBonusFlat(DamageType t, int value)
+        {
+            EnsureArrays();
+            attackerBonusFlatByType[Idx(t)] -= value;
+        }
+
+        public void RemoveDefenderVulnFlat(DamageType t, int value)
+        {
+            EnsureArrays();
+            defenderVulnFlatByType[Idx(t)] -= value;
+        }
+
+        public void RemoveDefenderResistFlat(DamageType t, int value)
+        {
+            EnsureArrays();
+            defenderResistFlatByType[Idx(t)] -= value;
+        }
+
+        public void RemoveAttackerWeakenFlat(DamageType t, int value)
+        {
+            EnsureArrays();
+            attackerWeakenFlatByType[Idx(t)] -= value;
+        }
+
         // Utility: avoid negative multipliers for "less"
         private static float Clamp01Factor(float v) => v < 0f ? 0f : v;
 

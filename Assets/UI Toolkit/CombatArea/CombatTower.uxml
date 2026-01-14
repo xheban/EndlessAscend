@@ -1,6 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
     <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelProgressBar/pixelStyle.uss?fileID=7433441132597879392&amp;guid=376b38c98fa84a74c9509e7f58f1adff&amp;type=3#pixelStyle" />
+    <Style src="project://database/Assets/UI%20Toolkit/CombatArea/CombatTower.uss?fileID=7433441132597879392&amp;guid=404dbbbee37a8fd4c97221c2b65fc0c2&amp;type=3#CombatTower" />
     <engine:VisualElement name="Bg" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Images/TowerCombat.png?fileID=2800000&amp;guid=3626939625081d843a6e3615e537197e&amp;type=3#TowerCombat&quot;);">
         <engine:VisualElement name="EnemyPlaceholder" style="flex-grow: 1; left: 1023px; position: absolute; top: 524px; width: 320px; height: 320px;">
             <engine:Label text="Label" name="EnemyAction" class="label-1" style="-unity-text-align: upper-center;" />
@@ -37,9 +38,120 @@
                         </engine:VisualElement>
                     </engine:VisualElement>
                 </engine:VisualElement>
-                <engine:VisualElement name="BuffsDebuffs" style="flex-grow: 0; height: 160px; flex-shrink: 0;">
-                    <MyGame.UI.PixelProgressBar _textSize="0" _fill="Orange" _showLabel="false" _showValues="false" _showText="false" name="TurnMeter" _value="45" style="height: 15px; margin-right: 64px;" />
-                    <engine:VisualElement style="flex-grow: 1;" />
+                <engine:VisualElement name="BuffsDebuffsTurnMeter" style="flex-grow: 0; height: 160px; flex-shrink: 0; margin-right: 64px;">
+                    <MyGame.UI.PixelProgressBar _textSize="0" _fill="Orange" _showLabel="false" _showValues="false" _showText="false" name="TurnMeter" _value="45" style="height: 15px; margin-right: 0;" />
+                    <engine:VisualElement name="BuffsDebuffs" style="flex-grow: 1;">
+                        <engine:VisualElement name="Buffs" style="flex-grow: 1; flex-direction: row; flex-basis: 1px; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; align-items: center; margin-right: 0;">
+                            <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Icons/MyAssets/utils/upgrade&apos;); -unity-background-scale-mode: stretch-to-fill; width: 48px; height: 48px; justify-content: flex-end; flex-shrink: 1; align-items: stretch; margin-right: 16px;" />
+                            <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
+                                <engine:VisualElement name="BuffSlot1" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot2" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot3" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot4" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot5" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot6" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot7" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot8" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot9" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot10" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Debuffs" style="flex-grow: 1; flex-direction: row; flex-basis: 1px; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; align-items: center;">
+                            <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Icons/MyAssets/utils/upgrade&apos;); -unity-background-scale-mode: scale-to-fit; background-color: rgba(3, 3, 3, 0); -unity-background-image-tint-color: rgb(255, 8, 0); rotate: 180deg; height: 48px; width: 48px; margin-right: 16px; margin-left: 0;" />
+                            <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
+                                <engine:VisualElement name="DebuffSlot1" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot2" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot3" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot4" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot5" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot6" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot7" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot8" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot9" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot10" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="EnemySection" style="flex-grow: 1; flex-basis: 1px;">
@@ -67,9 +179,120 @@
                         </engine:VisualElement>
                     </engine:VisualElement>
                 </engine:VisualElement>
-                <engine:VisualElement name="BuffsDebuffs" style="flex-grow: 0; height: 160px; flex-shrink: 0;">
-                    <MyGame.UI.PixelProgressBar _textSize="0" _fill="Orange" _showLabel="false" _showValues="false" _showText="false" name="TurnMeter" _value="95" style="height: 15px; margin-right: 0; margin-left: 64px;" />
-                    <engine:VisualElement style="flex-grow: 1;" />
+                <engine:VisualElement name="BuffsDebuffsTurnMeter" style="flex-grow: 0; height: 160px; flex-shrink: 0; margin-left: 64px;">
+                    <MyGame.UI.PixelProgressBar _textSize="0" _fill="Orange" _showLabel="false" _showValues="false" _showText="false" name="TurnMeter" _value="95" style="height: 15px; margin-right: 0; margin-left: 0;" />
+                    <engine:VisualElement name="BuffsDebuffs" style="flex-grow: 1;">
+                        <engine:VisualElement name="Buffs" style="flex-grow: 1; flex-direction: row; flex-basis: 1px; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; align-items: center; margin-right: 0;">
+                            <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Icons/MyAssets/utils/upgrade&apos;); -unity-background-scale-mode: stretch-to-fill; width: 48px; height: 48px; justify-content: flex-end; flex-shrink: 1; align-items: stretch; margin-right: 16px;" />
+                            <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
+                                <engine:VisualElement name="BuffSlot1" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot2" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot3" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot4" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot5" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot6" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot7" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot8" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot9" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="BuffSlot10" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Debuffs" style="flex-grow: 1; flex-direction: row; flex-basis: 1px; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; align-items: center;">
+                            <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Icons/MyAssets/utils/upgrade&apos;); -unity-background-scale-mode: scale-to-fit; background-color: rgba(3, 3, 3, 0); -unity-background-image-tint-color: rgb(255, 8, 0); rotate: 180deg; height: 48px; width: 48px; margin-right: 16px; margin-left: 0;" />
+                            <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
+                                <engine:VisualElement name="DebuffSlot1" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot2" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot3" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot4" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot5" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot6" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot7" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot8" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot9" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                                <engine:VisualElement name="DebuffSlot10" class="BuffSlot">
+                                    <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
+                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                </engine:VisualElement>
+                            </engine:VisualElement>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
                 </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MyGame.Common;
 
 namespace MyGame.Combat
@@ -19,6 +20,7 @@ namespace MyGame.Combat
         public DerivedCombatStats derived;
 
         public StatModifiers modifiers = new StatModifiers();
+        public List<ActiveEffectState> activeEffects = new List<ActiveEffectState>();
 
         // Runtime resources
         public int hp;

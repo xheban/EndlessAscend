@@ -15,15 +15,19 @@ namespace MyGame.Combat
         // Step 2: keep it simple (direct damage only)
         public int damage;
 
-        // Needed for scaling rules now / resistances later
-        public DamageKind damageKind;
-        public DamageType[] damageTypes;
-
         // Spell-specific defense bypass
         public int ignoreDefenseFlat;
         public int ignoreDefensePercent; // 0..100
         public int hitChance;
         public int baseUseSpeed;
+        public int level;
+
+        // Needed for scaling rules now / resistances later
+        public DamageKind damageKind;
+        public DamageType[] damageTypes;
+        public EffectInstance[] onHitEffects;
+        public EffectInstance[] onCastEffects;
+        public SpellIntent intent;
 
         public ResolvedSpell(
             string spellId,
@@ -31,12 +35,16 @@ namespace MyGame.Combat
             int manaCost,
             int cooldownTurns,
             int damage,
-            DamageKind damageKind,
-            DamageType[] damageTypes,
             int ignoreDefenseFlat,
             int ignoreDefensePercent,
             int hitChance,
-            int baseUseSpeed
+            int baseUseSpeed,
+            int level,
+            DamageKind damageKind,
+            DamageType[] damageTypes,
+            EffectInstance[] onHitEffects,
+            EffectInstance[] onCastEffects,
+            SpellIntent intent
         )
         {
             this.spellId = spellId;
@@ -51,6 +59,10 @@ namespace MyGame.Combat
             this.hitChance = hitChance;
             this.damageTypes = damageTypes;
             this.baseUseSpeed = baseUseSpeed;
+            this.onHitEffects = onHitEffects;
+            this.onCastEffects = onCastEffects;
+            this.intent = intent;
+            this.level = level;
         }
     }
 

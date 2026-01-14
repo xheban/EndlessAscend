@@ -12,6 +12,8 @@ namespace MyGame.Combat
         public CombatActorState attacker;
         public CombatActorState defender;
         public ResolvedSpell spell;
+        public DamageKind spellDamageKind;
+        public int lastDamageDealt;
 
         // Shared services
         public IRng rng;
@@ -33,7 +35,8 @@ namespace MyGame.Combat
         // -------------------
         // Phase 3: Effects
         // -------------------
-        public readonly List<EffectAttempt> effectAttempts = new();
+        public int spellLevel;
+        public EffectInstance[] effectInstancesToApply;
     }
 
     /// <summary>

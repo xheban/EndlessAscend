@@ -12,6 +12,9 @@ namespace MyGame.Run
         private SpellDatabase spellDatabase;
 
         [SerializeField]
+        private EffectDatabase effectDatabase;
+
+        [SerializeField]
         private SpellProgressionConfig spellProgression;
 
         [SerializeField]
@@ -27,6 +30,7 @@ namespace MyGame.Run
         public StartingSpellConfig StartingSpellConfig => startingSpellConfig;
 
         public SpellDatabase SpellDatabase => spellDatabase;
+        public EffectDatabase EffectDatabase => effectDatabase;
         public SpellProgressionConfig SpellProgression => spellProgression;
 
         public PlayerIconDatabase PlayerIconDatabase => playerIconDatabase;

@@ -15,7 +15,7 @@ public class EffectInstance
     [Min(1)]
     public int durationTurns = 2;
 
-    public int magnitudeFlat = 0; // e.g. 20 flat burn
+    public int magnitudeFlat = 0; // e.g. +20 flat
 
     [Range(0, 100)]
     public int magnitudePercent = 0; // e.g. 50 = 50%
@@ -23,6 +23,8 @@ public class EffectInstance
     public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
 
     public bool stackable = true;
+
+    public EffectTarget target = EffectTarget.Enemy;
 
     [Min(1)]
     public int maxStacks = 5;
@@ -34,6 +36,10 @@ public class EffectInstance
     public IntScalingChoice magnitudePercentScaling;
     public IntScalingChoice maxStacksScaling;
 
+    /// <summary>
+    /// Produces final integer values for runtime use,
+    /// based on spell level.
+    /// </summary>
     public EffectInstanceScaledIntValues GetScaled(int spellLevel)
     {
         int chance =
@@ -59,7 +65,9 @@ public class EffectInstance
         int stacks =
             maxStacksScaling != null ? maxStacksScaling.Evaluate(spellLevel, maxStacks) : maxStacks;
 
+        // -------------------------
         // Safety clamps
+        // -------------------------
         chance = Mathf.Clamp(chance, 0, 100);
         duration = Mathf.Max(1, duration);
         flat = Mathf.Max(0, flat);
@@ -76,22 +84,9 @@ public class EffectInstance
             durationTurns = duration,
             magnitudeFlat = flat,
             magnitudePercent = percent,
-            maxStacks = stacks,
+            magnitudeBasis = magnitudeBasis, // ✅ IMPORTANT FIX
             stackable = stackable,
+            maxStacks = stacks,
         };
     }
-}
-
-[Serializable]
-public struct EffectInstanceScaledIntValues
-{
-    [Range(0, 100)]
-    public int chancePercent;
-    public int durationTurns;
-    public int magnitudeFlat;
-
-    [Range(0, 100)]
-    public int magnitudePercent;
-    public bool stackable;
-    public int maxStacks;
 }

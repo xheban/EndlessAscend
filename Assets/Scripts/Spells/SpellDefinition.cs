@@ -8,6 +8,7 @@ public class SpellDefinition : ScriptableObject
     [Header("Identity")]
     public string spellId;
     public string displayName;
+    public string description;
     public Sprite icon;
 
     [Header("Restrictions")]
@@ -29,6 +30,9 @@ public class SpellDefinition : ScriptableObject
 
     [Header("Damage Kind")]
     public DamageKind damageKind = DamageKind.Magical;
+
+    [Header("Type")]
+    public SpellIntent intent = SpellIntent.Damage;
 
     [Header("Damage Type")]
     public DamageType[] damageTag;
@@ -58,6 +62,7 @@ public class SpellDefinition : ScriptableObject
 
     [Header("Effects")]
     public EffectInstance[] onHitEffects;
+    public EffectInstance[] onCastEffects;
 
     public int GetDamageAtLevel(int level)
     {
