@@ -1,4 +1,5 @@
 using System;
+using MyGame.Combat;
 using MyGame.Common;
 using UnityEngine;
 
@@ -8,33 +9,65 @@ public class EffectInstance
     [Header("Effect")]
     public EffectDefinition effect;
 
+    // -------------------------
+    // Apply chance / base numbers
+    // -------------------------
     [Header("Base (ALL INT)")]
     [Range(0, 100)]
-    public int chancePercent = 20;
+    public int chancePercent = 20; // 0..100
 
     [Min(1)]
     public int durationTurns = 2;
 
-    public int magnitudeFlat = 0;
+    public int magnitudeFlat = 0; // e.g. +20 flat
 
     [Range(0, 100)]
-    public int magnitudePercent = 0;
+    public int magnitudePercent = 0; // e.g. 50 = 50%
 
     public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
 
-    [Header("Stacking / Merging")]
+    // -------------------------
+    // Stacking / merging behavior (per spell instance)
+    // -------------------------
+    [Header("Stacking / Merging (per spell instance)")]
     public bool stackable = true;
-
-    [Tooltip(
-        "If true, different sources fuse into one bucket (same effectId). If false, each source gets a separate bucket."
-    )]
-    public bool mergeable = true;
-
-    public EffectTarget target = EffectTarget.Enemy;
 
     [Min(1)]
     public int maxStacks = 5;
 
+    [Tooltip(
+        "If true: effects from different sources fuse into one bucket (same effectId). If false: they stay separate per source."
+    )]
+    public bool mergeable = true;
+
+    [Header("Reapply Behavior (per spell instance)")]
+    public EffectReapplyRule reapplyRule = EffectReapplyRule.AddOnTop;
+
+    [Header("Duration Stacking (per spell instance)")]
+    public DurationStackMode durationStackMode = DurationStackMode.Refresh;
+
+    [Tooltip(
+        "Only when durationStackMode = Refresh. If true set remaining=newDuration, else remaining=max(remaining,newDuration)."
+    )]
+    public bool refreshOverridesRemaining = false;
+
+    [Header("Strength Compare (OverwriteIfStronger only)")]
+    public EffectStrengthCompareMode compareMode = EffectStrengthCompareMode.ByStrengthRating;
+
+    [Tooltip(
+        "Only used when compareMode = ByStrengthRating. Higher wins. If <= 0, definition strengthRating can be used (optional)."
+    )]
+    public int strengthRatingOverride = 0;
+
+    // -------------------------
+    // Target selection
+    // -------------------------
+    [Header("Target")]
+    public EffectTarget target = EffectTarget.Enemy;
+
+    // -------------------------
+    // Scaling (choose one per field)
+    // -------------------------
     [Header("Scaling (choose one per field)")]
     public IntScalingChoice chanceScaling;
     public IntScalingChoice durationScaling;
@@ -42,6 +75,10 @@ public class EffectInstance
     public IntScalingChoice magnitudePercentScaling;
     public IntScalingChoice maxStacksScaling;
 
+    /// <summary>
+    /// Produces final integer values for runtime use,
+    /// based on spell level, and snapshots instance behavior fields.
+    /// </summary>
     public EffectInstanceScaledIntValues GetScaled(int spellLevel)
     {
         int chance =
@@ -67,6 +104,9 @@ public class EffectInstance
         int stacks =
             maxStacksScaling != null ? maxStacksScaling.Evaluate(spellLevel, maxStacks) : maxStacks;
 
+        // -------------------------
+        // Safety clamps
+        // -------------------------
         chance = Mathf.Clamp(chance, 0, 100);
         duration = Mathf.Max(1, duration);
         flat = Mathf.Max(0, flat);
@@ -79,14 +119,27 @@ public class EffectInstance
 
         return new EffectInstanceScaledIntValues
         {
+            // numeric result
             chancePercent = chance,
             durationTurns = duration,
             magnitudeFlat = flat,
             magnitudePercent = percent,
+
+            // basis / flags
             magnitudeBasis = magnitudeBasis,
             stackable = stackable,
-            mergeable = mergeable,
             maxStacks = stacks,
+            mergeable = mergeable,
+
+            // per-instance behavior snapshot
+            reapplyRule = reapplyRule,
+            durationStackMode = durationStackMode,
+            refreshOverridesRemaining = refreshOverridesRemaining,
+            compareMode = compareMode,
+            strengthRatingOverride = strengthRatingOverride,
+
+            // targeting
+            target = target,
         };
     }
 }

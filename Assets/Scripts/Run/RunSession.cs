@@ -35,7 +35,6 @@ namespace MyGame.Run
                 Debug.LogError("[RunSession] ApplyRuntimeToSave: save is null.");
                 return;
             }
-            Debug.Log("i am saving");
             SpellSaveMapper.WriteToSave(Spellbook, save);
             TowerSaveMapper.WriteToSave(Towers, save);
         }

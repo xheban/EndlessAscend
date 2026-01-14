@@ -38,6 +38,7 @@ namespace MyGame.Combat
 
             [Range(0, 1000)]
             public int totalMagnitudePercent;
+            public int strengthRating;
 
             public EffectMagnitudeBasis magnitudeBasis;
 

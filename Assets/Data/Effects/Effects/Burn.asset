@@ -15,15 +15,10 @@ MonoBehaviour:
   effectId: burn
   displayName: Burn
   icon: {fileID: 21300000, guid: 5b5af956a028fd54b9adeca62d09c6cd, type: 3}
+  description: Burn let them Burnn burnn them all
   kind: 1
   polarity: 1
-  reapplyRule: 1
-  durationStackMode: 0
-  refreshOverridesRemaining: 0
-  compareMode: 0
-  strengthRating: 5
   stat: 0
   op: 1
   damageType: 01000000
   tickTiming: 1
-  description: Burn let them Burnn burnn them all

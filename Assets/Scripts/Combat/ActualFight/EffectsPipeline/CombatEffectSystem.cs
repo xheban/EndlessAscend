@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using MyGame.Common;
-using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 
 namespace MyGame.Combat
@@ -42,6 +40,11 @@ namespace MyGame.Combat
         // =========================
         // PUBLIC API
         // =========================
+
+        /// <summary>
+        /// Called when an actor CHOOSES an action (your definition of "new turn").
+        /// Ticks periodic effects on that actor and decrements durations.
+        /// </summary>
         public List<PeriodicTickResult> OnActionChosen(CombatState state, CombatActorType actorType)
         {
             var results = new List<PeriodicTickResult>();
@@ -70,7 +73,6 @@ namespace MyGame.Combat
             if (instances == null || instances.Length == 0)
                 return;
 
-            Debug.Log("aplying instances of effects");
             for (int i = 0; i < instances.Length; i++)
             {
                 ApplyEffectInstance(
@@ -109,17 +111,16 @@ namespace MyGame.Combat
             if (string.IsNullOrWhiteSpace(def.effectId))
                 return;
 
-            // Choose target based on instance setting
-            CombatActorState target = inst.target == EffectTarget.Self ? attacker : defender;
-            target.activeEffects ??= new List<ActiveEffectState>();
-
             var scaled = inst.GetScaled(spellLevel);
+
+            // Choose target based on INSTANCE snapshot
+            CombatActorState target = scaled.target == EffectTarget.Self ? attacker : defender;
+            target.activeEffects ??= new List<ActiveEffectState>();
 
             if (scaled.chancePercent <= 0)
                 return;
 
             int roll = rng.RangeInt(1, 101);
-            Debug.Log("effect rolled for hit:" + roll);
             if (roll > scaled.chancePercent)
                 return;
 
@@ -127,7 +128,7 @@ namespace MyGame.Combat
             int casterFinalAP = ComputeFinalAttackPower(attacker);
             int casterFinalMP = ComputeFinalMagicPower(attacker);
 
-            // Guard: basis-based stat modifiers must be Flat (we materialize percent-of-basis into flat)
+            // ✅ Guard: basis-based stat modifiers must be Flat (we materialize percent-of-basis into flat)
             if (
                 def.kind == EffectKind.StatModifier
                 && scaled.magnitudeBasis != EffectMagnitudeBasis.None
@@ -151,8 +152,6 @@ namespace MyGame.Combat
                     casterFinalMP: casterFinalMP,
                     lastDamageDealt: lastDamageDealt
                 );
-
-                Debug.Log("computed periodic damge is: " + computedPeriodicContribution);
             }
 
             // Materialize basis for stat modifiers: percent-of-basis becomes flat ON APPLY
@@ -178,7 +177,6 @@ namespace MyGame.Combat
             ApplyDelta delta = AddOrRefreshEffect(
                 list: target.activeEffects,
                 def: def,
-                inst: inst,
                 sourceActor: attacker.actorType,
                 sourceSpellId: spell.spellId,
                 scaled: scaled,
@@ -220,7 +218,6 @@ namespace MyGame.Combat
         private ApplyDelta AddOrRefreshEffect(
             List<ActiveEffectState> list,
             EffectDefinition def,
-            EffectInstance inst,
             CombatActorType sourceActor,
             string sourceSpellId,
             EffectInstanceScaledIntValues scaled,
@@ -228,9 +225,9 @@ namespace MyGame.Combat
             int materializedFlatFromBasis
         )
         {
-            if (list == null || def == null || inst == null)
+            if (list == null || def == null)
                 return default;
-            Debug.Log("adding or refreshing effect");
+
             // 1) Find/create bucket:
             // - mergeable => one bucket per effectId
             // - non-mergeable => separate bucket per source
@@ -238,27 +235,43 @@ namespace MyGame.Combat
                 list: list,
                 effectId: def.effectId,
                 kind: def.kind,
-                mergeable: scaled.mergeable, // ✅ FINAL PATCH: use scaled snapshot
+                mergeable: scaled.mergeable,
                 sourceActor: sourceActor,
                 sourceSpellId: sourceSpellId,
                 scaled: scaled
             );
-
-            Debug.Log("bucket is : " + bucket.effectId);
 
             bucket.EnsureContributionBacked();
 
             // 2) Find contribution in bucket for this source
             var contrib = FindContribution(bucket, sourceActor, sourceSpellId);
 
+            // ✅ Rule: not stackable + not mergeable => ignore re-apply from same source
+            // unless OverwriteIfStronger.
+            if (
+                contrib != null
+                && !scaled.stackable
+                && !scaled.mergeable
+                && scaled.reapplyRule != EffectReapplyRule.OverwriteIfStronger
+            )
+            {
+                bucket.RebuildLegacyFromContributions();
+                return default;
+            }
+
             bool createdNewContribution = false;
+
+            // 3) Create contribution if missing
             if (contrib == null)
             {
                 contrib = new ActiveEffectState.EffectContributionState
                 {
                     sourceActor = sourceActor,
                     sourceSpellId = sourceSpellId,
+
+                    // ✅ First application sets duration directly (do NOT ApplyDurationStacking here!)
                     remainingTurns = Mathf.Max(1, scaled.durationTurns),
+
                     stacks = 1,
                     stackable = scaled.stackable,
                     maxStacks = Mathf.Max(1, scaled.maxStacks),
@@ -267,6 +280,9 @@ namespace MyGame.Combat
                     totalMagnitudePercent = 0,
                     magnitudeBasis = scaled.magnitudeBasis,
 
+                    // If you have this field in your contribution, store it for rating compare:
+                    strengthRating = Mathf.Max(0, scaled.strengthRatingOverride),
+
                     periodicTickContributions = new List<int>(),
                 };
 
@@ -274,12 +290,7 @@ namespace MyGame.Combat
                 createdNewContribution = true;
             }
 
-            // 3) Apply duration rule per contribution (even if DoNothingIfPresent)
-            if (!createdNewContribution)
-            {
-                ApplyDurationStacking(contrib, scaled.durationTurns, def);
-            }
-            // 4) Compute base magnitudes for THIS application (one stack contribution)
+            // 4) Compute magnitudes for THIS application (one stack contribution)
             int addFlat = Mathf.Max(0, scaled.magnitudeFlat);
             int addPct = Mathf.Max(0, scaled.magnitudePercent);
 
@@ -293,12 +304,15 @@ namespace MyGame.Combat
                 addPct = 0;
             }
 
-            // 5) Creation: always apply first contribution
+            // 5) First-time application always applies contribution
             if (createdNewContribution)
             {
                 contrib.totalMagnitudeFlat = addFlat;
                 contrib.totalMagnitudePercent = addPct;
                 contrib.magnitudeBasis = scaled.magnitudeBasis;
+
+                // store rating snapshot if present
+                contrib.strengthRating = Mathf.Max(0, scaled.strengthRatingOverride);
 
                 if (def.kind == EffectKind.DamageOverTime || def.kind == EffectKind.HealOverTime)
                 {
@@ -315,17 +329,27 @@ namespace MyGame.Combat
                 return new ApplyDelta(addFlat, addPct);
             }
 
-            // 6) Reapply rules (apply to THIS source contribution)
-            switch (def.reapplyRule)
+            // 6) Reapply rules (existing contribution)
+            switch (scaled.reapplyRule)
             {
                 case EffectReapplyRule.DoNothingIfPresent:
                 {
+                    // Do absolutely nothing (no duration refresh)
                     bucket.RebuildLegacyFromContributions();
                     return default;
                 }
 
                 case EffectReapplyRule.AddOnTop:
                 {
+                    // Duration behavior applies on re-apply
+                    ApplyDurationStacking(
+                        c: contrib,
+                        newDuration: scaled.durationTurns,
+                        mode: scaled.durationStackMode,
+                        refreshOverridesRemaining: scaled.refreshOverridesRemaining
+                    );
+
+                    // If not stackable, AddOnTop becomes "duration-only"
                     if (!scaled.stackable || !contrib.stackable)
                     {
                         bucket.RebuildLegacyFromContributions();
@@ -347,11 +371,11 @@ namespace MyGame.Combat
                     contrib.stacks = nextStacks;
                     contrib.maxStacks = maxStacks;
 
-                    // StatModifier totals scale with stacks (store exact totals)
+                    // totals accumulate with stacks
                     contrib.totalMagnitudeFlat += addFlat;
                     contrib.totalMagnitudePercent += addPct;
 
-                    // DOT/HOT: add tick contribution for new stack
+                    // DOT/HOT: add another tick contribution per stack
                     if (
                         def.kind == EffectKind.DamageOverTime
                         || def.kind == EffectKind.HealOverTime
@@ -362,22 +386,38 @@ namespace MyGame.Combat
                         contrib.stacks = Mathf.Max(1, contrib.periodicTickContributions.Count);
                     }
 
+                    // keep/update rating snapshot
+                    contrib.strengthRating = Mathf.Max(
+                        contrib.strengthRating,
+                        Mathf.Max(0, scaled.strengthRatingOverride)
+                    );
+
                     bucket.RebuildLegacyFromContributions();
                     return new ApplyDelta(addFlat, addPct);
                 }
 
                 case EffectReapplyRule.OverwriteIfStronger:
                 {
-                    bool stronger = IsNewStronger_Contribution(contrib, def, scaled);
+                    bool stronger = IsNewStronger_Contribution(contrib, scaled);
                     if (!stronger)
                     {
+                        // ✅ requirement: NO duration refresh unless overwrite applied
                         bucket.RebuildLegacyFromContributions();
                         return default;
                     }
 
+                    // ✅ Only now refresh/prolong duration
+                    ApplyDurationStacking(
+                        c: contrib,
+                        newDuration: scaled.durationTurns,
+                        mode: scaled.durationStackMode,
+                        refreshOverridesRemaining: scaled.refreshOverridesRemaining
+                    );
+
                     int oldFlat = contrib.totalMagnitudeFlat;
                     int oldPct = contrib.totalMagnitudePercent;
 
+                    // overwrite everything
                     contrib.stacks = 1;
                     contrib.stackable = scaled.stackable;
                     contrib.maxStacks = Mathf.Max(1, scaled.maxStacks);
@@ -386,8 +426,12 @@ namespace MyGame.Combat
                     contrib.totalMagnitudePercent = addPct;
                     contrib.magnitudeBasis = scaled.magnitudeBasis;
 
-                    contrib.periodicTickContributions ??= new List<int>();
-                    contrib.periodicTickContributions.Clear();
+                    contrib.strengthRating = Mathf.Max(0, scaled.strengthRatingOverride);
+
+                    if (contrib.periodicTickContributions == null)
+                        contrib.periodicTickContributions = new List<int>();
+                    else
+                        contrib.periodicTickContributions.Clear();
 
                     if (
                         def.kind == EffectKind.DamageOverTime
@@ -425,7 +469,7 @@ namespace MyGame.Combat
 
             if (mergeable)
             {
-                // one bucket per effectId
+                // Mergeable: one bucket per effectId
                 for (int i = 0; i < list.Count; i++)
                 {
                     var e = list[i];
@@ -438,7 +482,7 @@ namespace MyGame.Combat
             }
             else
             {
-                // separate bucket per source
+                // Non-mergeable: bucket must match the same source contribution
                 for (int i = 0; i < list.Count; i++)
                 {
                     var e = list[i];
@@ -458,6 +502,7 @@ namespace MyGame.Combat
             if (found != null)
                 return found;
 
+            // Create new bucket (legacy ctor OK; bucket summary is rebuilt later)
             var created = new ActiveEffectState(
                 effectId: effectId,
                 durationTurns: Mathf.Max(1, scaled.durationTurns),
@@ -469,6 +514,9 @@ namespace MyGame.Combat
             );
 
             created.EnsureContributionBacked();
+            if (created.contributions != null && created.contributions.Count > 0)
+                created.contributions.Clear();
+
             list.Add(created);
             return created;
         }
@@ -495,15 +543,16 @@ namespace MyGame.Combat
         private static void ApplyDurationStacking(
             ActiveEffectState.EffectContributionState c,
             int newDuration,
-            EffectDefinition def
+            DurationStackMode mode,
+            bool refreshOverridesRemaining
         )
         {
-            if (c == null || def == null)
+            if (c == null)
                 return;
 
             int d = Mathf.Max(1, newDuration);
 
-            switch (def.durationStackMode)
+            switch (mode)
             {
                 case DurationStackMode.None:
                     return;
@@ -514,7 +563,7 @@ namespace MyGame.Combat
 
                 case DurationStackMode.Refresh:
                 default:
-                    if (def.refreshOverridesRemaining)
+                    if (refreshOverridesRemaining)
                         c.remainingTurns = d;
                     else
                         c.remainingTurns = Mathf.Max(c.remainingTurns, d);
@@ -522,39 +571,35 @@ namespace MyGame.Combat
             }
         }
 
-        private bool IsNewStronger_Contribution(
+        private static bool IsNewStronger_Contribution(
             ActiveEffectState.EffectContributionState existingContribution,
-            EffectDefinition newDef,
             EffectInstanceScaledIntValues scaled
         )
         {
-            if (existingContribution == null || newDef == null)
+            if (existingContribution == null)
                 return true;
 
-            var oldDef = _db != null ? _db.GetById(newDef.effectId) : null;
-            if (oldDef == null)
-            {
-                int oldScoreFallback =
-                    existingContribution.totalMagnitudeFlat
-                    + existingContribution.totalMagnitudePercent;
-                int newScoreFallback =
-                    Mathf.Max(0, scaled.magnitudeFlat) + Mathf.Max(0, scaled.magnitudePercent);
-                return newScoreFallback > oldScoreFallback;
-            }
-
-            switch (newDef.compareMode)
+            switch (scaled.compareMode)
             {
                 case EffectStrengthCompareMode.ByStrengthRating:
-                    return newDef.strengthRating > oldDef.strengthRating;
+                {
+                    int newRating = Mathf.Max(0, scaled.strengthRatingOverride);
+                    int oldRating = Mathf.Max(0, existingContribution.strengthRating);
+                    return newRating > oldRating;
+                }
 
                 case EffectStrengthCompareMode.ByComputedMagnitude:
                 default:
+                {
                     int oldScore =
                         existingContribution.totalMagnitudeFlat
                         + existingContribution.totalMagnitudePercent;
+
                     int newScore =
                         Mathf.Max(0, scaled.magnitudeFlat) + Mathf.Max(0, scaled.magnitudePercent);
+
                     return newScore > oldScore;
+                }
             }
         }
 
@@ -567,6 +612,7 @@ namespace MyGame.Combat
             if (owner == null || owner.activeEffects == null)
                 return;
 
+            // Iterate buckets
             for (int i = owner.activeEffects.Count - 1; i >= 0; i--)
             {
                 var bucket = owner.activeEffects[i];
@@ -580,35 +626,37 @@ namespace MyGame.Combat
 
                 int bucketTickTotal = 0;
 
+                // Iterate contributions
                 for (int cIndex = bucket.contributions.Count - 1; cIndex >= 0; cIndex--)
                 {
                     var c = bucket.contributions[cIndex];
+                    Debug.Log("-----------> Remaing duration is :" + c.remainingTurns);
                     if (c == null)
                     {
                         bucket.contributions.RemoveAt(cIndex);
                         continue;
                     }
 
-                    // Tick periodic for this contribution
+                    // 1) Tick periodic for this contribution BEFORE decrement/expire
                     if (
                         bucket.kind == EffectKind.DamageOverTime
                         || bucket.kind == EffectKind.HealOverTime
                     )
                     {
-                        if (c.periodicTickContributions != null)
+                        if (c.remainingTurns > 0 && c.periodicTickContributions != null)
                         {
                             for (int k = 0; k < c.periodicTickContributions.Count; k++)
                                 bucketTickTotal += Mathf.Max(0, c.periodicTickContributions[k]);
                         }
                     }
 
-                    // Decrement duration
+                    // 2) Decrement duration
                     c.remainingTurns--;
 
-                    // Expire contribution
+                    // 3) Expire contribution
                     if (c.remainingTurns <= 0)
                     {
-                        // Undo stat modifiers for THIS contribution only
+                        // Undo StatModifier totals for THIS contribution only
                         if (
                             bucket.kind == EffectKind.StatModifier
                             && owner.modifiers != null
@@ -631,17 +679,7 @@ namespace MyGame.Combat
                     }
                 }
 
-                // Remove empty bucket
-                if (bucket.contributions.Count == 0)
-                {
-                    owner.activeEffects.RemoveAt(i);
-                    continue;
-                }
-
-                // Rebuild summary fields
-                bucket.RebuildLegacyFromContributions();
-
-                // Emit merged tick once per bucket
+                // ✅ Emit tick result EVEN IF bucket expires this call (last-turn tick fix)
                 if (
                     bucketTickTotal > 0
                     && (
@@ -652,7 +690,7 @@ namespace MyGame.Combat
                 {
                     results?.Add(
                         new PeriodicTickResult(
-                            source: bucket.sourceActor, // summary source (first contribution)
+                            source: bucket.sourceActor,
                             target: owner.actorType,
                             kind: bucket.kind,
                             amount: bucketTickTotal,
@@ -660,6 +698,16 @@ namespace MyGame.Combat
                         )
                     );
                 }
+
+                // If bucket now has no contributions -> remove bucket
+                if (bucket.contributions.Count == 0)
+                {
+                    owner.activeEffects.RemoveAt(i);
+                    continue;
+                }
+
+                // Rebuild legacy/summary so UI/debug stays correct
+                bucket.RebuildLegacyFromContributions();
             }
         }
 
@@ -832,7 +880,7 @@ namespace MyGame.Combat
                     );
                     return;
 
-                // Spell base damage
+                // Spell base
                 case EffectStat.SpellBaseAll:
                     ApplyFlatOrMult(
                         def.op,
@@ -934,7 +982,7 @@ namespace MyGame.Combat
                     );
                     return;
 
-                // Type-based layers (uses def.damageType[])
+                // Type layers (uses def.damageType[])
                 case EffectStat.AttackerBonusByType:
                     ApplyTypeBased(def, mods, addFlat, pct, TypeMode.AttackerBonus);
                     return;

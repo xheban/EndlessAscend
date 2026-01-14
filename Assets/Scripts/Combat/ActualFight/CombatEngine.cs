@@ -305,6 +305,7 @@ namespace MyGame.Combat
 
             var ticks = _effects.OnActionChosen(State, CombatActorType.Enemy);
             ApplyPeriodicTicks(ticks);
+
             if (State.isFinished)
                 return;
 
@@ -871,8 +872,10 @@ namespace MyGame.Combat
 
                 if (t.kind == EffectKind.DamageOverTime)
                 {
-                    Debug.Log("Tick dealing damage:" + t.effectId);
-                    Debug.Log("Damage is:" + t.amount);
+                    Debug.Log(
+                        "////////////////////////////////////Tick dealing damage:" + t.effectId
+                    );
+                    Debug.Log("Damage is:" + t.amount + "///////////////////////////////////////");
                     DealDamage(source: t.source, target: t.target, amount: amount);
                 }
                 else if (t.kind == EffectKind.HealOverTime)

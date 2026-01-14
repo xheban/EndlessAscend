@@ -10,47 +10,35 @@ public class EffectDefinition : ScriptableObject
     public string displayName;
     public Sprite icon;
 
-    [Header("Kind")]
+    [TextArea(2, 4)]
+    public string description;
+
+    // -------------------------
+    // What the effect IS (stable meaning)
+    // -------------------------
+
+    [Header("Kind (what this effect is)")]
     public EffectKind kind = EffectKind.StatModifier;
 
-    [Tooltip("Used for UI/cleanse rules. Math is determined by stat/op or DOT/HOT kind.")]
+    [Tooltip("Used for UI/cleanse rules.")]
     public EffectPolarity polarity = EffectPolarity.Debuff;
 
-    [Header("Reapply Behavior")]
-    public EffectReapplyRule reapplyRule = EffectReapplyRule.AddOnTop;
-
-    [Header("Duration Stacking")]
-    public DurationStackMode durationStackMode = DurationStackMode.Refresh;
-
-    [Tooltip(
-        "Used only when durationStackMode = Refresh. If true, set remaining = newDuration; if false, remaining = max(remaining, newDuration)."
-    )]
-    public bool refreshOverridesRemaining = false;
-
-    [Header("Strength Compare (OverwriteIfStronger only)")]
-    public EffectStrengthCompareMode compareMode = EffectStrengthCompareMode.ByStrengthRating;
-
-    [Tooltip("Only used when compareMode = ByStrengthRating. Higher wins when overwriting.")]
-    public int strengthRating = 0;
-
     // -------------------------
-    // Stat modifier config
-    // Used only when kind == StatModifier
+    // Stat modifier mapping (only if Kind == StatModifier)
+    // This stays in definition so effectId always means the same stat/op.
     // -------------------------
-    [Header("Stat Modifier (only if Kind = StatModifier)")]
+    [Header("Stat Modifier Mapping (only if Kind = StatModifier)")]
     public EffectStat stat = EffectStat.DamageAll;
+
     public EffectOp op = EffectOp.MorePercent;
 
     [Tooltip("Used only for *ByType stats.")]
     public DamageType[] damageType;
 
     // -------------------------
-    // Periodic config
-    // Used only when kind == DOT/HOT
+    // Periodic configuration (only if Kind == DOT/HOT)
+    // This stays in definition so Burn always ticks the same way.
     // -------------------------
     [Header("Periodic (only if Kind = DOT/HOT)")]
     public EffectTickTiming tickTiming = EffectTickTiming.OnOwnerAction;
-
-    [TextArea(2, 4)]
-    public string description;
 }
