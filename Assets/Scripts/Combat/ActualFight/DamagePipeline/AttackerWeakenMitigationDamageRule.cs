@@ -4,7 +4,7 @@ namespace MyGame.Combat
 {
     public sealed class AttackerWeakenMitigationDamageRule : IDamageRule
     {
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             int dmg = ctx.finalDamage;
             if (dmg <= 0)
@@ -23,14 +23,11 @@ namespace MyGame.Combat
             for (int i = 0; i < types.Length; i++)
             {
                 var t = types[i];
-                flatWeaken += ctx.attacker.modifiers.GetAttackerWeakenFlat(t);
-                multWeaken *= ctx.attacker.modifiers.GetAttackerWeakenMult(t); // e.g. *0.8
+                flatWeaken += attackerModifiers.GetAttackerWeakenFlat(t);
+                multWeaken *= attackerModifiers.GetAttackerWeakenMult(t); // e.g. *0.8
             }
-
-            int outDmg = dmg - Mathf.Max(0, flatWeaken);
-            outDmg = Mathf.RoundToInt(outDmg * multWeaken);
-
-            ctx.finalDamage = Mathf.Max(0, outDmg);
+            ctx.flatDamageBonus -= flatWeaken;
+            ctx.damageMult *= multWeaken;
         }
     }
 }

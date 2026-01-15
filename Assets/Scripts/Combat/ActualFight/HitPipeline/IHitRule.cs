@@ -1,6 +1,6 @@
 namespace MyGame.Combat
 {
-    public interface IEffectRule
+    public interface IHitRule
     {
         void Apply(ActionContext ctx, StatModifiers attackerModifiers);
     }

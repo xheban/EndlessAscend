@@ -157,7 +157,6 @@ public sealed class CharacterSectionController
             // keep values clamped/sane
             int max = Mathf.Max(1, _combatStats.maxHp);
             int val = Mathf.Clamp(_saveData.currentHp, 1, max);
-            Debug.Log("max healt is :" + max);
             _healthBar.SetRange(0, max);
             _healthBar.SetValue(val);
         }

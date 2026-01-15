@@ -1,5 +1,4 @@
 using System;
-using MyGame.Combat;
 using MyGame.Common;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ public class EffectInstance
 
     public int magnitudeFlat = 0; // e.g. +20 flat
 
-    [Range(0, 100)]
+    [Range(0, 10000)]
     public int magnitudePercent = 0; // e.g. 50 = 50%
 
     public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
@@ -57,7 +56,10 @@ public class EffectInstance
     [Tooltip(
         "Only used when compareMode = ByStrengthRating. Higher wins. If <= 0, definition strengthRating can be used (optional)."
     )]
-    public int strengthRatingOverride = 0;
+    public int strengthRating = 0;
+
+    [Tooltip("Used to know when to remove the effect from the actor.")]
+    public RemoveWhenType removeWhenType = RemoveWhenType.DurationEnds;
 
     // -------------------------
     // Target selection
@@ -110,7 +112,7 @@ public class EffectInstance
         chance = Mathf.Clamp(chance, 0, 100);
         duration = Mathf.Max(1, duration);
         flat = Mathf.Max(0, flat);
-        percent = Mathf.Clamp(percent, 0, 100);
+        percent = Mathf.Clamp(percent, 0, 10000);
 
         if (!stackable)
             stacks = 1;
@@ -136,7 +138,7 @@ public class EffectInstance
             durationStackMode = durationStackMode,
             refreshOverridesRemaining = refreshOverridesRemaining,
             compareMode = compareMode,
-            strengthRatingOverride = strengthRatingOverride,
+            strengthRating = strengthRating,
 
             // targeting
             target = target,

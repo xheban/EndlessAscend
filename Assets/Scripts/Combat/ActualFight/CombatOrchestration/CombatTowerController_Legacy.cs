@@ -596,13 +596,14 @@ public class CombatTowerController_Legacy : MonoBehaviour, IScreenController
 
         if (_engine != null && _engine.State != null)
         {
-            SetBar(_playerHpBar, _engine.State.player.hp, _engine.State.player.derived.maxHp);
+            var s = _engine.State;
+            SetBar(_playerHpBar, s.player.hp, s.player.derived.maxHp);
 
-            SetBar(_playerManaBar, _engine.State.player.mana, _engine.State.player.derived.maxMana);
+            SetBar(_playerManaBar, s.player.mana, s.player.derived.maxMana);
 
-            SetBar(_enemyHpBar, _engine.State.enemy.hp, _engine.State.enemy.derived.maxHp);
+            SetBar(_enemyHpBar, s.enemy.hp, s.enemy.derived.maxHp);
 
-            SetBar(_enemyManaBar, _engine.State.enemy.mana, _engine.State.enemy.derived.maxMana);
+            SetBar(_enemyManaBar, s.enemy.mana, s.enemy.derived.maxMana);
         }
     }
 
@@ -1003,7 +1004,6 @@ public class CombatTowerController_Legacy : MonoBehaviour, IScreenController
             OnReturnToTower = () =>
             {
                 CleanupCombat();
-                Debug.Log("returnTo tower");
                 _swapper.ShowScreen("inside_tower", new InsideTowerContext(_context.towerId));
             },
 

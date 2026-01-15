@@ -18,16 +18,14 @@ namespace MyGame.Combat
         private readonly HitPhase _hitPhase;
         private readonly DamagePhase _damagePhase;
         private readonly EffectPhase _effectPhase;
-        private readonly CombatEffectSystem _effects;
 
         public CombatState State { get; private set; }
+        private readonly CombatEffectSystem _effects;
 
         public CombatEngine(ICombatSpellResolver spellResolver, EffectDatabase effectDb)
         {
             _spellResolver = spellResolver;
-
             _effects = new CombatEffectSystem(effectDb);
-
             // RNG (centralized)
             _rng = new UnityRng();
 
@@ -46,24 +44,24 @@ namespace MyGame.Combat
             _damagePhase = new DamagePhase(
                 new IDamageRule[]
                 {
-                    new SpellBaseDamageBonusRule(),
-                    new PowerScalingDamageRule(percentOfPower: 0.50f),
-                    new AttackerTypeBonusDamageRule(),
-                    new DefenderVulnerabilityDamageRule(),
-                    new AttackerWeakenMitigationDamageRule(),
-                    new DefenderResistanceMitigationDamageRule(),
-                    new DefenseMitigationDamageRule(),
+                    new SpellBaseDamageBonusRule(), // správne nastaví baseDamage
+                    new PowerScalingDamageRule(percentOfPower: 0.50f), // správne pridá flat damage bonus z AP alebo MP
+                    new AttackerTypeBonusDamageRule(), //správne nastaví falt a mult bonus podľa typu spellu
+                    new DefenderVulnerabilityDamageRule(), //správne pridí do flatDamageBonus a damageMult
+                    new AttackerWeakenMitigationDamageRule(), // odoberie z flat a mult final damage
+                    new DefenderResistanceMitigationDamageRule(), // odoberie z flat a mult final damage
+                    new DefenseMitigationDamageRule(), // vypočíta effective Defense
                     new LevelTierSuppressionDamageRule(
                         levelFactor: 0.03f,
                         tierFactor: 0.20f,
                         minMult: 0.05f
-                    ),
-                    new DamageBonusRule(),
-                    new RandomVarianceDamageRule(pct: 0.20f),
+                    ), // korektne zdihne mult bonus
+                    new DamageBonusRule(), // korektne zvysi mult aj flat bonus
+                    new RandomVarianceDamageRule(pct: 0.20f), // dobre zysi damage mult
                 }
             );
 
-            _effectPhase = new EffectPhase(new IEffectRule[] { new ApplyEffectsRule(_effects) });
+            _effectPhase = new EffectPhase(new IEffectRule[] { new ApplyEffectRule(_effects) });
         }
 
         // -------------------------
@@ -303,12 +301,9 @@ namespace MyGame.Combat
             if (string.IsNullOrWhiteSpace(chosen))
                 chosen = "enemy_attack"; // fallback if no candidates
 
-            var ticks = _effects.OnActionChosen(State, CombatActorType.Enemy);
-            ApplyPeriodicTicks(ticks);
-
             if (State.isFinished)
                 return;
-
+            //TickEffectsForActor(CombatActorType.Enemy);
             State.enemy.queuedSpellId = chosen;
             Emit(new SpellQueuedEvent(CombatActorType.Enemy, State.enemy.displayName, chosen));
         }
@@ -426,15 +421,10 @@ namespace MyGame.Combat
                 return false;
             }
 
-            // ✅ tick/decrement effects ONCE per chosen action
-            var ticks = _effects.OnActionChosen(State, CombatActorType.Player);
-            ApplyPeriodicTicks(ticks);
-
             if (State.isFinished)
                 return false;
-
+            //TickEffectsForActor(CombatActorType.Player);
             State.player.queuedSpellId = spellId;
-
             Emit(
                 new SpellQueuedEvent(
                     CombatActorType.Player,
@@ -461,7 +451,8 @@ namespace MyGame.Combat
             CombatActorState defender,
             CombatActorType source,
             CombatActorType target,
-            ResolvedSpell spell
+            ResolvedSpell spell,
+            StatModifiers modifiers
         )
         {
             var ctx = new ActionContext
@@ -474,13 +465,11 @@ namespace MyGame.Combat
                 hitChance = spell.hitChance,
             };
 
-            Debug.Log("resolving spell action");
-
             // 0) ON-CAST EFFECTS
             if (spell.onCastEffects != null && spell.onCastEffects.Length > 0)
             {
                 ctx.effectInstancesToApply = spell.onCastEffects;
-                _effectPhase.Resolve(ctx);
+                _effectPhase.Resolve(ctx, modifiers);
                 ctx.effectInstancesToApply = null;
             }
 
@@ -491,7 +480,7 @@ namespace MyGame.Combat
             // 1) HIT
             if (requiresHitCheck)
             {
-                _hitPhase.Resolve(ctx);
+                _hitPhase.Resolve(ctx, modifiers);
 
                 if (!ctx.hit)
                 {
@@ -513,12 +502,28 @@ namespace MyGame.Combat
             // 2) DAMAGE / HEAL / SKIP
             if (spell.intent == SpellIntent.Damage)
             {
-                _damagePhase.Resolve(ctx);
-                DealDamage(source, target, ctx.finalDamage);
+                Debug.Log("CTX before damage phase:");
+                _damagePhase.Resolve(ctx, modifiers);
+                Debug.Log($"[CombatEngine] Final Damage after phases: {ctx.finalDamage}");
+                DealDamage(
+                    source,
+                    target,
+                    ctx.finalDamage,
+                    fromEffect: false,
+                    fromSpell: true,
+                    spell.displayName
+                );
             }
             else if (spell.intent == SpellIntent.Heal)
             {
-                ApplyHeal(source, target, Mathf.Max(0, spell.damage));
+                ApplyHeal(
+                    source,
+                    target,
+                    Mathf.Max(0, spell.damage),
+                    fromEffect: false,
+                    fromSpell: true,
+                    spell.displayName
+                );
                 ctx.finalDamage = Mathf.Max(0, spell.damage); // treat as "amount" if needed
             }
             else
@@ -533,7 +538,7 @@ namespace MyGame.Combat
             if (ctx.hit && spell.onHitEffects != null && spell.onHitEffects.Length > 0)
             {
                 ctx.effectInstancesToApply = spell.onHitEffects;
-                _effectPhase.Resolve(ctx);
+                _effectPhase.Resolve(ctx, modifiers);
                 ctx.effectInstancesToApply = null;
             }
 
@@ -563,7 +568,14 @@ namespace MyGame.Combat
         // HP / Mana helpers
         // -------------------------
 
-        private void DealDamage(CombatActorType source, CombatActorType target, int amount)
+        private void DealDamage(
+            CombatActorType source,
+            CombatActorType target,
+            int amount,
+            bool fromEffect,
+            bool fromSpell,
+            string damageSourceName
+        )
         {
             amount = Math.Max(0, amount);
 
@@ -573,22 +585,43 @@ namespace MyGame.Combat
             t.hp = Math.Max(0, t.hp - amount);
 
             int delta = t.hp - before; // negative on damage
+            if (fromEffect)
+            {
+                Emit(
+                    new CombatAdvancedLogEvent(
+                        $"{damageSourceName} deals",
+                        amount,
+                        $"damage to {t.displayName}",
+                        CombatLogType.Damage
+                    )
+                );
+            }
+            if (fromSpell)
+            {
+                Emit(
+                    new CombatAdvancedLogEvent(
+                        $"{State.Get(source).displayName}'s {damageSourceName} deals",
+                        amount,
+                        $"damage to {t.displayName} sssssssssssssssssssssssssssss",
+                        CombatLogType.Damage
+                    )
+                );
+            }
 
-            Emit(
-                new CombatAdvancedLogEvent(
-                    $"{State.Get(source).displayName} deals",
-                    amount,
-                    $"damage to {t.displayName}",
-                    CombatLogType.Damage
-                )
-            );
             Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
 
             if (t.hp <= 0)
                 FinishCombat(source);
         }
 
-        private void ApplyHeal(CombatActorType source, CombatActorType target, int amount)
+        private void ApplyHeal(
+            CombatActorType source,
+            CombatActorType target,
+            int amount,
+            bool fromEffect,
+            bool fromSpell,
+            string healSourceName
+        )
         {
             amount = Math.Max(0, amount);
 
@@ -600,15 +633,28 @@ namespace MyGame.Combat
             int delta = t.hp - before; // positive on heal
             if (delta <= 0)
                 return;
-
-            Emit(
-                new CombatAdvancedLogEvent(
-                    $"{State.Get(source).displayName} heals",
-                    delta,
-                    $"HP for {t.displayName}",
-                    CombatLogType.Heal
-                )
-            );
+            if (fromEffect)
+            {
+                Emit(
+                    new CombatAdvancedLogEvent(
+                        $"{healSourceName} heals",
+                        delta,
+                        $"HP for {t.displayName}",
+                        CombatLogType.Heal
+                    )
+                );
+            }
+            if (fromSpell)
+            {
+                Emit(
+                    new CombatAdvancedLogEvent(
+                        $"{State.Get(source).displayName}'s {healSourceName} heals",
+                        delta,
+                        $"HP for {t.displayName}",
+                        CombatLogType.Heal
+                    )
+                );
+            }
 
             Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
         }
@@ -622,6 +668,51 @@ namespace MyGame.Combat
 
             int realDelta = a.mana - before;
             Emit(new ManaChangedEvent(actor, a.mana, a.derived.maxMana, realDelta));
+        }
+
+        private void TickEffectsForActor(CombatActorType actorType)
+        {
+            //LogAllStatModifiers(actorType, "Before ticking effects");
+            DebugLogAllStatModifiers(actorType, "Before ticking effects");
+            if (_effects == null || State == null || State.isFinished)
+                return;
+
+            var ticks = _effects.TickOnActionChosen(State, actorType);
+            if (ticks == null || ticks.Count == 0)
+                return;
+
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                var t = ticks[i];
+                int amount = Math.Max(0, t.amount);
+                if (amount <= 0)
+                    continue;
+
+                if (t.kind == EffectKind.DamageOverTime)
+                {
+                    // damage target
+                    DealDamage(
+                        source: t.source,
+                        target: t.target,
+                        amount: amount,
+                        fromEffect: true,
+                        fromSpell: false,
+                        damageSourceName: t.effectName
+                    );
+                }
+                else if (t.kind == EffectKind.HealOverTime)
+                {
+                    // heal target
+                    ApplyHeal(
+                        source: t.target,
+                        target: t.target,
+                        amount: amount,
+                        fromEffect: true,
+                        fromSpell: false,
+                        healSourceName: t.effectName
+                    );
+                }
+            }
         }
 
         private static int Clamp(int v, int min, int max)
@@ -750,8 +841,9 @@ namespace MyGame.Combat
         {
             var attacker = State.Get(actorType);
             var defender = State.GetOpponent(actorType);
-
-            Debug.Log("firing spell");
+            attacker.actionIndex++;
+            var modsBeforeTick = attacker.modifiers.Clone();
+            TickEffectsForActor(actorType);
 
             if (actorType == CombatActorType.Player)
             {
@@ -772,15 +864,16 @@ namespace MyGame.Combat
                 );
             }
 
-            Emit(new SpellFiredEvent(actorType));
-
             ResolveAction(
                 attacker: attacker,
                 defender: defender,
                 source: actorType,
                 target: defender.actorType,
-                spell: resolvedQueuedSpell
+                spell: resolvedQueuedSpell,
+                modifiers: modsBeforeTick
             );
+
+            Emit(new SpellFiredEvent(actorType));
         }
 
         private void AfterActorFired(CombatActorType actorType)
@@ -858,36 +951,6 @@ namespace MyGame.Combat
             return true;
         }
 
-        private void ApplyPeriodicTicks(List<CombatEffectSystem.PeriodicTickResult> ticks)
-        {
-            if (ticks == null || ticks.Count == 0)
-                return;
-
-            for (int i = 0; i < ticks.Count; i++)
-            {
-                var t = ticks[i];
-                int amount = Mathf.Max(0, t.amount);
-                if (amount <= 0)
-                    continue;
-
-                if (t.kind == EffectKind.DamageOverTime)
-                {
-                    Debug.Log(
-                        "////////////////////////////////////Tick dealing damage:" + t.effectId
-                    );
-                    Debug.Log("Damage is:" + t.amount + "///////////////////////////////////////");
-                    DealDamage(source: t.source, target: t.target, amount: amount);
-                }
-                else if (t.kind == EffectKind.HealOverTime)
-                {
-                    ApplyHeal(source: t.source, target: t.target, amount: amount);
-                }
-
-                if (State.isFinished)
-                    return;
-            }
-        }
-
         private void DebugLogDerivedStats()
         {
             Debug.Log(BuildDerivedStatsBlock("PLAYER", State.player));
@@ -919,6 +982,299 @@ Cast Speed:      {d.castSpeed}
 Evasion:         {d.evasion}
 
 ==============================================================";
+        }
+
+        private void LogAllStatModifiers(CombatActorType actorType, string header = null)
+        {
+            if (State == null)
+                return;
+
+            var a = State.Get(actorType);
+            if (a == null)
+                return;
+
+            var m = a.modifiers;
+            if (m == null)
+            {
+                Emit(new CombatLogEvent($"{a.displayName} has no StatModifiers object."));
+                return;
+            }
+
+            // Helper for consistent formatting
+            static string F(string name, int v) => $"{name}: {v}";
+            static string P(string name, float v) => $"{name}: {v:0.###}";
+            static string JoinLines(List<string> lines)
+            {
+                if (lines == null || lines.Count == 0)
+                    return "";
+                return string.Join("\n", lines);
+            }
+
+            var lines = new List<string>(128);
+
+            // Title
+            lines.Add("==============================================================");
+            lines.Add($"STAT MODIFIERS DUMP: {a.displayName} ({actorType})");
+            if (!string.IsNullOrWhiteSpace(header))
+                lines.Add(header);
+            lines.Add("--------------------------------------------------------------");
+
+            // ---------
+            // Flat fields (based on what your mapping uses)
+            // ---------
+            lines.Add("[FLATS]");
+            lines.Add(F("powerFlat", m.powerFlat));
+            lines.Add(F("attackPowerFlat", m.attackPowerFlat));
+            lines.Add(F("magicPowerFlat", m.magicPowerFlat));
+
+            lines.Add(F("damageFlat", m.damageFlat));
+            lines.Add(F("attackDamageFlat", m.attackDamageFlat));
+            lines.Add(F("magicDamageFlat", m.magicDamageFlat));
+
+            lines.Add(F("defenceFlat", m.defenceFlat));
+            lines.Add(F("physicalDefenseFlat", m.physicalDefenseFlat));
+            lines.Add(F("magicDefenseFlat", m.magicDefenseFlat));
+
+            lines.Add(F("attackSpeedFlat", m.attackSpeedFlat));
+            lines.Add(F("castingSpeedFlat", m.castingSpeedFlat));
+
+            // ---------
+            // Final multiplier properties (you referenced these in old system)
+            // ---------
+            lines.Add("--------------------------------------------------------------");
+            lines.Add("[FINAL MULTIPLIERS]");
+            lines.Add(P("PowerMultFinal", m.PowerMultFinal));
+            lines.Add(P("AttackPowerMultFinal", m.AttackPowerMultFinal));
+            lines.Add(P("MagicPowerMultFinal", m.MagicPowerMultFinal));
+
+            // ---------
+            // If you have “mult containers” (spellBaseMult etc.), dump them
+            // (This assumes your mult container has readable ToString or fields.
+            // If not, we’ll adjust to your exact class.)
+            // ---------
+            lines.Add("--------------------------------------------------------------");
+            lines.Add("[MULT CONTAINERS]");
+            lines.Add($"spellBaseMult: {m.spellBaseMult}");
+            lines.Add($"physicalSpellBaseMult: {m.physicalSpellBaseMult}");
+            lines.Add($"magicSpellBaseMult: {m.magicSpellBaseMult}");
+
+            // ---------
+            // Type-based tables (AttackerBonus / DefenderVuln / Resist / Weaken)
+            // We can only dump these if you expose them from StatModifiers.
+            // Common patterns:
+            //  - Dictionary<DamageType, int> attackerBonusFlat
+            //  - Dictionary<DamageType, MultBucket> attackerBonusMore
+            //
+            // If your StatModifiers has getters like GetAttackerBonusFlat(type) etc.,
+            // we can iterate over all DamageType enum values.
+            // ---------
+            lines.Add("--------------------------------------------------------------");
+            lines.Add("[TYPE-BASED MODIFIERS]");
+            try
+            {
+                var allTypes = (DamageType[])Enum.GetValues(typeof(DamageType));
+                for (int i = 0; i < allTypes.Length; i++)
+                {
+                    var t = allTypes[i];
+
+                    // These methods may or may not exist in your StatModifiers.
+                    // If they don't, tell me your StatModifiers code and I’ll adapt.
+                    int atkBonusFlat = m.GetAttackerBonusFlat(t);
+                    float atkBonusMore = m.GetAttackerBonusMult(t);
+
+                    int defVulnFlat = m.GetDefenderVulnFlat(t);
+                    float defVulnMore = m.GetDefenderVulnMult(t);
+
+                    int defResistFlat = m.GetDefenderResistFlat(t);
+                    float defResistLess = m.GetDefenderResistMult(t);
+
+                    int atkWeakenFlat = m.GetAttackerWeakenFlat(t);
+                    float atkWeakenLess = m.GetAttackerWeakenMult(t);
+
+                    bool any =
+                        atkBonusFlat != 0
+                        || Math.Abs(atkBonusMore) > 0.0001f
+                        || defVulnFlat != 0
+                        || Math.Abs(defVulnMore) > 0.0001f
+                        || defResistFlat != 0
+                        || Math.Abs(defResistLess) > 0.0001f
+                        || atkWeakenFlat != 0
+                        || Math.Abs(atkWeakenLess) > 0.0001f;
+
+                    if (!any)
+                        continue;
+
+                    lines.Add($"- {t}:");
+                    lines.Add($"    AttackerBonus: flat {atkBonusFlat}, more {atkBonusMore:0.###}");
+                    lines.Add($"    DefenderVuln:  flat {defVulnFlat}, more {defVulnMore:0.###}");
+                    lines.Add(
+                        $"    DefenderResist:flat {defResistFlat}, less {defResistLess:0.###}"
+                    );
+                    lines.Add(
+                        $"    AttackerWeaken:flat {atkWeakenFlat}, less {atkWeakenLess:0.###}"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // If your StatModifiers doesn't expose these getters yet, we still want the dump.
+                lines.Add($"(Type-based dump skipped: {ex.GetType().Name} - {ex.Message})");
+                lines.Add(
+                    "If you paste StatModifiers, I will wire this dump to your exact fields."
+                );
+            }
+
+            lines.Add("==============================================================");
+
+            // Emit as multiple log lines (so your UI log doesn't get one giant label)
+            for (int i = 0; i < lines.Count; i++)
+                Emit(new CombatLogEvent(lines[i]));
+        }
+
+        private void DebugLogAllStatModifiers(CombatActorType actorType, string header = null)
+        {
+            if (State == null)
+            {
+                Debug.Log("[StatDump] CombatEngine.State is null.");
+                return;
+            }
+
+            var a = State.Get(actorType);
+            if (a == null)
+            {
+                Debug.Log($"[StatDump] Actor not found for {actorType}.");
+                return;
+            }
+
+            var m = a.modifiers;
+            if (m == null)
+            {
+                Debug.Log($"[StatDump] {a.displayName} has no StatModifiers object.");
+                return;
+            }
+
+            // Local helpers
+            static string F(string name, int v) => $"{name, -24}: {v}";
+            static string PF(string name, float v) => $"{name, -24}: {v:0.###}";
+
+            var sb = new System.Text.StringBuilder(2048);
+
+            sb.AppendLine("==============================================================");
+            sb.AppendLine($"STAT MODIFIERS DUMP: {a.displayName} ({actorType})");
+            if (!string.IsNullOrWhiteSpace(header))
+                sb.AppendLine(header);
+            sb.AppendLine("--------------------------------------------------------------");
+
+            // -------------------------
+            // FLATS (based on your ApplyModifierDelta mappings)
+            // -------------------------
+            sb.AppendLine("[FLATS]");
+            sb.AppendLine(F("powerFlat", m.powerFlat));
+            sb.AppendLine(F("attackPowerFlat", m.attackPowerFlat));
+            sb.AppendLine(F("magicPowerFlat", m.magicPowerFlat));
+
+            sb.AppendLine(F("damageFlat", m.damageFlat));
+            sb.AppendLine(F("attackDamageFlat", m.attackDamageFlat));
+            sb.AppendLine(F("magicDamageFlat", m.magicDamageFlat));
+
+            sb.AppendLine(F("defenceFlat", m.defenceFlat));
+            sb.AppendLine(F("physicalDefenseFlat", m.physicalDefenseFlat));
+            sb.AppendLine(F("magicDefenseFlat", m.magicDefenseFlat));
+
+            sb.AppendLine(F("attackSpeedFlat", m.attackSpeedFlat));
+            sb.AppendLine(F("castingSpeedFlat", m.castingSpeedFlat));
+
+            sb.AppendLine("--------------------------------------------------------------");
+
+            // -------------------------
+            // FINAL MULTIPLIERS (you referenced these earlier)
+            // -------------------------
+            sb.AppendLine("[FINAL MULTIPLIERS]");
+            sb.AppendLine(PF("PowerMultFinal", m.PowerMultFinal));
+            sb.AppendLine(PF("AttackPowerMultFinal", m.AttackPowerMultFinal));
+            sb.AppendLine(PF("MagicPowerMultFinal", m.MagicPowerMultFinal));
+
+            sb.AppendLine("--------------------------------------------------------------");
+
+            // -------------------------
+            // MULT CONTAINERS (ToString() dump; if ugly, we’ll adapt to your type)
+            // -------------------------
+            sb.AppendLine("[MULT CONTAINERS]");
+            sb.AppendLine($"spellBaseMult            : {m.spellBaseMult}");
+            sb.AppendLine($"physicalSpellBaseMult    : {m.physicalSpellBaseMult}");
+            sb.AppendLine($"magicSpellBaseMult       : {m.magicSpellBaseMult}");
+
+            sb.AppendLine("--------------------------------------------------------------");
+
+            // -------------------------
+            // TYPE-BASED MODIFIERS
+            // This requires getter methods on StatModifiers.
+            // If you don't have them, this section will say "skipped".
+            // -------------------------
+            sb.AppendLine("[TYPE-BASED MODIFIERS]");
+            try
+            {
+                var allTypes = (DamageType[])Enum.GetValues(typeof(DamageType));
+                bool printedAny = false;
+
+                for (int i = 0; i < allTypes.Length; i++)
+                {
+                    var t = allTypes[i];
+
+                    // These methods must exist on StatModifiers for this to work:
+                    int atkBonusFlat = m.GetAttackerBonusFlat(t);
+                    float atkBonusMore = m.GetAttackerBonusMult(t);
+
+                    int defVulnFlat = m.GetDefenderVulnFlat(t);
+                    float defVulnMore = m.GetDefenderVulnMult(t);
+
+                    int defResistFlat = m.GetDefenderResistFlat(t);
+                    float defResistLess = m.GetDefenderResistMult(t);
+
+                    int atkWeakenFlat = m.GetAttackerWeakenFlat(t);
+                    float atkWeakenLess = m.GetAttackerWeakenMult(t);
+
+                    bool any =
+                        atkBonusFlat != 0
+                        || Math.Abs(atkBonusMore) > 0.0001f
+                        || defVulnFlat != 0
+                        || Math.Abs(defVulnMore) > 0.0001f
+                        || defResistFlat != 0
+                        || Math.Abs(defResistLess) > 0.0001f
+                        || atkWeakenFlat != 0
+                        || Math.Abs(atkWeakenLess) > 0.0001f;
+
+                    if (!any)
+                        continue;
+
+                    printedAny = true;
+                    sb.AppendLine($"- {t}:");
+                    sb.AppendLine(
+                        $"    AttackerBonus : flat {atkBonusFlat}, more {atkBonusMore:0.###}"
+                    );
+                    sb.AppendLine(
+                        $"    DefenderVuln  : flat {defVulnFlat}, more {defVulnMore:0.###}"
+                    );
+                    sb.AppendLine(
+                        $"    DefenderResist: flat {defResistFlat}, less {defResistLess:0.###}"
+                    );
+                    sb.AppendLine(
+                        $"    AttackerWeaken: flat {atkWeakenFlat}, less {atkWeakenLess:0.###}"
+                    );
+                }
+
+                if (!printedAny)
+                    sb.AppendLine("(none)");
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine($"(Type-based dump skipped: {ex.GetType().Name} - {ex.Message})");
+                sb.AppendLine("Paste StatModifiers and I’ll wire this to your exact structure.");
+            }
+
+            sb.AppendLine("==============================================================");
+
+            Debug.Log(sb.ToString());
         }
     }
 }

@@ -291,11 +291,15 @@ public class CombatTowerController : MonoBehaviour, IScreenController
         _combat.OnEnemyDecisionRequested -= HandleEnemyDecisionRequested;
         _combat.OnCombatEnded -= HandleCombatEnded;
         _combat.OnPlayerSpellFired -= HandlePlayerSpellFired;
+        _combat.OnPlayerSpellQueued -= HandlePlayerSpellQueued;
+        _combat.OnEnemySpellQueued -= HandleEnemySpellQueued;
 
         // Hook
         _combat.OnEnemyDecisionRequested += HandleEnemyDecisionRequested;
         _combat.OnCombatEnded += HandleCombatEnded;
         _combat.OnPlayerSpellFired += HandlePlayerSpellFired;
+        _combat.OnPlayerSpellQueued += HandlePlayerSpellQueued;
+        _combat.OnEnemySpellQueued += HandleEnemySpellQueued;
 
         bool started = _combat.TryStartEncounter(
             save: SaveSession.Current,
@@ -314,27 +318,15 @@ public class CombatTowerController : MonoBehaviour, IScreenController
 
         if (engine != null && engine.State != null)
         {
-            _view?.SetBar(
-                _view.PlayerHpBar,
-                engine.State.player.hp,
-                engine.State.player.derived.maxHp
-            );
-            _view?.SetBar(
-                _view.PlayerManaBar,
-                engine.State.player.mana,
-                engine.State.player.derived.maxMana
-            );
+            var s = engine.State;
+            _view?.SetBar(_view.PlayerHpBar, s.player.hp, s.player.derived.maxHp);
+            _view?.SetBar(_view.PlayerManaBar, s.player.mana, s.player.derived.maxMana);
 
-            _view?.SetBar(
-                _view.EnemyHpBar,
-                engine.State.enemy.hp,
-                engine.State.enemy.derived.maxHp
-            );
-            _view?.SetBar(
-                _view.EnemyManaBar,
-                engine.State.enemy.mana,
-                engine.State.enemy.derived.maxMana
-            );
+            _view?.SetBar(_view.EnemyHpBar, s.enemy.hp, s.enemy.derived.maxHp);
+            _view?.SetBar(_view.EnemyManaBar, s.enemy.mana, s.enemy.derived.maxMana);
+
+            _view.RenderEffects(CombatActorType.Player, s.player.activeEffects);
+            _view.RenderEffects(CombatActorType.Enemy, s.enemy.activeEffects);
         }
     }
 
@@ -467,5 +459,31 @@ public class CombatTowerController : MonoBehaviour, IScreenController
             return;
 
         _view.RefreshCooldownUI(_combat.Engine, _view.SpellSlots, _view.SlotViews);
+        var s = _combat.Engine?.State;
+        if (s != null)
+        {
+            _view.RenderEffects(CombatActorType.Player, s.player.activeEffects);
+            _view.RenderEffects(CombatActorType.Enemy, s.enemy.activeEffects);
+        }
+    }
+
+    private void HandlePlayerSpellQueued()
+    {
+        var s = _combat.Engine?.State;
+        if (s != null)
+        {
+            _view.RenderEffects(CombatActorType.Player, s.player.activeEffects);
+            _view.RenderEffects(CombatActorType.Enemy, s.enemy.activeEffects);
+        }
+    }
+
+    private void HandleEnemySpellQueued()
+    {
+        var s = _combat.Engine?.State;
+        if (s != null)
+        {
+            _view.RenderEffects(CombatActorType.Player, s.player.activeEffects);
+            _view.RenderEffects(CombatActorType.Enemy, s.enemy.activeEffects);
+        }
     }
 }

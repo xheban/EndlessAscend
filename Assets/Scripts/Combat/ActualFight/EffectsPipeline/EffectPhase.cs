@@ -16,7 +16,7 @@ namespace MyGame.Combat
             _rules = new List<IEffectRule>(rules);
         }
 
-        public void Resolve(ActionContext ctx)
+        public void Resolve(ActionContext ctx, StatModifiers attackerModifiers)
         {
             // 1) Safety checks
             if (ctx == null || ctx.attacker == null || ctx.defender == null || ctx.spell == null)
@@ -27,7 +27,7 @@ namespace MyGame.Combat
             }
 
             for (int i = 0; i < _rules.Count; i++)
-                _rules[i]?.Apply(ctx);
+                _rules[i]?.Apply(ctx, attackerModifiers);
         }
     }
 }

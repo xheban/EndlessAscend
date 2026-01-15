@@ -12,7 +12,7 @@ namespace MyGame.Combat
             _rules = new List<IHitRule>(rules);
         }
 
-        public void Resolve(ActionContext ctx)
+        public void Resolve(ActionContext ctx, StatModifiers attackerModifiers)
         {
             if (ctx == null || ctx.attacker == null || ctx.defender == null || ctx.spell == null)
             {
@@ -26,7 +26,7 @@ namespace MyGame.Combat
 
             // Apply hit rules
             for (int i = 0; i < _rules.Count; i++)
-                _rules[i]?.Apply(ctx);
+                _rules[i]?.Apply(ctx, attackerModifiers);
 
             // Clamp after rules
             ctx.hitChance = Mathf.Clamp(ctx.hitChance, 0, 100);

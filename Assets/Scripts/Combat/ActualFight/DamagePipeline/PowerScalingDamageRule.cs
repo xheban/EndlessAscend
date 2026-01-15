@@ -17,7 +17,7 @@ namespace MyGame.Combat
             _percentOfPower = Mathf.Max(0f, percentOfPower);
         }
 
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             // Attack and magic power after bonuses
             float basePower =
@@ -54,21 +54,10 @@ namespace MyGame.Combat
             float finalPercentageOfPower =
                 (_percentOfPower + bonusFlatPercentageOfPower) * bonusMultPercentageOfPower;
 
-            // Debug.Log("Base power: " + basePower);
-            // Debug.Log("Base power flat bonus: " + bonusFlatPower);
-            // Debug.Log("Base power mult bonus: " + bonusMultPower);
-            // Debug.Log("FinalPower: " + finalPower);
-            // Debug.Log("final Bonus Flat for percentage of power: " + bonusFlatPercentageOfPower);
-            // Debug.Log("final Bonus Mult or percentage of power: " + bonusMultPercentageOfPower);
-            // Debug.Log("Final Percentage of Power: " + finalPercentageOfPower);
-
             // final result of damage added is multiplication of finalPower times finalPowerScaling
             int bonus = Mathf.FloorToInt(finalPower * finalPercentageOfPower);
-            ctx.finalDamage = ctx.baseDamage + bonus;
-
-            // Debug.Log("After Power scaling flat bonus damage: " + ctx.flatDamageBonus);
-            // Debug.Log("After Power scaling mult bonus damage: " + ctx.damageMult);
-            // Debug.Log("After Power scaling final damage: " + ctx.finalDamage);
+            ctx.lastDamageDealtPower = Mathf.FloorToInt(finalPower);
+            ctx.flatDamageBonus = bonus;
         }
     }
 }

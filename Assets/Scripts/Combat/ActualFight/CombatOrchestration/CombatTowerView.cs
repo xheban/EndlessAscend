@@ -36,6 +36,12 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
     public VisualElement LogRoot { get; private set; }
     public ScrollView LogScroll { get; private set; }
 
+    public VisualElement[] PlayerBuffSlots { get; private set; }
+    public VisualElement[] PlayerDebuffSlots { get; private set; }
+
+    public VisualElement[] EnemyBuffSlots { get; private set; }
+    public VisualElement[] EnemyDebuffSlots { get; private set; }
+
     // Buttons
     public Button RunButton { get; private set; }
 
@@ -129,6 +135,7 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
 
         // Log container
         LogRoot = screenHost?.Q<VisualElement>("Log");
+        CacheBuffDebuffSlots();
 
         // Create a ScrollView inside Log so we can append lines (same behavior as controller)
         if (LogRoot != null)
@@ -149,6 +156,161 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
             Debug.LogWarning("[CombatTowerView] Log root not found (name='Log').");
             LogScroll = null;
         }
+    }
+
+    private void CacheBuffDebuffSlots()
+    {
+        // Player side
+        CacheSlotsInPanel(PlayerPanel, out var pBuffs, out var pDebuffs);
+        PlayerBuffSlots = pBuffs;
+        PlayerDebuffSlots = pDebuffs;
+
+        // Enemy side
+        CacheSlotsInPanel(EnemyPanel, out var eBuffs, out var eDebuffs);
+        EnemyBuffSlots = eBuffs;
+        EnemyDebuffSlots = eDebuffs;
+    }
+
+    private static void CacheSlotsInPanel(
+        VisualElement panelRoot,
+        out VisualElement[] buffSlots,
+        out VisualElement[] debuffSlots
+    )
+    {
+        buffSlots = new VisualElement[10];
+        debuffSlots = new VisualElement[10];
+
+        if (panelRoot == null)
+            return;
+
+        // Buff area: panelRoot -> BuffsDebuffsTurnMeter -> Buffs -> List -> BuffSlotX
+        var buffsList = panelRoot
+            .Q<VisualElement>("BuffsDebuffsTurnMeter")
+            ?.Q<VisualElement>("Buffs")
+            ?.Q<VisualElement>("List");
+
+        // Debuff area: panelRoot -> BuffsDebuffsTurnMeter -> Debuffs -> List -> DebuffSlotX
+        var debuffsList = panelRoot
+            .Q<VisualElement>("BuffsDebuffsTurnMeter")
+            ?.Q<VisualElement>("Debuffs")
+            ?.Q<VisualElement>("List");
+
+        for (int i = 0; i < 10; i++)
+        {
+            buffSlots[i] = buffsList?.Q<VisualElement>($"BuffSlot{i + 1}");
+            debuffSlots[i] = debuffsList?.Q<VisualElement>($"DebuffSlot{i + 1}");
+        }
+    }
+
+    private static void HideSlotKeepLayout(VisualElement slot)
+    {
+        if (slot == null)
+            return;
+
+        slot.style.visibility = Visibility.Hidden;
+        slot.pickingMode = PickingMode.Ignore; // no hover/click/tooltip
+
+        // Reset visuals
+        var icon = slot.Q<VisualElement>("Icon");
+        if (icon != null)
+            icon.style.backgroundImage = StyleKeyword.None;
+
+        var stacks = slot.Q<Label>("Stacks");
+        if (stacks != null)
+            stacks.text = string.Empty;
+
+        var duration = slot.Q<Label>("Duration");
+        if (duration != null)
+            duration.text = string.Empty;
+
+        slot.tooltip = string.Empty;
+    }
+
+    private static void ShowSlot(VisualElement slot)
+    {
+        if (slot == null)
+            return;
+
+        slot.style.visibility = Visibility.Visible;
+        slot.pickingMode = PickingMode.Position;
+    }
+
+    private static void ClearSlotsKeepLayout(VisualElement[] slots)
+    {
+        if (slots == null)
+            return;
+        for (int i = 0; i < slots.Length; i++)
+            HideSlotKeepLayout(slots[i]);
+    }
+
+    public void RenderEffects(CombatActorType actor, IReadOnlyList<ActiveEffect> effects)
+    {
+        var buffSlots = actor == CombatActorType.Player ? PlayerBuffSlots : EnemyBuffSlots;
+        var debuffSlots = actor == CombatActorType.Player ? PlayerDebuffSlots : EnemyDebuffSlots;
+
+        ClearSlotsKeepLayout(buffSlots);
+        ClearSlotsKeepLayout(debuffSlots);
+
+        if (effects == null || effects.Count == 0)
+            return;
+
+        int b = 0;
+        int d = 0;
+
+        for (int i = 0; i < effects.Count; i++)
+        {
+            var e = effects[i];
+            if (e == null || e.definition == null)
+                continue;
+
+            // Decide target row based on polarity
+            bool isBuff = e.polarity == EffectPolarity.Buff;
+
+            if (isBuff)
+            {
+                if (b >= buffSlots.Length)
+                    continue;
+                RenderOne(buffSlots[b], e);
+                b++;
+            }
+            else
+            {
+                if (d >= debuffSlots.Length)
+                    continue;
+                RenderOne(debuffSlots[d], e);
+                d++;
+            }
+        }
+    }
+
+    private static void RenderOne(VisualElement slot, ActiveEffect e)
+    {
+        if (slot == null || e == null)
+            return;
+
+        ShowSlot(slot);
+
+        // ICON
+        // Replace "icon" with your real field name in EffectDefinition
+        Sprite iconSprite = e.definition.icon; // <-- adjust if needed
+
+        var icon = slot.Q<VisualElement>("Icon");
+        if (icon != null)
+            icon.style.backgroundImage =
+                iconSprite != null ? new StyleBackground(iconSprite) : StyleKeyword.None;
+
+        // STACKS (you don't have stacks yet -> hide)
+        var stacks = slot.Q<Label>("Stacks");
+        if (stacks != null)
+            stacks.text = e.TotalStacks > 0 ? e.TotalStacks.ToString() : "";
+
+        // DURATION
+        var duration = slot.Q<Label>("Duration");
+        if (duration != null)
+            duration.text = e.MaxRemainingTurns > 0 ? e.MaxRemainingTurns.ToString() : "";
+
+        // Tooltip (nice for debugging)
+        slot.tooltip = $"{e.effectId} ({e.polarity})";
     }
 
     // -------------------------

@@ -162,6 +162,217 @@ namespace MyGame.Combat
             Reset();
         }
 
+        private void EnsureInitialized()
+        {
+            EnsureArrays();
+
+            // If a MoreLessMult struct was never Reset(), it's all zeros.
+            // That makes Final = 0 and kills all math.
+            Fix(ref magicDamageMult);
+            Fix(ref physicalDamageMult);
+            Fix(ref damageMult);
+
+            Fix(ref physicalSpellBaseMult);
+            Fix(ref spellBaseMult);
+            Fix(ref magicSpellBaseMult);
+
+            Fix(ref powerMult);
+            Fix(ref attackPowerMult);
+            Fix(ref magicPowerMult);
+
+            Fix(ref attackPowerScalingMult);
+            Fix(ref magicPowerScalingMult);
+            Fix(ref powerScalingMult);
+
+            Fix(ref hitChanceMult);
+            Fix(ref castingSpeedMult);
+            Fix(ref attackSpeedMult);
+
+            Fix(ref physicalDefenceMult);
+            Fix(ref magicDefenceMult);
+            Fix(ref defenceMult);
+        }
+
+        private static void Fix(ref MoreLessMult m)
+        {
+            // If either is 0, treat as uninitialized and reset to identity.
+            if (m.more == 0f)
+                m.more = 1f;
+            if (m.less == 0f)
+                m.less = 1f;
+        }
+
+        public StatModifiers Clone()
+        {
+            EnsureInitialized();
+
+            var clone = new StatModifiers();
+            clone.EnsureInitialized();
+
+            // ---------- Flats ----------
+            clone.attackPowerFlat = attackPowerFlat;
+            clone.magicPowerFlat = magicPowerFlat;
+            clone.powerFlat = powerFlat;
+
+            clone.spellBaseFlat = spellBaseFlat;
+            clone.magicSpellBaseFlat = magicSpellBaseFlat;
+            clone.physicalSpellBaseFlat = physicalSpellBaseFlat;
+
+            clone.defenceFlat = defenceFlat;
+            clone.physicalDefenseFlat = physicalDefenseFlat;
+            clone.magicDefenseFlat = magicDefenseFlat;
+
+            clone.attackSpeedFlat = attackSpeedFlat;
+            clone.castingSpeedFlat = castingSpeedFlat;
+
+            clone.damageFlat = damageFlat;
+            clone.magicDamageFlat = magicDamageFlat;
+            clone.attackDamageFlat = attackDamageFlat;
+
+            clone.powerScalingFlat = powerScalingFlat;
+            clone.attackPowerScalingFlat = attackPowerScalingFlat;
+            clone.magicPowerScalingFlat = magicPowerScalingFlat;
+
+            // ---------- More / Less buckets ----------
+            clone.magicDamageMult = magicDamageMult;
+            clone.physicalDamageMult = physicalDamageMult;
+            clone.damageMult = damageMult;
+
+            clone.spellBaseMult = spellBaseMult;
+            clone.magicSpellBaseMult = magicSpellBaseMult;
+            clone.physicalSpellBaseMult = physicalSpellBaseMult;
+
+            clone.powerMult = powerMult;
+            clone.attackPowerMult = attackPowerMult;
+            clone.magicPowerMult = magicPowerMult;
+
+            clone.attackPowerScalingMult = attackPowerScalingMult;
+            clone.magicPowerScalingMult = magicPowerScalingMult;
+            clone.powerScalingMult = powerScalingMult;
+
+            clone.hitChanceMult = hitChanceMult;
+            clone.castingSpeedMult = castingSpeedMult;
+            clone.attackSpeedMult = attackSpeedMult;
+
+            clone.physicalDefenceMult = physicalDefenceMult;
+            clone.magicDefenceMult = magicDefenceMult;
+            clone.defenceMult = defenceMult;
+
+            // ---------- Type-based arrays ----------
+            clone.attackerBonusFlatByType = (int[])attackerBonusFlatByType.Clone();
+            clone.attackerBonusMultByType = (float[])attackerBonusMultByType.Clone();
+
+            clone.defenderVulnFlatByType = (int[])defenderVulnFlatByType.Clone();
+            clone.defenderVulnMultByType = (float[])defenderVulnMultByType.Clone();
+
+            clone.defenderResistFlatByType = (int[])defenderResistFlatByType.Clone();
+            clone.defenderResistMultByType = (float[])defenderResistMultByType.Clone();
+
+            clone.attackerWeakenFlatByType = (int[])attackerWeakenFlatByType.Clone();
+            clone.attackerWeakenMultByType = (float[])attackerWeakenMultByType.Clone();
+
+            return clone;
+        }
+
+        public void CopyFrom(StatModifiers other)
+        {
+            EnsureInitialized();
+            other.EnsureInitialized();
+            // ---------- Flats ----------
+            attackPowerFlat = other.attackPowerFlat;
+            magicPowerFlat = other.magicPowerFlat;
+            powerFlat = other.powerFlat;
+
+            spellBaseFlat = other.spellBaseFlat;
+            magicSpellBaseFlat = other.magicSpellBaseFlat;
+            physicalSpellBaseFlat = other.physicalSpellBaseFlat;
+
+            defenceFlat = other.defenceFlat;
+            physicalDefenseFlat = other.physicalDefenseFlat;
+            magicDefenseFlat = other.magicDefenseFlat;
+
+            attackSpeedFlat = other.attackSpeedFlat;
+            castingSpeedFlat = other.castingSpeedFlat;
+
+            damageFlat = other.damageFlat;
+            magicDamageFlat = other.magicDamageFlat;
+            attackDamageFlat = other.attackDamageFlat;
+
+            powerScalingFlat = other.powerScalingFlat;
+            attackPowerScalingFlat = other.attackPowerScalingFlat;
+            magicPowerScalingFlat = other.magicPowerScalingFlat;
+
+            // ---------- More / Less ----------
+            magicDamageMult = other.magicDamageMult;
+            physicalDamageMult = other.physicalDamageMult;
+            damageMult = other.damageMult;
+
+            spellBaseMult = other.spellBaseMult;
+            magicSpellBaseMult = other.magicSpellBaseMult;
+            physicalSpellBaseMult = other.physicalSpellBaseMult;
+
+            powerMult = other.powerMult;
+            attackPowerMult = other.attackPowerMult;
+            magicPowerMult = other.magicPowerMult;
+
+            attackPowerScalingMult = other.attackPowerScalingMult;
+            magicPowerScalingMult = other.magicPowerScalingMult;
+            powerScalingMult = other.powerScalingMult;
+
+            hitChanceMult = other.hitChanceMult;
+            castingSpeedMult = other.castingSpeedMult;
+            attackSpeedMult = other.attackSpeedMult;
+
+            physicalDefenceMult = other.physicalDefenceMult;
+            magicDefenceMult = other.magicDefenceMult;
+            defenceMult = other.defenceMult;
+
+            // ---------- Arrays ----------
+            Array.Copy(
+                other.attackerBonusFlatByType,
+                attackerBonusFlatByType,
+                attackerBonusFlatByType.Length
+            );
+            Array.Copy(
+                other.attackerBonusMultByType,
+                attackerBonusMultByType,
+                attackerBonusMultByType.Length
+            );
+
+            Array.Copy(
+                other.defenderVulnFlatByType,
+                defenderVulnFlatByType,
+                defenderVulnFlatByType.Length
+            );
+            Array.Copy(
+                other.defenderVulnMultByType,
+                defenderVulnMultByType,
+                defenderVulnMultByType.Length
+            );
+
+            Array.Copy(
+                other.defenderResistFlatByType,
+                defenderResistFlatByType,
+                defenderResistFlatByType.Length
+            );
+            Array.Copy(
+                other.defenderResistMultByType,
+                defenderResistMultByType,
+                defenderResistMultByType.Length
+            );
+
+            Array.Copy(
+                other.attackerWeakenFlatByType,
+                attackerWeakenFlatByType,
+                attackerWeakenFlatByType.Length
+            );
+            Array.Copy(
+                other.attackerWeakenMultByType,
+                attackerWeakenMultByType,
+                attackerWeakenMultByType.Length
+            );
+        }
+
         // -------------------------
         // Helpers for NEW power fields (NO math pipeline here)
         // -------------------------

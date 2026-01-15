@@ -8,7 +8,7 @@ namespace MyGame.Combat
     /// </summary>
     public sealed class SpellBaseDamageBonusRule : IDamageRule
     {
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             // Attack and magic power after bonuses
             float flatBonus =

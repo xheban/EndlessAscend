@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace MyGame.Combat
             _rules = new List<IDamageRule>(rules);
         }
 
-        public void Resolve(ActionContext ctx)
+        public void Resolve(ActionContext ctx, StatModifiers attackerModifiers)
         {
             // 1) Safety checks
             if (ctx == null || ctx.attacker == null || ctx.defender == null || ctx.spell == null)
@@ -34,13 +35,19 @@ namespace MyGame.Combat
 
             // 3) Apply each damage rule in a deterministic order
             for (int i = 0; i < _rules.Count; i++)
-                _rules[i]?.Apply(ctx);
+                _rules[i]?.Apply(ctx, attackerModifiers);
+
+            Debug.Log("After all damage rules:");
+            Debug.Log($"  baseDamage: {ctx.baseDamage}");
+            Debug.Log($"  flatDamageBonus: {ctx.flatDamageBonus}");
+            Debug.Log($"  damageMult: {ctx.damageMult}");
+            Debug.Log($"  effectiveDefense: {ctx.effectiveDefense}");
 
             // 4) Compute final
             //    "Base + Flat" first, then multiply.
             int dmg = ctx.baseDamage + ctx.flatDamageBonus;
             if (dmg < 0)
-                dmg = 0;
+                dmg = 1;
 
             float mult = ctx.damageMult;
             if (mult < 0f)
@@ -50,7 +57,22 @@ namespace MyGame.Combat
             if (dmg < 0)
                 dmg = 0;
 
-            ctx.finalDamage = dmg;
+            Debug.Log("----- Damage afte all calulated: " + dmg + "---------------");
+
+            // 4) apply spell ignores (order you wanted: percent first, then flat)
+            int ignorePct = ctx.spell.ignoreDefensePercent;
+            if (ignorePct < 0)
+                ignorePct = 0;
+            if (ignorePct > 100)
+                ignorePct = 100;
+
+            Debug.Log("Ignoring flat defecne " + ctx.spell.ignoreDefensePercent);
+            Debug.Log("ignoring Flat defence " + ctx.spell.ignoreDefenseFlat);
+            int ignoreFlat = Mathf.Max(0, ctx.spell.ignoreDefenseFlat);
+            float defenceAfterIgnore = ctx.effectiveDefense * (1f - (ignorePct / 100)) - ignoreFlat;
+            Debug.Log("Defeence after ignore: " + defenceAfterIgnore);
+
+            ctx.finalDamage = Math.Max(0, Mathf.FloorToInt(dmg - defenceAfterIgnore));
         }
     }
 }

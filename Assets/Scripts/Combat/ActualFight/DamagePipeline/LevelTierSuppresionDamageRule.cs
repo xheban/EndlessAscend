@@ -24,7 +24,7 @@ namespace MyGame.Combat
             _minMult = minMult;
         }
 
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             int levelDelta = ctx.attacker.level - ctx.defender.level;
             int tierDelta = (int)ctx.attacker.tier - (int)ctx.defender.tier;

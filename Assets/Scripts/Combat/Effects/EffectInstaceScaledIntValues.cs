@@ -45,18 +45,22 @@ namespace MyGame.Common
         // Duration behavior (per instance)
         // -------------------------
         public DurationStackMode durationStackMode;
-        public bool refreshOverridesRemaining;
 
         // -------------------------
         // Strength compare (per instance)
         // -------------------------
         public EffectStrengthCompareMode compareMode;
 
+        /// ------------------------
+        /// If true, when reapplying this effect,the remaining duration will be overridden to the new application duration.
+        /// ------------------------
+        public bool refreshOverridesRemaining;
+
         /// <summary>
         /// Used when compareMode == ByStrengthRating.
         /// If <= 0, you can fall back to definition strength if you keep one,
         /// otherwise treat as 0.
         /// </summary>
-        public int strengthRatingOverride;
+        public int strengthRating;
     }
 }

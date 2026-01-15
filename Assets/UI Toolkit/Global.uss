@@ -425,6 +425,7 @@ IntegerField > #unity-text-input {
 .combat-log-line {
     flex-direction: row;
     align-items: center;
+    font-size: 20px;
     line-height: 14px;
     margin-top: 1px;
     margin-bottom: 1px;

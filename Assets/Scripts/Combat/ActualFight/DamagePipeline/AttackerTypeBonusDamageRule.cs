@@ -4,12 +4,12 @@ namespace MyGame.Combat
 {
     public sealed class AttackerTypeBonusDamageRule : IDamageRule
     {
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             ApplyTypes(
                 ctx,
-                getFlat: t => ctx.attacker.modifiers.GetAttackerBonusFlat(t),
-                getMult: t => ctx.attacker.modifiers.GetAttackerBonusMult(t)
+                getFlat: t => attackerModifiers.GetAttackerBonusFlat(t),
+                getMult: t => attackerModifiers.GetAttackerBonusMult(t)
             );
         }
 
@@ -39,10 +39,10 @@ namespace MyGame.Combat
                 flat += getFlat(t);
                 mult *= getMult(t);
             }
+            Debug.Log("Flat je :" + flat);
 
-            int outDmg = dmg + flat;
-            outDmg = Mathf.RoundToInt(outDmg * mult);
-            ctx.finalDamage = Mathf.Max(0, outDmg);
+            ctx.flatDamageBonus += flat;
+            ctx.damageMult *= mult;
         }
     }
 }

@@ -19,6 +19,8 @@ public sealed class CombatSessionCoordinator
     public event Action<CombatEndedEvent> OnCombatEnded;
 
     public event Action OnPlayerSpellFired;
+    public event Action OnPlayerSpellQueued;
+    public event Action OnEnemySpellQueued;
 
     private ICombatLogSink _logSink;
     private ICombatUiSink _uiSink;
@@ -128,6 +130,10 @@ public sealed class CombatSessionCoordinator
                     q.SpellId
                 );
                 string text = $"{q.CasterName} casting {spellName}…";
+                if (q.Actor == CombatActorType.Player)
+                    OnPlayerSpellQueued?.Invoke();
+                else
+                    OnEnemySpellQueued?.Invoke();
                 _uiSink?.SetActionText(q.Actor, text);
                 break;
             }
@@ -137,7 +143,6 @@ public sealed class CombatSessionCoordinator
                 if (fired.Actor == CombatActorType.Player)
                 {
                     _uiSink?.SetActionText(CombatActorType.Player, "Choose action...");
-                    Debug.Log("spell firing");
                     OnPlayerSpellFired?.Invoke();
                 }
                 else

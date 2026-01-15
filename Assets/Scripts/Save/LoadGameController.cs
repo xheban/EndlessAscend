@@ -69,7 +69,7 @@ public class LoadGameController : MonoBehaviour, IOverlayController
             RunSession.Clear();
             SaveSession.Clear();
 
-            Debug.Log($"Loading slot {slot}: {data.characterName}");
+            //Debug.Log($"Loading slot {slot}: {data.characterName}");
 
             SaveSession.SetCurrent(slot, data);
             InitializeRuntimeAndEnterDashboard(data);

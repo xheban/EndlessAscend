@@ -5,6 +5,6 @@ namespace MyGame.Combat
     /// </summary>
     public interface IDamageRule
     {
-        void Apply(ActionContext ctx);
+        void Apply(ActionContext ctx, StatModifiers attackerModifiers);
     }
 }

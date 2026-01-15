@@ -45,7 +45,6 @@ namespace MyGame.Progression
                     save.tier
                 );
             }
-            Debug.Log(save.currentHp);
             return gained;
         }
     }

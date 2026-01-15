@@ -34,19 +34,4 @@ namespace MyGame.Combat
         Debuff, // applies negative effects, no damage/heal
         Utility, // later: cleanse, dispel, swap, shield-only etc.
     }
-
-    public enum EffectKind
-    {
-        StatModifier, // modifies StatModifiers
-        DamageOverTime, // periodic damage ticks
-        HealOverTime, // periodic heal ticks
-        // later: Stun, Silence, Shield, Dispel, etc.
-    }
-
-    public enum EffectTickTiming
-    {
-        None, // for StatModifier
-        OnOwnerAction, // tick when the affected actor takes an action
-        // later: OnAnyAction, OnTurnStart, OnTurnEnd
-    }
 }

@@ -15,7 +15,7 @@ namespace MyGame.Combat
             _pct = Mathf.Max(0f, pct);
         }
 
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             // Prefer ctx.rng if present (deterministic), otherwise fallback.
             float roll =

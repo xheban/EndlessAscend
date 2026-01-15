@@ -43,6 +43,12 @@ namespace MyGame.Common
         Milestone,
     }
 
+    public enum RemoveWhenType
+    {
+        DurationOfLastStackEnds,
+        DurationEnds,
+    }
+
     public enum EffectPolarity
     {
         Buff,
@@ -60,6 +66,21 @@ namespace MyGame.Common
         Flat, // uses EffectInstance magnitudeFlat
         MorePercent, // uses magnitudePercent: +20 => *1.2
         LessPercent, // uses magnitudePercent: 20 => *0.8
+    }
+
+    public enum EffectKind
+    {
+        StatModifier, // modifies StatModifiers
+        DamageOverTime, // periodic damage ticks
+        HealOverTime, // periodic heal ticks
+        // later: Stun, Silence, Shield, Dispel, etc.
+    }
+
+    public enum EffectTickTiming
+    {
+        None, // for StatModifier
+        OnOwnerAction, // tick when the affected actor takes an action
+        // later: OnAnyAction, OnTurnStart, OnTurnEnd
     }
 
     public enum EffectStat

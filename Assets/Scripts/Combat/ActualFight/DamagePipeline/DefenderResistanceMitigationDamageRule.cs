@@ -4,7 +4,7 @@ namespace MyGame.Combat
 {
     public sealed class DefenderResistanceMitigationDamageRule : IDamageRule
     {
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             int dmg = ctx.finalDamage;
             if (dmg <= 0)
@@ -27,10 +27,8 @@ namespace MyGame.Combat
                 multResist *= ctx.defender.modifiers.GetDefenderResistMult(t); // e.g. *0.8
             }
 
-            int outDmg = dmg - Mathf.Max(0, flatResist);
-            outDmg = Mathf.RoundToInt(outDmg * multResist);
-
-            ctx.finalDamage = Mathf.Max(0, outDmg);
+            ctx.flatDamageBonus -= flatResist;
+            ctx.damageMult *= multResist;
         }
     }
 }

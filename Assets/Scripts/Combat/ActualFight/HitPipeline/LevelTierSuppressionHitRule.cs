@@ -20,7 +20,7 @@ namespace MyGame.Combat
             _tierPenaltyPerTier = tierPenaltyPerTier;
         }
 
-        public void Apply(ActionContext ctx)
+        public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             int levelDiff = ctx.defender.level - ctx.attacker.level;
             int tierDiff = (int)ctx.defender.tier - (int)ctx.attacker.tier;

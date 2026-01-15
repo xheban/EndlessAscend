@@ -9,6 +9,7 @@ namespace MyGame.Combat
     {
         // Who is this actor? Player or Enemy.
         public CombatActorType actorType;
+        public int actionIndex;
 
         // For UI and logs
         public string displayName;
@@ -20,7 +21,7 @@ namespace MyGame.Combat
         public DerivedCombatStats derived;
 
         public StatModifiers modifiers = new StatModifiers();
-        public List<ActiveEffectState> activeEffects = new List<ActiveEffectState>();
+        public readonly List<ActiveEffect> activeEffects = new List<ActiveEffect>(16);
 
         // Runtime resources
         public int hp;

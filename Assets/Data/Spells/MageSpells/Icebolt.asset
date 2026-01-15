@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellId: icebolt
   displayName: Icebolt
+  description: 
   icon: {fileID: 21300000, guid: c0ba3f4e726debe4387c6d0b3d709017, type: 3}
   allowedClasses: 1
   allowedSpecs: -1
@@ -23,12 +24,166 @@ MonoBehaviour:
   maxLevel: 10
   baseDamage: 10
   damageKind: 1
+  intent: 0
   damageTag: 
   tier: 0
-  ignoreDefenseFlat: 0
-  ignoreDefensePercent: 0
+  ignoreDefenseFlat: 20
+  ignoreDefensePercent: 10
   hitChance: 100
   baseUseSpeed: 100
   damageScalingType: 0
   damageScalingValue: 5
-  onHitEffects: []
+  onHitEffects:
+  - effect: {fileID: 11400000, guid: 4053abdb9a144a14fa47fd83875d9e5b, type: 2}
+    chancePercent: 0
+    durationTurns: 2
+    magnitudeFlat: 30
+    magnitudePercent: 50
+    magnitudeBasis: 1
+    stackable: 0
+    maxStacks: 0
+    mergeable: 0
+    reapplyRule: 0
+    durationStackMode: 0
+    refreshOverridesRemaining: 0
+    compareMode: 0
+    strengthRating: 0
+    removeWhenType: 0
+    target: 1
+    chanceScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    durationScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    magnitudeFlatScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    magnitudePercentScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    maxStacksScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+  onCastEffects:
+  - effect: {fileID: 11400000, guid: 4eed9c06357180f428fe6222b0bf37f4, type: 2}
+    chancePercent: 0
+    durationTurns: 3
+    magnitudeFlat: 0
+    magnitudePercent: 220
+    magnitudeBasis: 1
+    stackable: 0
+    maxStacks: 0
+    mergeable: 0
+    reapplyRule: 0
+    durationStackMode: 2
+    refreshOverridesRemaining: 0
+    compareMode: 0
+    strengthRating: 0
+    removeWhenType: 1
+    target: 1
+    chanceScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    durationScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    magnitudeFlatScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    magnitudePercentScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    maxStacksScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0

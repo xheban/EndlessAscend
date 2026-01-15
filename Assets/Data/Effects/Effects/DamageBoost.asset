@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7370e9d609c9afa4ba4c78cc1208e2e6, type: 3}
-  m_Name: Burn
+  m_Name: DamageBoost
   m_EditorClassIdentifier: 
-  effectId: burn
-  displayName: Burn
-  icon: {fileID: -1632327899919742125, guid: 84323e5f44fbd964db44576c0c0645ed, type: 3}
-  description: Burn let them Burnn burnn them all
-  kind: 1
-  polarity: 1
-  stat: 0
-  op: 1
+  effectId: damage_boost
+  displayName: Damage Boost
+  icon: {fileID: 21300000, guid: 4ebd6606f414f044da1090cf8eacbb4f, type: 3}
+  description: 
+  kind: 0
+  polarity: 0
+  stat: 16
+  op: 0
   damageType: 01000000
   tickTiming: 1

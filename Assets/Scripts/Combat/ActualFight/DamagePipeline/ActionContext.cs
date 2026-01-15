@@ -14,6 +14,7 @@ namespace MyGame.Combat
         public ResolvedSpell spell;
         public DamageKind spellDamageKind;
         public int lastDamageDealt;
+        public int lastDamageDealtPower;
 
         // Shared services
         public IRng rng;
@@ -31,6 +32,7 @@ namespace MyGame.Combat
         public int flatDamageBonus; // additive bonuses/penalties
         public float damageMult = 1f; // multiplicative bonuses/penalties
         public int finalDamage; // computed final
+        public int effectiveDefense;
 
         // -------------------
         // Phase 3: Effects
