@@ -156,10 +156,24 @@ namespace MyGame.Combat
         [SerializeField]
         private float[] attackerWeakenMultByType; // 30% less => *0.7
 
+        // E) Attacker buffs by range type (MORE)
+        [SerializeField]
+        private int[] attackerRangeBonusFlatByRange;
+
+        [SerializeField]
+        private float[] attackerRangeBonusMultByRange;
+
         public StatModifiers()
         {
             EnsureArrays();
-            Reset();
+            ResetAll();
+        }
+
+        private StatModifiers(bool skipReset)
+        {
+            EnsureArrays();
+            if (!skipReset)
+                ResetAll();
         }
 
         private void EnsureInitialized()
@@ -206,7 +220,7 @@ namespace MyGame.Combat
         {
             EnsureInitialized();
 
-            var clone = new StatModifiers();
+            var clone = new StatModifiers(skipReset: true);
             clone.EnsureInitialized();
 
             // ---------- Flats ----------
@@ -270,6 +284,9 @@ namespace MyGame.Combat
 
             clone.attackerWeakenFlatByType = (int[])attackerWeakenFlatByType.Clone();
             clone.attackerWeakenMultByType = (float[])attackerWeakenMultByType.Clone();
+
+            clone.attackerRangeBonusFlatByRange = (int[])attackerRangeBonusFlatByRange.Clone();
+            clone.attackerRangeBonusMultByRange = (float[])attackerRangeBonusMultByRange.Clone();
 
             return clone;
         }
@@ -370,6 +387,17 @@ namespace MyGame.Combat
                 other.attackerWeakenMultByType,
                 attackerWeakenMultByType,
                 attackerWeakenMultByType.Length
+            );
+
+            Array.Copy(
+                other.attackerRangeBonusFlatByRange,
+                attackerRangeBonusFlatByRange,
+                attackerRangeBonusFlatByRange.Length
+            );
+            Array.Copy(
+                other.attackerRangeBonusMultByRange,
+                attackerRangeBonusMultByRange,
+                attackerRangeBonusMultByRange.Length
             );
         }
 
@@ -604,12 +632,15 @@ namespace MyGame.Combat
 
         private static int Idx(DamageType t) => (int)t;
 
+        private static int Idx(DamageRangeType t) => (int)t;
+
         // Unity serialization note:
         // Constructors are not guaranteed to run for serialized instances,
         // so always ensure arrays exist before use.
         private void EnsureArrays()
         {
             int count = Enum.GetValues(typeof(DamageType)).Length;
+            int rangeCount = Enum.GetValues(typeof(DamageRangeType)).Length;
 
             attackerBonusFlatByType ??= new int[count];
             attackerBonusMultByType ??= NewMultArray(count);
@@ -622,6 +653,37 @@ namespace MyGame.Combat
 
             attackerWeakenFlatByType ??= new int[count];
             attackerWeakenMultByType ??= NewMultArray(count);
+
+            attackerRangeBonusFlatByRange ??= new int[rangeCount];
+            attackerRangeBonusMultByRange ??= NewMultArray(rangeCount);
+        }
+
+        // -------------------------
+        // E) Attacker buffs by range type (MORE)
+        // -------------------------
+        public int GetAttackerRangeBonusFlat(DamageRangeType t)
+        {
+            EnsureArrays();
+            return attackerRangeBonusFlatByRange[Idx(t)];
+        }
+
+        public float GetAttackerRangeBonusMult(DamageRangeType t)
+        {
+            EnsureArrays();
+            return attackerRangeBonusMultByRange[Idx(t)];
+        }
+
+        public void AddAttackerRangeBonusFlat(DamageRangeType t, int value)
+        {
+            EnsureArrays();
+            attackerRangeBonusFlatByRange[Idx(t)] += value;
+        }
+
+        /// <summary>+0.20 => *1.2 (multiplicative stacking)</summary>
+        public void AddAttackerRangeBonusMorePercent(DamageRangeType t, float percent)
+        {
+            EnsureArrays();
+            attackerRangeBonusMultByRange[Idx(t)] *= (1f + percent);
         }
 
         // -------------------------
@@ -806,7 +868,7 @@ namespace MyGame.Combat
         // Utility: avoid negative multipliers for "less"
         private static float Clamp01Factor(float v) => v < 0f ? 0f : v;
 
-        public void Reset()
+        public void ResetAll()
         {
             EnsureArrays();
 
@@ -871,6 +933,9 @@ namespace MyGame.Combat
 
             ClearInts(attackerWeakenFlatByType);
             ResetMults(attackerWeakenMultByType);
+
+            ClearInts(attackerRangeBonusFlatByRange);
+            ResetMults(attackerRangeBonusMultByRange);
         }
 
         private static void ClearInts(int[] arr) => Array.Clear(arr, 0, arr.Length);

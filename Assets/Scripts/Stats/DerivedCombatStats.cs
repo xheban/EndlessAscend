@@ -14,6 +14,7 @@ namespace MyGame.Combat
         public int physicalDefense;
         public int magicalDefense;
         public int evasion;
+        public int accuracy;
 
         public int attackSpeed;
         public int castSpeed;

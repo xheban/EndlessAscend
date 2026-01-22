@@ -1,0 +1,93 @@
+/* Hide label (your original rule) */
+Slider Label {
+    display: none;
+}
+
+/* Root size (was inline in UXML before) */
+Slider {
+    width: 100%;
+    height: 40px;
+
+    /* previously: background-image on slider root */
+    background-image: resource('UI_Own/Slider');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    -unity-slice-scale: 4px;
+
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+
+/* Dragger (your original) */
+Slider #unity-dragger {
+    background-image: resource('UI_Own/SliderDragger');
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+
+    width: 24px;
+    height: 24px;
+
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    -unity-slice-scale: 1px;
+
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Tracker (your original) */
+Slider #unity-tracker {
+    background-color: rgba(0, 0, 0, 0);
+
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+
+    background-image: resource('UI_Own/SliderTracker');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    flex-grow: 1;
+
+    position: relative;
+    top: 0px;
+
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+
+    -unity-slice-scale: 4px;
+}
+
+/* Your container padding (your original) */
+Slider #unity-drag-container {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+/* Fill inside the tracker */
+.slider-fill {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+
+    height: 100%;
+    width: 0px; /* will be set from code */
+
+    background-image: resource('UI_Own/SliderFill');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    border-width: 0px;
+    border-radius: 0px;
+    -unity-slice-scale: 4px;
+}

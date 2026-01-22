@@ -12,9 +12,9 @@ namespace MyGame.Combat
         public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
             int dmg = ctx.finalDamage;
-            Debug.Log($"[MergeAllDamageRule] Final Damage: {ctx.finalDamage}");
-            Debug.Log($"[MergeAllDamageRule] Damage Multiplier: {ctx.damageMult}");
-            Debug.Log($"[MergeAllDamageRule] Flat Damage Bonus: {ctx.flatDamageBonus}");
+            // Debug.Log($"[MergeAllDamageRule] Final Damage: {ctx.finalDamage}");
+            // Debug.Log($"[MergeAllDamageRule] Damage Multiplier: {ctx.damageMult}");
+            // Debug.Log($"[MergeAllDamageRule] Flat Damage Bonus: {ctx.flatDamageBonus}");
         }
     }
 }

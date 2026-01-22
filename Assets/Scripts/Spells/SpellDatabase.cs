@@ -57,6 +57,12 @@ namespace MyGame.Spells
             return def != null ? def.displayName : spellId;
         }
 
+        public Sprite GetIcon(string spellId)
+        {
+            var def = GetById(spellId);
+            return def != null ? def.icon : null; // adjust field name if needed
+        }
+
         public IReadOnlyList<SpellDefinition> All => spells;
 
         // ✅ This must be INSIDE the class

@@ -20,7 +20,7 @@ MonoBehaviour:
   allowedSpecs: -1
   rarity: 0
   manaCost: 1
-  cooldownTurns: 0
+  cooldownTurns: 1
   maxLevel: 10
   baseDamage: 10
   damageKind: 1
@@ -30,6 +30,7 @@ MonoBehaviour:
   ignoreDefenseFlat: 0
   ignoreDefensePercent: 70
   hitChance: 100
+  castTimeValue: 100
   baseUseSpeed: 120
   damageScalingType: 0
   damageScalingValue: 3
@@ -47,7 +48,8 @@ MonoBehaviour:
     durationStackMode: 1
     refreshOverridesRemaining: 0
     compareMode: 0
-    strengthRatingOverride: 10
+    strengthRating: 0
+    removeWhenType: 1
     target: 0
     chanceScaling:
       type: 1

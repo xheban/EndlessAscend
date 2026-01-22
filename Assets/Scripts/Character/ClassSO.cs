@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MyGame.Common;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Class", menuName = "MyGame/Classes/Class")]
@@ -16,4 +17,8 @@ public class ClassSO : ScriptableObject
 
     [Header("Spec")]
     public List<SpecSO> spec = new();
+
+    [Header("Starting Bonuses (new)")]
+    public List<BaseStatModifier> baseStatMods = new();
+    public List<DerivedStatModifier> derivedStatMods = new();
 }

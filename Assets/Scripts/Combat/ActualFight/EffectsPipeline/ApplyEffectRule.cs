@@ -38,14 +38,16 @@ namespace MyGame.Combat
 
             float bonusFlatPower =
                 ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.magicPowerFlat
-                    : ctx.attacker.modifiers.attackPowerFlat + ctx.attacker.modifiers.powerFlat;
+                    ? attackerModifiers.magicPowerFlat
+                    : attackerModifiers.attackPowerFlat;
+            bonusFlatPower += attackerModifiers.powerFlat;
 
             float bonusMultPower =
                 ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.MagicPowerMultFinal
-                    : ctx.attacker.modifiers.AttackPowerMultFinal
-                        * ctx.attacker.modifiers.PowerMultFinal;
+                    ? attackerModifiers.MagicPowerMultFinal
+                    : attackerModifiers.AttackPowerMultFinal;
+
+            bonusMultPower *= attackerModifiers.PowerMultFinal;
 
             int finalPower = Mathf.FloorToInt((basePower + bonusFlatPower) * bonusMultPower);
 

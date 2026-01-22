@@ -1,27 +1,21 @@
+/* ===============================
+   AppRoot.uss
+   =============================== */
+
 #app-root {
     position: relative;
-    -unity-font-definition: resource("Fonts & Materials/PixellariRaster");
 
+    /* Default/base font for the whole UI (inherits unless overridden) */
+    -unity-font-definition: resource("Fonts & Materials/PixellariRaster");
     width: 100%;
     height: 100%;
-    --color-bg-main: #1e1e1e;
-    --color-bg-panel: #2a2a2a;
-    --color-accent: #4aa3ff;
-    --color-accent-hover: #6bb7ff;
-
-    --color-text-main: #C8C8C8;
-    --color-text-black: #000000;
-    --color-text-white: #C8C8C8;
-    --color-text-muted: #bbbbbb;
-    --color-danger: #e05252;
-    --color-hover-success: #89C579;
-    --color-item-selected:  #B4E9A6;
-    --color-item-disabled: #DF3939;
 }
 
 
+#screen-host,
+#overlay-host,
 
-#screen-host, #overlay-host, #modal-host {
+#modal-host {
     position: absolute;
     left: 0;
     top: 0;
@@ -33,37 +27,7 @@
     display: none; /* closed by default */
 }
 
-#overlay-backdrop {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-/* cloned overlay UXML goes here */
-#overlay-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;  /* horizontal */
-    align-items: center;      /* vertical */
-}
-
-#modal-content {
-    position: absolute;
-    left: 0; top: 0; right: 0; bottom: 0;
-
-    display: flex;
-    justify-content: center;  /* horizontal */
-    align-items: center;      /* vertical */
-}
-
+#overlay-backdrop,
 #modal-backdrop {
     position: absolute;
     left: 0;
@@ -74,8 +38,21 @@
     background-color: rgba(0, 0, 0, 0.4);
 }
 
+/* cloned overlay UXML goes here */
+#overlay-content,
+#modal-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center; /* horizontal */
+    align-items: center;     /* vertical */
+}
+
 /* ---------- Autosave icon base ---------- */
-/* Autosave icon hidden by default */
 #autosave {
     overflow: visible;
     transition-property: opacity;
@@ -94,11 +71,11 @@
 }
 
 /* --- Quill motion --- */
-
 #autosave > #quill {
     position: absolute;
     left: 12px;
     top: 0;
+
     transition-property: translate;
     transition-duration: 1s;
     transition-timing-function: ease-in-out;

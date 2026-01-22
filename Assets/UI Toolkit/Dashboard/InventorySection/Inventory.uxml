@@ -1,0 +1,106 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Separator" src="project://database/Assets/UI%20Toolkit/Components/Utils/Separator.uxml?fileID=9197481963319205126&amp;guid=0455613e7a8639a42a23c1a0065e009a&amp;type=3#Separator" />
+    <engine:Template name="InventoryDetail" src="project://database/Assets/UI%20Toolkit/Dashboard/InventorySection/InventoryDetail.uxml?fileID=9197481963319205126&amp;guid=36fb6c1b1888bc24491de2cc90c3d0d4&amp;type=3#InventoryDetail" />
+    <engine:VisualElement name="InventoryPanel" style="flex-grow: 1; flex-direction: row; display: flex; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; position: relative;">
+        <engine:VisualElement name="EquippedItems" style="flex-grow: 0; background-image: none; width: 460px; align-items: stretch; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; margin-left: 12px;">
+            <engine:Label text="Equipped Items" name="EquippedItemsTitle" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-self: center;" />
+            <engine:VisualElement name="EquippedItemsContent" style="flex-grow: 0; margin-top: 16px; background-image: resource(&apos;UI_Own/EquipmentFrame&apos;); -unity-background-scale-mode: stretch-to-fill; width: 412px; height: 492px;">
+                <engine:VisualElement name="OffHand" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 394px; left: 172px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Shield&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="MainHand" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 394px; left: 101px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Weapon&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Ammunition" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 394px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_arrows&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Gloves" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 322px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Glowes&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Belt" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 252px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Belt&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Bracer" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 180px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Bracelet&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Cape" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 108px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Tabard&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Jewelery" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 36px; left: 312px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Jewelery&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Head" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 36px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Head&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Chest" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 180px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Chest&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Legs" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 252px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_pants&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Foot" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 322px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_boots&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Shoulder" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 108px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Shoulder&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Ranged" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 394px; left: 242px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_bow&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Ring1" style="flex-grow: 0; width: 32px; height: 32px; position: absolute; top: 320px; left: 145px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_ring&apos;); padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Ring2" style="flex-grow: 0; width: 32px; height: 32px; position: absolute; top: 320px; left: 188px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_ring&apos;); padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Amulet" style="flex-grow: 0; width: 32px; height: 32px; position: absolute; top: 320px; left: 231px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_neck&apos;); padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Trinket" style="flex-grow: 0; width: 64px; height: 64px; position: absolute; top: 394px; left: 32px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Eq_Trinket&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="CharacterAvatar" style="flex-grow: 0; width: 160px; height: 260px; position: absolute; top: 53px; left: 124px; -unity-background-scale-mode: scale-to-fit; background-image: resource(&apos;Avatars/Player/mage_03&apos;);" />
+                <engine:VisualElement name="NameHolder" style="flex-grow: 1; position: absolute; width: 200px; height: 25px; top: 366px; left: 102px; justify-content: center;">
+                    <engine:Label text="Black Flame" name="Name" class="label-sm" style="-unity-text-align: lower-center;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 0; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
+        <engine:VisualElement name="StorageHolder" style="flex-grow: 1; flex-direction: row;">
+            <engine:VisualElement name="EquipmentInventory" style="flex-grow: 1; background-image: none; width: auto; align-items: stretch; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; flex-basis: 1px;">
+                <engine:Label text="Equipment" name="EquipmentTitle" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; width: 80%; align-self: center;" />
+                <engine:Instance template="Separator" style="align-self: center;" />
+                <engine:VisualElement name="EquipmentFilter" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-top: 8px;">
+                    <engine:Label text="Search &#10;" name="Label" class="label-sm" style="height: 32px; margin-right: 8px; justify-content: flex-start; align-content: auto; -unity-text-align: lower-left;" />
+                    <engine:TextField name="EquipmentSearch" style="height: 32px; width: auto; flex-grow: 1;" />
+                    <engine:Button text="Open filter" name="FilterSettings" class="btn btn-small btn-violet" style="height: 32px;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="EquipmentContent" style="flex-grow: 0; margin-top: 0; background-image: resource(&apos;UI_Own/BagSlotFrame&apos;); height: 480px; padding-top: 14px; padding-right: 14px; padding-bottom: 14px; padding-left: 14px; flex-direction: row;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 0; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
+            <engine:VisualElement name="ItemsInventory" style="flex-grow: 1; background-image: none; width: auto; align-items: stretch; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; flex-basis: 1px;">
+                <engine:Label text="Items" name="ItemsTitle" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; width: 80%; align-self: center;" />
+                <engine:Instance template="Separator" style="align-self: center;" />
+                <engine:VisualElement name="ItemsFilter" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-top: 8px;">
+                    <engine:Label text="Search &#10;" name="Label" class="label-sm" style="height: 32px; margin-right: 8px; justify-content: flex-start; align-content: auto; -unity-text-align: lower-left;" />
+                    <engine:TextField name="ItemsSearch" style="height: 32px; width: auto; flex-grow: 1;" />
+                    <engine:Button text="Open filter" name="FilterSettings" class="btn btn-small btn-violet" style="height: 32px;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="ItemsContent" style="flex-grow: 0; margin-top: 0; background-image: resource(&apos;UI_Own/BagSlotFrame&apos;); height: 480px; display: flex; padding-top: 14px; padding-right: 14px; padding-bottom: 14px; padding-left: 14px;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 0; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
+        <engine:VisualElement name="Currencies" style="flex-grow: 0; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; width: 240px;">
+            <engine:Label text="Currencies" name="EquippedItemsTitle" double-click-selects-word="false" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; margin-bottom: 24px;" />
+            <engine:VisualElement name="CurrencyList" style="flex-grow: 1;">
+                <engine:VisualElement name="Gold" style="flex-grow: 0; flex-direction: row;">
+                    <engine:VisualElement name="Icon" style="flex-grow: 0; width: 48px; height: 48px; margin-right: 8px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/Icons/32_coin&apos;);" />
+                    <engine:Label text="1200" name="Value" class="label-md" style="-unity-text-align: middle-left;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:Instance template="InventoryDetail" name="InventoryDetailTooltip" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; display: none;" />
+        <engine:Instance template="InventoryDetail" name="InventoryDetailTooltipCompare" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; display: none;" />
+    </engine:VisualElement>
+</engine:UXML>

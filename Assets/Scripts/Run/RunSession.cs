@@ -1,3 +1,4 @@
+using MyGame.Inventory;
 using MyGame.Save;
 using MyGame.Spells;
 using MyGame.Towers;
@@ -9,8 +10,11 @@ namespace MyGame.Run
     {
         public static PlayerSpellbook Spellbook { get; private set; }
         public static TowerRunProgress Towers { get; private set; }
+        public static PlayerItems Items { get; private set; }
+        public static PlayerEquipment Equipment { get; private set; }
 
-        public static bool IsInitialized => Spellbook != null && Towers != null;
+        public static bool IsInitialized =>
+            Spellbook != null && Towers != null && Items != null && Equipment != null;
 
         public static void InitializeFromSave(
             SaveData save,
@@ -26,6 +30,8 @@ namespace MyGame.Run
 
             Spellbook = SpellSaveMapper.LoadFromSave(save, db, progression);
             Towers = TowerSaveMapper.LoadFromSave(save);
+            Items = InventorySaveMapper.LoadItemsFromSave(save);
+            Equipment = InventorySaveMapper.LoadEquipmentFromSave(save);
         }
 
         public static void ApplyRuntimeToSave(SaveData save)
@@ -37,12 +43,15 @@ namespace MyGame.Run
             }
             SpellSaveMapper.WriteToSave(Spellbook, save);
             TowerSaveMapper.WriteToSave(Towers, save);
+            InventorySaveMapper.WriteToSave(Items, Equipment, save);
         }
 
         public static void Clear()
         {
             Spellbook = null;
             Towers = null;
+            Items = null;
+            Equipment = null;
         }
     }
 }

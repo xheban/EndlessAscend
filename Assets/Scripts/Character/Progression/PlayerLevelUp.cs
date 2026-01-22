@@ -1,4 +1,6 @@
+using System;
 using MyGame.Combat;
+using MyGame.Common;
 using MyGame.Save;
 using UnityEngine;
 
@@ -7,9 +9,21 @@ namespace MyGame.Progression
     public static class PlayerLevelUp
     {
         // Replace with your real formula or config table later
-        public static int GetXpRequiredForLevel(int level)
+        public static long GetXpRequiredForLevel(int level)
         {
-            return Mathf.RoundToInt(50 * Mathf.Pow(1.25f, level - 1));
+            level = Mathf.Max(1, level);
+
+            // Tunable constants
+            const double baseXp = 30.0; // baseline
+            const double linear = 20.0; // early growth
+            const double quadratic = 8.0; // mid growth
+            const double cubic = 0.01; // late growth
+
+            double l = level;
+
+            double xp = baseXp + linear * l + quadratic * l * l + cubic * l * l * l * l; // quartic tail (VERY gentle)
+
+            return (long)Math.Round(xp);
         }
 
         /// <summary>
@@ -25,7 +39,7 @@ namespace MyGame.Progression
 
             while (true)
             {
-                int required = GetXpRequiredForLevel(save.level);
+                long required = GetXpRequiredForLevel(save.level);
                 if (save.exp < required)
                     break;
 
@@ -33,17 +47,10 @@ namespace MyGame.Progression
                 save.level += 1;
                 gained += 1;
 
-                // Optional: heal on level up
-                save.currentHp = CombatStatCalculator.CalculateMaxHp(
-                    save.finalStats,
-                    save.level,
-                    save.tier
-                );
-                save.currentMana = CombatStatCalculator.CalculateMaxMana(
-                    save.finalStats,
-                    save.level,
-                    save.tier
-                );
+                // Optional: heal on level up (use fully bonused max values)
+                var derived = PlayerDerivedStatsResolver.BuildEffectiveDerivedStats(save);
+                save.currentHp = Mathf.Max(1, derived.maxHp);
+                save.currentMana = Mathf.Max(0, derived.maxMana);
             }
             return gained;
         }

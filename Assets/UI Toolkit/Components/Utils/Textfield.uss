@@ -1,0 +1,26 @@
+IntegerField > #unity-text-input {
+    padding-left: 4px;
+    padding-right: 16px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Description_mini_bar.png");
+}
+
+TextField > #unity-text-input {
+    padding-left: 16px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Description_mini_bar.png");
+
+}
+
+IntegerField > #unity-text-input > TextElement {
+    color: var(--color-text-white);
+}
+
+TextField > #unity-text-input > TextElement {
+    color: var(--color-text-white);
+}
+
+

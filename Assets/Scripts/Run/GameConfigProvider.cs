@@ -22,10 +22,20 @@ namespace MyGame.Run
 
         [Header("Player")]
         [SerializeField]
+        private PlayerAvatarDatabase playerAvatarDatabase;
+
+        [SerializeField]
         private PlayerIconDatabase playerIconDatabase;
 
         [SerializeField]
         private PlayerClassDatabase playerClassDatabase;
+
+        [Header("Inventory")]
+        [SerializeField]
+        private ItemDatabase itemDatabase;
+
+        [SerializeField]
+        private EquipmentDatabase equipmentDatabase;
 
         public StartingSpellConfig StartingSpellConfig => startingSpellConfig;
 
@@ -33,9 +43,12 @@ namespace MyGame.Run
         public EffectDatabase EffectDatabase => effectDatabase;
         public SpellProgressionConfig SpellProgression => spellProgression;
 
+        public PlayerAvatarDatabase PlayerAvatarDatabase => playerAvatarDatabase;
         public PlayerIconDatabase PlayerIconDatabase => playerIconDatabase;
-
         public PlayerClassDatabase PlayerClassDatabase => playerClassDatabase;
+
+        public ItemDatabase ItemDatabase => itemDatabase;
+        public EquipmentDatabase EquipmentDatabase => equipmentDatabase;
 
         private void Awake()
         {

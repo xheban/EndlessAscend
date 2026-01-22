@@ -26,30 +26,35 @@ namespace MyGame.Combat
                     : ctx.attacker.derived.attackPower;
 
             float bonusFlatPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.magicPowerFlat
-                    : ctx.attacker.modifiers.attackPowerFlat + ctx.attacker.modifiers.powerFlat;
+                (
+                    ctx.spell.damageKind == DamageKind.Magical
+                        ? ctx.attacker.modifiers.magicPowerFlat
+                        : ctx.attacker.modifiers.attackPowerFlat
+                ) + ctx.attacker.modifiers.powerFlat;
 
             float bonusMultPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.MagicPowerMultFinal
-                    : ctx.attacker.modifiers.AttackPowerMultFinal
-                        * ctx.attacker.modifiers.PowerMultFinal;
+                (
+                    ctx.spell.damageKind == DamageKind.Magical
+                        ? ctx.attacker.modifiers.MagicPowerMultFinal
+                        : ctx.attacker.modifiers.AttackPowerMultFinal
+                ) * ctx.attacker.modifiers.PowerMultFinal;
 
             float finalPower = (basePower + bonusFlatPower) * bonusMultPower;
 
             // percentage of power multipliers and flat bonuses meaning how much one AP or MP will afffect the spell damge. bose is 0.5 damage per one AP or MP
             float bonusFlatPercentageOfPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.magicPowerScalingFlat
-                    : ctx.attacker.modifiers.magicPowerScalingFlat
-                        + ctx.attacker.modifiers.powerScalingFlat;
+                (
+                    ctx.spell.damageKind == DamageKind.Magical
+                        ? ctx.attacker.modifiers.magicPowerScalingFlat
+                        : ctx.attacker.modifiers.attackPowerScalingFlat
+                ) + ctx.attacker.modifiers.powerScalingFlat;
 
             float bonusMultPercentageOfPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? ctx.attacker.modifiers.MagicPowerScalingMultFinal
-                    : ctx.attacker.modifiers.AttackPowerScalingMultFinal
-                        * ctx.attacker.modifiers.PowerScalingMultFinal;
+                (
+                    ctx.spell.damageKind == DamageKind.Magical
+                        ? ctx.attacker.modifiers.MagicPowerScalingMultFinal
+                        : ctx.attacker.modifiers.AttackPowerScalingMultFinal
+                ) * ctx.attacker.modifiers.PowerScalingMultFinal;
 
             float finalPercentageOfPower =
                 (_percentOfPower + bonusFlatPercentageOfPower) * bonusMultPercentageOfPower;

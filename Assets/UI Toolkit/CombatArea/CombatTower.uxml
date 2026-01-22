@@ -1,36 +1,30 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
-    <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelProgressBar/pixelStyle.uss?fileID=7433441132597879392&amp;guid=376b38c98fa84a74c9509e7f58f1adff&amp;type=3#pixelStyle" />
     <Style src="project://database/Assets/UI%20Toolkit/CombatArea/CombatTower.uss?fileID=7433441132597879392&amp;guid=404dbbbee37a8fd4c97221c2b65fc0c2&amp;type=3#CombatTower" />
     <engine:VisualElement name="Bg" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Images/TowerCombat.png?fileID=2800000&amp;guid=3626939625081d843a6e3615e537197e&amp;type=3#TowerCombat&quot;);">
         <engine:VisualElement name="EnemyPlaceholder" style="flex-grow: 1; left: 1023px; position: absolute; top: 524px; width: 320px; height: 320px;">
-            <engine:Label text="Label" name="EnemyAction" class="label-1" style="-unity-text-align: upper-center;" />
+            <engine:Label text="Label" name="EnemyAction" class="header-xs" style="-unity-text-align: upper-right;" />
             <engine:VisualElement name="EnemyIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/45_crystal.png?fileID=2800000&amp;guid=83f3f03fad7e7504984dfa2e5caca23e&amp;type=3#45_crystal&quot;); -unity-background-scale-mode: scale-to-fit; align-self: flex-start; height: 320px; width: 320px; position: relative; top: 0; left: 0;" />
         </engine:VisualElement>
         <engine:VisualElement name="PlayerPlaceholder" style="flex-grow: 1; left: 344px; position: absolute; top: 482px; width: 320px; height: 320px;">
-            <engine:Label text="Label" name="PlayerAction" class="label-1" style="-unity-text-align: upper-center;" />
-            <engine:VisualElement name="EnemyIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/45_crystal.png?fileID=2800000&amp;guid=83f3f03fad7e7504984dfa2e5caca23e&amp;type=3#45_crystal&quot;); -unity-background-scale-mode: scale-to-fit; align-self: flex-start; height: 320px; width: 320px; position: relative; top: 0; left: 0;" />
+            <engine:Label text="Label" name="PlayerAction" class="header-xs" style="-unity-text-align: upper-left;" />
+            <engine:VisualElement name="PlayerIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/45_crystal.png?fileID=2800000&amp;guid=83f3f03fad7e7504984dfa2e5caca23e&amp;type=3#45_crystal&quot;); -unity-background-scale-mode: scale-to-fit; align-self: flex-start; height: 320px; width: 320px; position: relative; top: 0; left: 0;" />
         </engine:VisualElement>
         <engine:VisualElement name="TopPart" style="flex-grow: 1; flex-direction: row; margin-top: 32px; margin-right: 128px; margin-bottom: 32px; margin-left: 128px; flex-shrink: 0;">
             <engine:VisualElement name="PlayerSection" style="flex-grow: 1; flex-basis: 1px;">
                 <engine:VisualElement name="Player" style="flex-grow: 1; flex-basis: 1px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decorated_bar&apos;); -unity-background-scale-mode: stretch-to-fill; margin-right: 64px; flex-direction: row; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px; flex-shrink: 1; height: auto;">
                     <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/Icons/27_Skull&apos;); -unity-background-scale-mode: stretch-to-fill; flex-shrink: 1; height: 200px; width: 200px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
                     <engine:VisualElement name="Info" style="flex-grow: 1; margin-left: 16px;">
-                        <engine:VisualElement name="NameLvl" style="flex-grow: 0; flex-direction: row;">
-                            <engine:Label text="Player name&#10;" name="Name" class="header-1" style="color: rgb(255, 243, 243); flex-grow: 1;" />
-                            <engine:Label text="Lvl " name="Level" class="header-1 header-2" style="color: rgb(255, 243, 243); -unity-text-align: lower-left; margin-right: 12px;" />
-                            <engine:Label text="38" name="LevelValue" class="header-1 header-2" style="color: rgb(255, 243, 243); justify-content: flex-end; align-content: flex-end; -unity-text-align: lower-left;" />
+                        <engine:VisualElement name="NameLvl" style="flex-grow: 0; flex-direction: row; border-bottom-width: 8px;">
+                            <engine:Label text="Player name&#10;" name="Name" class="label-md" style="color: rgb(255, 243, 243); flex-grow: 1;" />
+                            <engine:Label text="Lvl " name="Level" class="label-sm" style="color: rgb(255, 243, 243); -unity-text-align: lower-left; margin-right: 12px;" />
+                            <engine:Label text="38" name="LevelValue" class="header-1 header-2 label-sm" style="color: rgb(255, 243, 243); justify-content: flex-end; align-content: flex-end; -unity-text-align: lower-left;" />
                         </engine:VisualElement>
                         <engine:VisualElement name="ClassInfo" style="flex-grow: 0; flex-direction: row; margin-bottom: 16px;">
-                            <engine:Label text="Tier I" name="Tier" class="header-2" style="color: rgb(255, 243, 243); margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                            <engine:Label name="Class" class="header-1 header-2" style="color: rgb(255, 243, 243); margin-right: 8px;" />
-                            <engine:Label name="Spec" class="header-1 header-2" style="color: rgb(255, 243, 243);" />
+                            <engine:Label text="Tier I" name="Tier" class="label-sm" style="color: rgb(255, 243, 243); margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            <engine:Label name="Class" class="label-sm" style="color: rgb(255, 243, 243); margin-right: 8px;" />
+                            <engine:Label name="Spec" class="label-sm" style="color: rgb(255, 243, 243);" />
                         </engine:VisualElement>
                         <engine:VisualElement name="Resources" style="flex-grow: 1; flex-direction: row;">
-                            <engine:VisualElement name="Labels" style="flex-grow: 0;">
-                                <engine:Label text="Hp" class="header-2" style="color: rgb(255, 255, 255);" />
-                                <engine:Label text="Mp" class="header-2" style="color: rgb(255, 255, 255); margin-top: 20px;" />
-                            </engine:VisualElement>
                             <engine:VisualElement name="Bars" style="flex-grow: 1;">
                                 <MyGame.UI.PixelProgressBar name="Hp" style="margin-bottom: 16px;" />
                                 <MyGame.UI.PixelProgressBar name="Mana" _fill="Blue" />
@@ -46,53 +40,53 @@
                             <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
                                 <engine:VisualElement name="BuffSlot1" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot2" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot3" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot4" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot5" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot6" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot7" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot8" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot9" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot10" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                             </engine:VisualElement>
                         </engine:VisualElement>
@@ -101,53 +95,53 @@
                             <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
                                 <engine:VisualElement name="DebuffSlot1" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot2" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot3" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot4" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot5" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot6" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot7" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot8" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot9" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot10" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                             </engine:VisualElement>
                         </engine:VisualElement>
@@ -158,20 +152,17 @@
                 <engine:VisualElement name="Enemy" style="flex-grow: 1; flex-basis: 1px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decorated_bar&apos;); -unity-background-scale-mode: stretch-to-fill; margin-left: 64px; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px; flex-direction: row; flex-shrink: 1;">
                     <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/Icons/27_Skull&apos;); -unity-background-scale-mode: stretch-to-fill; flex-shrink: 1; height: 200px; width: 200px;" />
                     <engine:VisualElement name="Info" style="flex-grow: 1; margin-left: 16px;">
-                        <engine:VisualElement name="NameLvl" style="flex-grow: 0; flex-direction: row;">
-                            <engine:Label text="Enemy Name" name="Name" class="header-1" style="color: rgb(255, 243, 243); flex-grow: 1;" />
-                            <engine:Label text="Lvl " name="Level" class="header-1 header-2" style="color: rgb(255, 243, 243); -unity-text-align: lower-left; margin-right: 12px;" />
-                            <engine:Label text="38" name="LevelValue" class="header-1 header-2" style="color: rgb(255, 243, 243); justify-content: flex-end; align-content: flex-end; -unity-text-align: lower-left;" />
+                        <engine:VisualElement name="NameLvl" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Enemy Name" name="Name" class="header-1 label-md" style="color: rgb(255, 243, 243); flex-grow: 1;" />
+                            <engine:Label text="Lvl " name="Level" class="label-sm" style="color: rgb(255, 243, 243); -unity-text-align: lower-left; margin-right: 12px;" />
+                            <engine:Label text="38" name="LevelValue" class="label-sm" style="color: rgb(255, 243, 243); justify-content: flex-end; align-content: flex-end; -unity-text-align: lower-left;" />
                         </engine:VisualElement>
                         <engine:VisualElement name="TagsInfo" style="flex-grow: 0; flex-direction: row; margin-bottom: 16px;">
-                            <engine:Label text="Tier I" name="Tier" class="header-2" style="color: rgb(255, 243, 243); margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                            <engine:Label text="Undead fire beast dreaGON&#10;" name="Tags" class="header-1 header-2" style="color: rgb(255, 243, 243); margin-right: 8px;" />
+                            <engine:Label text="Tier I" name="Tier" class="label-sm" style="color: rgb(255, 243, 243); margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                            <engine:Label text="Undead fire beast dreaGON&#10;" name="Tags" class="label-sm" style="color: rgb(255, 243, 243); margin-right: 8px;" />
                         </engine:VisualElement>
                         <engine:VisualElement name="Resources" style="flex-grow: 1; flex-direction: row;">
-                            <engine:VisualElement name="Labels" style="flex-grow: 0;">
-                                <engine:Label text="Hp" class="header-2" style="color: rgb(255, 255, 255);" />
-                                <engine:Label text="Mp" class="header-2" style="color: rgb(255, 255, 255); margin-top: 20px;" />
-                            </engine:VisualElement>
+                            <engine:VisualElement name="Labels" style="flex-grow: 0;" />
                             <engine:VisualElement name="Bars" style="flex-grow: 1;">
                                 <MyGame.UI.PixelProgressBar name="Hp" style="margin-bottom: 16px;" />
                                 <MyGame.UI.PixelProgressBar name="Mana" _fill="Blue" />
@@ -187,53 +178,53 @@
                             <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
                                 <engine:VisualElement name="BuffSlot1" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot2" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot3" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot4" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot5" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot6" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot7" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot8" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot9" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="BuffSlot10" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                             </engine:VisualElement>
                         </engine:VisualElement>
@@ -242,53 +233,53 @@
                             <engine:VisualElement name="List" style="flex-grow: 1; flex-direction: row; margin-right: 0; justify-content: space-between; align-items: center;">
                                 <engine:VisualElement name="DebuffSlot1" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot2" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot3" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot4" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot5" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot6" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot7" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot8" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot9" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                                 <engine:VisualElement name="DebuffSlot10" class="BuffSlot">
                                     <engine:VisualElement name="Icon" class="BuffIcon" style="flex-grow: 1;" />
-                                    <engine:Label text="3" name="Stacks" class="label-3-bold" style="position: absolute; top: 4px; left: 4px;" />
-                                    <engine:Label text="38" name="Duration" class="label-3-bold" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
+                                    <engine:Label text="3" name="Stacks" class="label-sm" style="position: absolute; top: 4px; left: 4px;" />
+                                    <engine:Label text="38" name="Duration" class="label-3-bold label-sm" style="position: absolute; top: auto; left: auto; right: 4px; bottom: 4px;" />
                                 </engine:VisualElement>
                             </engine:VisualElement>
                         </engine:VisualElement>
@@ -297,7 +288,7 @@
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="MiddlePart" style="flex-grow: 0; flex-direction: row; height: 200px; flex-shrink: 0; justify-content: flex-end; align-self: auto; align-items: auto; align-content: auto;">
-            <engine:Button text="Run" name="Flee" class="button-2-variant-o" style="align-content: auto; justify-content: flex-start; position: absolute; right: 0; bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            <engine:Button text="Run" name="Flee" class="btn btn-sm btn-orange" style="align-content: auto; justify-content: flex-start; position: absolute; right: 0; bottom: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
         </engine:VisualElement>
         <engine:VisualElement name="BottomPart" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; height: 400px; align-items: flex-end;">
             <engine:VisualElement name="Items" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/TopDownSlots&apos;); -unity-background-scale-mode: scale-to-fit; height: 388px; width: 120px; justify-content: space-around; align-content: flex-end;">
@@ -314,7 +305,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot2" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 150px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -322,7 +313,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot3" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 241px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -330,7 +321,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot4" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 331px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -338,7 +329,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot5" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 420px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -346,7 +337,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot6" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 510px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -354,7 +345,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot7" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 605px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -362,7 +353,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot8" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 694px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -370,7 +361,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot9" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 784px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -378,7 +369,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot10" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 873px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -386,7 +377,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot11" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 964px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -394,7 +385,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="Mask" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                     <engine:VisualElement name="SpellSlot12" style="flex-grow: 1; background-image: none; width: 70px; height: 70px; position: absolute; top: 32px; left: 1054px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
                         <engine:VisualElement name="ImageHolder" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: none; padding-top: 4px; padding-right: 4px; padding-bottom: 4px; padding-left: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
@@ -402,7 +393,7 @@
                         </engine:VisualElement>
                         <engine:VisualElement name="MaskFull" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhite&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
                         <engine:VisualElement name="MaskToResize" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/SkillMaskWhiteFullSide&apos;); background-color: rgba(0, 0, 0, 0); top: 0; left: 0; display: flex; -unity-background-image-tint-color: rgba(255, 255, 255, 0.31); -unity-slice-scale: 2px;" />
-                        <engine:Label text="3" name="Cooldown" class="label-3-bold-black" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                        <engine:Label text="3" name="Cooldown" class="text-black label-md" style="position: absolute; top: 0; left: 0; -unity-text-align: middle-center; width: 100%; height: 100%; align-self: auto; align-content: center; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
                     </engine:VisualElement>
                 </engine:VisualElement>
             </engine:VisualElement>
@@ -410,5 +401,7 @@
                 <engine:ScrollView name="LogScroll" style="flex-grow: 1; height: 100%; padding-left: 16px; padding-right: 16px; padding-top: 16px; padding-bottom: 16px;" />
             </engine:VisualElement>
         </engine:VisualElement>
+        <engine:VisualElement name="EnemyFloatingLayer" picking-mode="Ignore" style="flex-grow: 1; position: absolute; width: 160px; height: 280px; top: 498px; left: 901px;" />
+        <engine:VisualElement name="PlayerFloatingLayer" picking-mode="Ignore" style="flex-grow: 1; position: absolute; width: 160px; height: 284px; top: 444px; left: 599px;" />
     </engine:VisualElement>
 </engine:UXML>

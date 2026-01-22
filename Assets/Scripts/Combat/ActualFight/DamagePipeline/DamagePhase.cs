@@ -37,12 +37,6 @@ namespace MyGame.Combat
             for (int i = 0; i < _rules.Count; i++)
                 _rules[i]?.Apply(ctx, attackerModifiers);
 
-            Debug.Log("After all damage rules:");
-            Debug.Log($"  baseDamage: {ctx.baseDamage}");
-            Debug.Log($"  flatDamageBonus: {ctx.flatDamageBonus}");
-            Debug.Log($"  damageMult: {ctx.damageMult}");
-            Debug.Log($"  effectiveDefense: {ctx.effectiveDefense}");
-
             // 4) Compute final
             //    "Base + Flat" first, then multiply.
             int dmg = ctx.baseDamage + ctx.flatDamageBonus;
@@ -57,8 +51,6 @@ namespace MyGame.Combat
             if (dmg < 0)
                 dmg = 0;
 
-            Debug.Log("----- Damage afte all calulated: " + dmg + "---------------");
-
             // 4) apply spell ignores (order you wanted: percent first, then flat)
             int ignorePct = ctx.spell.ignoreDefensePercent;
             if (ignorePct < 0)
@@ -66,11 +58,20 @@ namespace MyGame.Combat
             if (ignorePct > 100)
                 ignorePct = 100;
 
-            Debug.Log("Ignoring flat defecne " + ctx.spell.ignoreDefensePercent);
-            Debug.Log("ignoring Flat defence " + ctx.spell.ignoreDefenseFlat);
             int ignoreFlat = Mathf.Max(0, ctx.spell.ignoreDefenseFlat);
-            float defenceAfterIgnore = ctx.effectiveDefense * (1f - (ignorePct / 100)) - ignoreFlat;
-            Debug.Log("Defeence after ignore: " + defenceAfterIgnore);
+            float defenceAfterIgnore =
+                (ctx.effectiveDefense * (1f - (ignorePct / 100f))) - ignoreFlat;
+
+            // Debug.Log("----- Damage Phase Debug -----");
+            // Debug.Log(
+            //     $"Defence after ignore: {defenceAfterIgnore} (ignoring {ignorePct}% and {ignoreFlat} flat from {ctx.effectiveDefense})"
+            // );
+            // Debug.Log($"Final damage before defence: {dmg}");
+            // Debug.Log($"Final damage calculation: {dmg} - {defenceAfterIgnore}");
+            // Debug.Log(" baseDamage: " + ctx.baseDamage);
+            // Debug.Log(" flatDamageBonus: " + ctx.flatDamageBonus);
+            // Debug.Log(" damageMult: " + ctx.damageMult);
+            // Debug.Log("--------------------------------");
 
             ctx.finalDamage = Math.Max(0, Mathf.FloorToInt(dmg - defenceAfterIgnore));
         }

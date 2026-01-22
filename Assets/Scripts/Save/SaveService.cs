@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MyGame.Combat;
 using MyGame.Common;
 using UnityEngine;
 
@@ -117,7 +118,7 @@ namespace MyGame.Save
 
                 if (data.version < 11)
                 {
-                    data.playerIconId = "default";
+                    data.avatarId = "default";
                     data.version = 11;
                 }
 
@@ -132,6 +133,43 @@ namespace MyGame.Save
                     data.spellActiveSlotProgress = new();
                     data.version = 13;
                 }
+
+                if (data.version < 14)
+                {
+                    // new settings container + default spell bindings
+                    data.version = 14;
+                }
+
+                if (data.version < 15)
+                {
+                    if (data.items == null)
+                        data.items = new List<SavedItemStackEntry>();
+
+                    if (data.equipmentInstances == null)
+                        data.equipmentInstances = new List<SavedEquipmentInstance>();
+
+                    if (data.equippedSlots == null)
+                        data.equippedSlots = new List<SavedEquippedSlot>();
+
+                    // Ensure roll lists exist on equipment instances (older saves)
+                    if (data.equipmentInstances != null)
+                    {
+                        foreach (var e in data.equipmentInstances)
+                        {
+                            if (e == null)
+                                continue;
+
+                            e.rolledBaseStatMods ??= new List<BaseStatModifier>();
+                            e.rolledDerivedStatMods ??= new List<DerivedStatModifier>();
+                            e.rolledSpellMods ??= new List<SpellCombatModifier>();
+                            e.rolledSpellOverrides ??= new List<SpellVariableOverride>();
+                        }
+                    }
+
+                    data.version = 15;
+                }
+
+                NormalizeInventoryRollLists(data);
 
                 return data;
             }
@@ -164,6 +202,9 @@ namespace MyGame.Save
                 if (data.version < 4)
                     data.version = 4;
 
+                if (data.version < 15)
+                    data.version = 15;
+
                 var json = JsonUtility.ToJson(data, prettyPrint: true);
                 File.WriteAllText(GetSlotPath(slot), json);
             }
@@ -195,6 +236,31 @@ namespace MyGame.Save
                     currentFloor = startFloor,
                 }
             );
+        }
+
+        private static void NormalizeInventoryRollLists(SaveData data)
+        {
+            if (data == null)
+                return;
+
+            data.items ??= new List<SavedItemStackEntry>();
+            data.equipmentInstances ??= new List<SavedEquipmentInstance>();
+            data.equippedSlots ??= new List<SavedEquippedSlot>();
+
+            if (data.equipmentInstances == null)
+                return;
+
+            for (int i = 0; i < data.equipmentInstances.Count; i++)
+            {
+                var e = data.equipmentInstances[i];
+                if (e == null)
+                    continue;
+
+                e.rolledBaseStatMods ??= new List<BaseStatModifier>();
+                e.rolledDerivedStatMods ??= new List<DerivedStatModifier>();
+                e.rolledSpellMods ??= new List<SpellCombatModifier>();
+                e.rolledSpellOverrides ??= new List<SpellVariableOverride>();
+            }
         }
 
         /// <summary>
@@ -244,6 +310,27 @@ namespace MyGame.Save
                     result.Add(slot);
             }
             return result;
+        }
+
+        private static KeyCode DefaultKeyForSpellSlot(int slotIndex)
+        {
+            // Typical defaults: 1..0 for first 10, then - and =
+            return slotIndex switch
+            {
+                0 => KeyCode.Alpha1,
+                1 => KeyCode.Alpha2,
+                2 => KeyCode.Alpha3,
+                3 => KeyCode.Alpha4,
+                4 => KeyCode.Alpha5,
+                5 => KeyCode.Alpha6,
+                6 => KeyCode.Alpha7,
+                7 => KeyCode.Alpha8,
+                8 => KeyCode.Alpha9,
+                9 => KeyCode.Alpha0,
+                10 => KeyCode.Minus,
+                11 => KeyCode.Equals,
+                _ => KeyCode.None,
+            };
         }
     }
 }

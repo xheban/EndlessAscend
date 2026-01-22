@@ -1,0 +1,11 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Holder" style="flex-grow: 0; height: auto;">
+        <engine:VisualElement name="Modal" style="flex-grow: 1; width: 600px; height: auto; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256.png?fileID=1422470188&amp;guid=79edde4c35b3a5a4aa4a5455f0b557a5&amp;type=3#Frame_square_256_0&quot;); margin-top: 32px;">
+            <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 64px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px;" />
+            <engine:Button name="Exit" class="exit-button" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Header" style="flex-grow: 0; height: 66px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 232px; position: absolute; top: -2px; left: 192px; right: 191px; bottom: auto; justify-content: flex-end;">
+            <engine:Label text="Save To SLOT" name="Title" class="header-sm" style="align-self: center; margin-top: 0; -unity-text-align: upper-left; margin-bottom: 6px; color: rgb(164, 164, 164);" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

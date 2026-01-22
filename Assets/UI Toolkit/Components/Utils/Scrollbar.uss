@@ -1,0 +1,65 @@
+/* ===============================
+   Scrollbars – Pixel Theme (global)
+   =============================== */
+Scroller {
+    width: 16px;
+    flex-shrink: 0;
+    min-height: 0;
+}
+
+/* Remove default visuals */
+Scroller #unity-tracker,
+Scroller #unity-dragger,
+Scroller #unity-dragger-border,
+Scroller #unity-low-button,
+Scroller #unity-high-button {
+    background-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-radius: 0;
+}
+
+/* Hide border element */
+Scroller #unity-dragger-border {
+    display: none;
+}
+
+/* Ensure the internal parts stretch properly */
+Scroller #unity-slider,
+Scroller #unity-drag-container,
+Scroller #unity-tracker {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Tracker texture */
+Scroller #unity-tracker {
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Scroll_frame.png?fileID=21300000&guid=bbd533a2a5a5a6943b12e7dcca6a489f&type=3#Scroll_frame");
+    background-repeat: repeat-y;
+    background-size: auto;
+    background-position: center;
+}
+
+/* Dragger texture */
+Scroller #unity-dragger {
+    width: 100%;
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Scroll_button.png?fileID=21300000&guid=1d05a104c049a0c49a7f33184fc9e4fc&type=3#Scroll_button");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+}
+
+/* Arrow buttons */
+Scroller #unity-low-button {
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_up.png?fileID=21300000&guid=736e51891d76bc24aa11770a49a47c48&type=3#Arrow_up");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+Scroller #unity-high-button {
+    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_down.png?fileID=21300000&guid=cfaf5533b560ea3498bdbdff3e74a0db&type=3#Arrow_down");
+    background-repeat: no-repeat;
+    background-position: center;
+}

@@ -1,0 +1,103 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Separator" src="project://database/Assets/UI%20Toolkit/Components/Utils/Separator.uxml?fileID=9197481963319205126&amp;guid=0455613e7a8639a42a23c1a0065e009a&amp;type=3#Separator" />
+    <engine:Template name="StatsPanel" src="project://database/Assets/UI%20Toolkit/Components/Stats/StatsPanel.uxml?fileID=9197481963319205126&amp;guid=789217c166764fa4f81181e32ee135fd&amp;type=3#StatsPanel" />
+    <engine:VisualElement name="CharacterPanel" style="flex-grow: 1; flex-direction: row; display: flex; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+        <engine:VisualElement name="BasicInfo" style="flex-grow: 0; background-image: none; width: 460px; align-items: stretch; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px;">
+            <engine:Label text="Testomage" name="CharName" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-items: center;" />
+            <engine:VisualElement name="LevelTier" style="flex-grow: 0; flex-direction: row; height: auto; margin-top: 8px; margin-bottom: 8px;">
+                <engine:Label text="Level 17" name="Level" class="label-md" style="margin-right: 32px;" />
+                <engine:Label text="Tier III" name="Tier" class="label-md" />
+            </engine:VisualElement>
+            <MyGame.UI.PixelProgressBar name="ExpBar" _fill="Green" _min="0" _max="100" _value="22" _heightPx="30" _labelText="EXP" style="margin-bottom: 8px;" />
+            <MyGame.UI.PixelProgressBar name="CurrentHp" _fill="Red" _min="0" _max="100" _value="100" _heightPx="30" _labelText="HP" style="margin-bottom: 8px;" />
+            <MyGame.UI.PixelProgressBar name="CurrentMana" _fill="Blue" _min="0" _max="100" _value="22" _heightPx="30" _labelText="MP" style="margin-bottom: 8px;" />
+            <engine:VisualElement name="Other" style="flex-grow: 1;">
+                <engine:VisualElement name="ClassSpecBonuses" style="flex-grow: 1;">
+                    <engine:Label text="Class &amp; Specialization Bonuses" name="ClassSpec" class="label-sm" style="margin-bottom: 8px;" />
+                    <engine:VisualElement name="ClassSpecIcons" style="flex-grow: 1; flex-direction: row;">
+                        <engine:VisualElement name="Class" style="flex-grow: 0; width: 64px; height: 64px; margin-right: 16px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Frame&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                            <engine:VisualElement name="ClassIcon" style="flex-grow: 1; -unity-background-scale-mode: scale-to-fit; background-repeat: no-repeat;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Spec" style="flex-grow: 0; width: 64px; height: 64px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_Frame&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                            <engine:VisualElement name="SpecIcon" style="flex-grow: 1; -unity-background-scale-mode: scale-to-fit; background-repeat: no-repeat;" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 16px; margin-right: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
+        <engine:VisualElement name="BasicStats" style="flex-grow: 0; background-image: none; width: 460px; align-items: stretch; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px;">
+            <engine:Label text="Basic Stats" name="SectionTitle" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-items: center;" />
+            <engine:VisualElement name="Stats" style="flex-grow: 0; margin-bottom: 16px; margin-top: 16px;">
+                <engine:Instance template="StatsPanel" />
+            </engine:VisualElement>
+            <engine:Button text="Add Points" name="AddPoints" class="btn btn-violet btn-md" />
+        </engine:VisualElement>
+        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 16px; margin-right: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
+        <engine:VisualElement name="AdvancedStats" style="flex-grow: 1; background-image: none; width: 460px; align-items: stretch; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px;">
+            <engine:Label text="Advanced Stats" name="SectionTitle" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-items: center;" />
+            <engine:VisualElement name="BonusHolder" style="flex-grow: 1; flex-direction: row;">
+                <engine:VisualElement name="AdvancedStats" style="flex-grow: 1; flex-basis: 1px;">
+                    <engine:VisualElement name="CombatStats" style="flex-grow: 0;">
+                        <engine:Label text="Combat Stats" name="Title" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
+                        <engine:VisualElement name="MaximumHealth" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Maximum Health - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="3000" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="MaximumMana" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Maximum Mana - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="1000" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="AttackPower" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Attack Power - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="120" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="MagicPower" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Magical Power - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="120" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="AttackSpeed" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Attack Speed - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="64" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="CastingSpeed" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Casting Speed - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="27" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="PhysicalDefence" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Physical Defence - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="120" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="MagicalDefence" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Magical Defence - " name="Name" selectable="false" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="142" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Evasion" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Evasion - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="13" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Accuracy" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Accuracy - " name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="21" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement name="NonCombatStats" style="flex-grow: 1;">
+                        <engine:Label text="Non-Combat Stats" name="Title" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
+                        <engine:VisualElement name="ManaRegen" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                            <engine:Label text="Mana regen / 10 seconds -" name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="12" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="HealthRegen" style="flex-grow: 0; flex-direction: row;">
+                            <engine:Label text="Health regen / 10 seconds -" name="Name" class="label-sm" style="margin-right: 8px;" />
+                            <engine:Label text="10&#10;" name="Value" class="label-sm" />
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Bonuses" style="flex-grow: 1; flex-basis: 1px;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

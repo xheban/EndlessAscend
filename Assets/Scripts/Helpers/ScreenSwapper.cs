@@ -86,8 +86,13 @@ public class ScreenSwapper : MonoBehaviour
     //-------TOOLTIP PART----------------------
     [SerializeField]
     private VisualTreeAsset tooltipUxml;
+
+    [SerializeField]
+    private VisualTreeAsset inventoryDetailTooltipUxml;
     private VisualElement _tooltipHost;
     private VisualElement _tooltipContent;
+    private VisualElement _customTooltipHost;
+    private VisualElement _activeCustomTooltip;
 
     private void Awake()
     {
@@ -147,6 +152,35 @@ public class ScreenSwapper : MonoBehaviour
 
         tooltipUxml.CloneTree(_tooltipContent);
 
+        // Dedicated host for custom tooltip visuals (inventory detail, etc.)
+        _customTooltipHost = new VisualElement { name = "custom-tooltip-host" };
+        _customTooltipHost.pickingMode = PickingMode.Ignore;
+        _customTooltipHost.style.position = Position.Absolute;
+        _customTooltipHost.style.left = 0;
+        _customTooltipHost.style.top = 0;
+        _customTooltipHost.style.right = 0;
+        _customTooltipHost.style.bottom = 0;
+        _tooltipContent.Add(_customTooltipHost);
+
+        // Optional: create the rich inventory detail tooltip in the global host.
+        // This avoids keeping an extra instance inside Inventory.uxml.
+        if (inventoryDetailTooltipUxml != null)
+        {
+            var temp = new VisualElement();
+            inventoryDetailTooltipUxml.CloneTree(temp);
+
+            // InventoryDetail.uxml has a single root VisualElement.
+            if (temp.childCount > 0)
+            {
+                var detail = temp[0];
+                detail.RemoveFromHierarchy();
+                detail.name = "InventoryDetailTooltip";
+                detail.pickingMode = PickingMode.Ignore;
+                detail.style.display = DisplayStyle.None;
+                _customTooltipHost.Add(detail);
+            }
+        }
+
         // Build modal UI once into modal-body (no extra layer)
         _modalContent.Clear();
         globalModalUxml.CloneTree(_modalContent);
@@ -181,6 +215,18 @@ public class ScreenSwapper : MonoBehaviour
 
         RefreshOverlayState();
         ShowScreen(startScreenId);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            const string settingsId = "settings";
+            if (IsOverlayOpen(settingsId))
+                CloseOverlay(settingsId);
+            else
+                ShowOverlay(settingsId);
+        }
     }
 
     public void ShowScreen(string screenId, object context)
@@ -444,18 +490,21 @@ public class ScreenSwapper : MonoBehaviour
         _overlayBackdrop.pickingMode = showBackdrop ? PickingMode.Position : PickingMode.Ignore;
     }
 
-    public void ShowGlobalModal(
+    public GlobalModalController ShowGlobalModal(
         string title,
         string message,
         string primaryText,
         Action onPrimary,
         string secondaryText = null,
         Action onSecondary = null,
-        bool closeOnOutsideClick = false
+        bool closeOnOutsideClick = false,
+        VisualElement customContent = null,
+        bool replaceCustomContent = true
     )
     {
         SetGlobalModalOpen(true);
         _closeModalOnOutsideClick = closeOnOutsideClick;
+
         _globalModal.Show(
             title,
             message,
@@ -465,7 +514,19 @@ public class ScreenSwapper : MonoBehaviour
             onSecondary,
             onClose: () => SetGlobalModalOpen(false)
         );
+
+        if (customContent != null)
+            _globalModal.SetCustomContent(customContent, replace: replaceCustomContent);
+        else
+            _globalModal.ClearCustomContent();
+
+        _modalContent.focusable = true;
+        _modalContent.tabIndex = 0;
+        _modalContent.Focus();
+
         RevealModalAfterLayoutStable();
+
+        return _globalModal; // ✅ handle for runtime updates
     }
 
     public void CloseGlobalModal()
@@ -555,6 +616,202 @@ public class ScreenSwapper : MonoBehaviour
             return;
 
         body.style.display = DisplayStyle.None;
+    }
+
+    public void ShowCustomTooltipAtWorldPosition(
+        VisualElement tooltip,
+        Vector2 worldPos,
+        float offsetPx = 8f,
+        float edgePaddingPx = 8f,
+        float fallbackWidthPx = 360f,
+        float fallbackHeightPx = 180f
+    )
+    {
+        if (
+            tooltip == null
+            || _tooltipContent == null
+            || _customTooltipHost == null
+            || _root == null
+        )
+            return;
+
+        // Hide the standard text tooltip if it's up.
+        HideTooltip();
+
+        _activeCustomTooltip = tooltip;
+
+        // Reparent into the global tooltip overlay host.
+        if (tooltip.parent != _customTooltipHost)
+        {
+            tooltip.RemoveFromHierarchy();
+            _customTooltipHost.Add(tooltip);
+        }
+
+        tooltip.style.display = DisplayStyle.Flex;
+        tooltip.style.position = Position.Absolute;
+        tooltip.BringToFront();
+
+        // Delay positioning until layout resolves.
+        tooltip.schedule.Execute(() =>
+        {
+            PositionCustomTooltipAtWorldPosition(
+                tooltip,
+                worldPos,
+                offsetPx,
+                edgePaddingPx,
+                fallbackWidthPx,
+                fallbackHeightPx
+            );
+        });
+    }
+
+    public void PositionCustomTooltipAtWorldPosition(
+        VisualElement tooltip,
+        Vector2 worldPos,
+        float offsetPx = 8f,
+        float edgePaddingPx = 8f,
+        float fallbackWidthPx = 360f,
+        float fallbackHeightPx = 180f
+    )
+    {
+        if (tooltip == null || _root == null)
+            return;
+
+        var local = _root.WorldToLocal(worldPos);
+
+        float w = tooltip.resolvedStyle.width;
+        float h = tooltip.resolvedStyle.height;
+        if (w <= 1f)
+            w = fallbackWidthPx;
+        if (h <= 1f)
+            h = fallbackHeightPx;
+
+        float panelW = _root.resolvedStyle.width;
+        float panelH = _root.resolvedStyle.height;
+
+        float x = local.x + offsetPx;
+        float y = local.y + offsetPx;
+
+        // Prefer flipping left/up if it would overflow.
+        if (panelW > 0 && x + w + edgePaddingPx > panelW)
+            x = local.x - w - offsetPx;
+        if (panelH > 0 && y + h + edgePaddingPx > panelH)
+            y = local.y - h - offsetPx;
+
+        if (panelW > 0)
+            x = Mathf.Clamp(x, edgePaddingPx, Mathf.Max(edgePaddingPx, panelW - w - edgePaddingPx));
+        if (panelH > 0)
+            y = Mathf.Clamp(y, edgePaddingPx, Mathf.Max(edgePaddingPx, panelH - h - edgePaddingPx));
+
+        tooltip.style.left = x;
+        tooltip.style.top = y;
+    }
+
+    public void ShowCustomTooltipAboveWorldPosition(
+        VisualElement tooltip,
+        Vector2 worldPos,
+        float offsetPx = 8f,
+        float edgePaddingPx = 8f,
+        float fallbackWidthPx = 360f,
+        float fallbackHeightPx = 180f
+    )
+    {
+        if (
+            tooltip == null
+            || _tooltipContent == null
+            || _customTooltipHost == null
+            || _root == null
+        )
+            return;
+
+        HideTooltip();
+        _activeCustomTooltip = tooltip;
+
+        if (tooltip.parent != _customTooltipHost)
+        {
+            tooltip.RemoveFromHierarchy();
+            _customTooltipHost.Add(tooltip);
+        }
+
+        tooltip.style.display = DisplayStyle.Flex;
+        tooltip.style.position = Position.Absolute;
+        tooltip.BringToFront();
+
+        tooltip.schedule.Execute(() =>
+        {
+            PositionCustomTooltipAboveWorldPosition(
+                tooltip,
+                worldPos,
+                offsetPx,
+                edgePaddingPx,
+                fallbackWidthPx,
+                fallbackHeightPx
+            );
+        });
+    }
+
+    public void PositionCustomTooltipAboveWorldPosition(
+        VisualElement tooltip,
+        Vector2 worldPos,
+        float offsetPx = 8f,
+        float edgePaddingPx = 8f,
+        float fallbackWidthPx = 360f,
+        float fallbackHeightPx = 180f
+    )
+    {
+        if (tooltip == null || _root == null)
+            return;
+
+        var local = _root.WorldToLocal(worldPos);
+
+        float w = tooltip.resolvedStyle.width;
+        float h = tooltip.resolvedStyle.height;
+        if (w <= 1f)
+            w = fallbackWidthPx;
+        if (h <= 1f)
+            h = fallbackHeightPx;
+
+        float panelW = _root.resolvedStyle.width;
+        float panelH = _root.resolvedStyle.height;
+
+        // Center horizontally on the anchor, and place above it.
+        float x = local.x - (w * 0.5f);
+        float y = local.y - h - offsetPx;
+
+        // If there's no room above, place below.
+        if (panelH > 0 && y < edgePaddingPx)
+            y = local.y + offsetPx;
+
+        if (panelW > 0)
+            x = Mathf.Clamp(x, edgePaddingPx, Mathf.Max(edgePaddingPx, panelW - w - edgePaddingPx));
+        if (panelH > 0)
+            y = Mathf.Clamp(y, edgePaddingPx, Mathf.Max(edgePaddingPx, panelH - h - edgePaddingPx));
+
+        tooltip.style.left = x;
+        tooltip.style.top = y;
+    }
+
+    public void HideCustomTooltip(VisualElement tooltip = null)
+    {
+        if (_customTooltipHost == null)
+            return;
+
+        var t = tooltip ?? _activeCustomTooltip;
+        if (t == null)
+            return;
+
+        t.style.display = DisplayStyle.None;
+
+        if (ReferenceEquals(t, _activeCustomTooltip))
+            _activeCustomTooltip = null;
+    }
+
+    public VisualElement GetCustomTooltipElement(string name)
+    {
+        if (_customTooltipHost == null || string.IsNullOrWhiteSpace(name))
+            return null;
+
+        return _customTooltipHost.Q<VisualElement>(name);
     }
 
     public void ShowTooltipAtElement(
@@ -654,4 +911,7 @@ public class ScreenSwapper : MonoBehaviour
         float y = Mathf.Clamp(pos.y, 0, panelH - h);
         return new Vector2(x, y);
     }
+
+    // Convenience public method to open the Settings overlay from code.
+    public void OpenSettingsOverlay() => ShowOverlay("Settings");
 }

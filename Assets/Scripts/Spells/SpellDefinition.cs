@@ -31,6 +31,9 @@ public class SpellDefinition : ScriptableObject
     [Header("Damage Kind")]
     public DamageKind damageKind = DamageKind.Magical;
 
+    [Header("Damage Range Type")]
+    public DamageRangeType damageRangeType = DamageRangeType.Melee;
+
     [Header("Type")]
     public SpellIntent intent = SpellIntent.Damage;
 
@@ -49,6 +52,9 @@ public class SpellDefinition : ScriptableObject
 
     [Range(0, 100)]
     public int hitChance = 100;
+
+    [Header("Cast time")]
+    public int castTimeValue = 100;
 
     public int baseUseSpeed = 100;
 

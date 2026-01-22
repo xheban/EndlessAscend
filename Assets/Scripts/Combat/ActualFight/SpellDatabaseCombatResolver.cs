@@ -50,6 +50,7 @@ namespace MyGame.Combat
                 cooldownTurns: def.cooldownTurns,
                 damage: finalDamage,
                 damageKind: def.damageKind,
+                damageRangeType: def.damageRangeType,
                 ignoreDefenseFlat: ignoreFlat,
                 ignoreDefensePercent: ignorePct,
                 hitChance: def.hitChance,
@@ -58,7 +59,9 @@ namespace MyGame.Combat
                 onHitEffects: def.onHitEffects,
                 onCastEffects: def.onCastEffects,
                 intent: def.intent,
-                level: spellLevel
+                level: spellLevel,
+                castTimeValue: def.castTimeValue,
+                icon: def.icon
             );
 
             return true;

@@ -1,10 +1,9 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
-    <engine:VisualElement name="MainMenu" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/unlimited_tower.png?fileID=-1796747440384222005&amp;guid=1149dba4da9a8284c8733f1146732b6e&amp;type=3#unlimited_tower_0&quot;); align-self: flex-start; align-content: flex-start; justify-content: flex-start; align-items: center; width: 1920px; height: 1080px;">
+    <engine:VisualElement name="MainMenu" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/unlimited_tower.png?fileID=-1796747440384222005&amp;guid=1149dba4da9a8284c8733f1146732b6e&amp;type=3#unlimited_tower_0&quot;); align-self: flex-start; align-content: flex-start; justify-content: flex-start; align-items: center; width: 1920px; height: 1080px;">
         <engine:VisualElement name="Logo" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Images/Title.png?fileID=21300000&amp;guid=68f7b6660cc3f6142afa6749ebfda643&amp;type=3#Title&quot;); flex-shrink: 0; width: 595px; height: 260px; margin-top: 32px; margin-bottom: 32px;" />
-        <engine:Button text="New Game" name="NewGame" class="button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
-        <engine:Button text="Load Game" name="LoadGame" class="button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
-        <engine:Button text="SETTINGS" name="Settings" class="button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
-        <engine:Button text="Exit Game" name="ExitGame" class="button" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        <engine:Button text="New Game" name="NewGame" class="button btn btn-lg btn-violet btn-hover-scale" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        <engine:Button text="Load Game" name="LoadGame" class="button btn btn-lg btn-violet btn-hover-scale" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        <engine:Button text="SETTINGS" name="Settings" class="button btn btn-lg btn-violet btn-hover-scale" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        <engine:Button text="Exit Game" name="ExitGame" class="button btn btn-lg btn-violet btn-hover-scale" style="border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
     </engine:VisualElement>
 </engine:UXML>

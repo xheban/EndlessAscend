@@ -1,4 +1,7 @@
+using System;
 using MyGame.Common; // Tier, Stats (your core stats type)
+using Unity.VisualScripting;
+using UnityEngine;
 
 namespace MyGame.Combat
 {
@@ -33,23 +36,24 @@ namespace MyGame.Combat
         {
             int end = ClampMin(s.endurance, 0);
             int spi = ClampMin(s.spirit, 0);
+
             int t = (int)tier;
 
-            // 1% base
-            int baseRegen = maxHp / 100;
+            // Base: 1% of max HP.
+            float baseRegen = maxHp / 100f;
 
-            // END:SPIRIT = 1:4
-            int points10 = end * 2 + spi * 8;
+            // Bonus: percent of max HP from stats (soft-capped).
+            // END:SPIRIT = 2:8 ratio (fixed-point x10).
+            int points10 = (end * 2 + spi * 8) * 10;
 
-            // Up to +4% from stats (+0.8% per tier)
+            // Up to +4% from stats (+1% per tier)
             int maxBonusPercent = 4 + t; // Tier VI (5) => +9%
             int k10 = (200 + level * 20 + t * 300) * 10;
 
-            int bonusPercent = SoftCapPercentFromPoints10(points10, maxBonusPercent, k10);
+            float bonusPercent = SoftCapPercentFromPoints10(points10, maxBonusPercent, k10);
+            float bonusRegen = (maxHp * bonusPercent) / 100f;
 
-            int bonusRegen = (maxHp * bonusPercent) / 100;
-
-            return baseRegen + bonusRegen;
+            return Mathf.FloorToInt(Math.Max(baseRegen + bonusRegen, 1f));
         }
 
         public static int CalculateOutOfCombatManaRegenPer10s(
@@ -59,22 +63,27 @@ namespace MyGame.Combat
             Tier tier
         )
         {
-            int end = ClampMin(s.endurance, 0);
+            int intel = ClampMin(s.intelligence, 0);
             int spi = ClampMin(s.spirit, 0);
+
             int t = (int)tier;
 
-            int baseRegen = maxMana / 100;
+            // Base: 1% of max mana.
+            float baseRegen = maxMana / 100f;
 
-            int points10 = end * 2 + spi * 8;
+            // Bonus: percent of max mana from stats (soft-capped).
+            // END:SPIRIT = 2:8 ratio (fixed-point x10).
+            int points10 = (intel * 2 + spi * 8) * 10;
 
-            int maxBonusPercent = 4 + t;
+            // Slightly higher early-game impact than HP regen.
+            // Example target: at maxMana=200 and Spirit=10, bonus ~ +3 per 10s.
+            int maxBonusPercent = 6 + t;
             int k10 = (200 + level * 20 + t * 300) * 10;
 
-            int bonusPercent = SoftCapPercentFromPoints10(points10, maxBonusPercent, k10);
+            float bonusPercent = SoftCapPercentFromPoints10(points10, maxBonusPercent, k10);
+            float bonusRegen = (maxMana * bonusPercent) / 100f;
 
-            int bonusRegen = (maxMana * bonusPercent) / 100;
-
-            return baseRegen + bonusRegen;
+            return Mathf.FloorToInt(Math.Max(baseRegen + bonusRegen, 1f));
         }
 
         public static int CalculateAttackPower(Stats s, int level, Tier tier)
@@ -147,6 +156,29 @@ namespace MyGame.Combat
             return ClampMin(baseEva + bonus, 0);
         }
 
+        public static int CalculateAccuracy(Stats s, int level, Tier tier)
+        {
+            int spi = ClampMin(s.spirit, 0);
+            int t = (int)tier;
+
+            // Base accuracy: steady progression
+            int baseAcc = 15 + level / 2 + t * 6;
+
+            // Spirit-only contribution (fixed-point x10)
+            int points10 = spi * 10;
+
+            // Soft-cap to prevent guaranteed hits
+            int maxBonus = 300 + t * 50; // mirrors evasion scale
+            int k10 = (300 + level * 12 + t * 350) * 10;
+
+            int bonus = SoftCapBonusFromPoints10(points10, maxBonus, k10);
+
+            // Optional absolute cap (recommended if accuracy is % based)
+            // return Clamp(baseAcc + bonus, 0, 500);
+
+            return ClampMin(baseAcc + bonus, 0);
+        }
+
         public static int CalculateAttackSpeed(Stats s, int level, Tier tier)
         {
             int agi = ClampMin(s.agility, 0);
@@ -184,6 +216,8 @@ namespace MyGame.Combat
             outStats.magicalDefense = CalculateMagicalDefence(s, level, tier);
 
             outStats.evasion = CalculateEvasion(s, level, tier);
+            outStats.accuracy = CalculateAccuracy(s, level, tier);
+
             outStats.castSpeed = CalculateCastSpeed(s, level, tier);
             outStats.attackSpeed = CalculateAttackSpeed(s, level, tier);
 
@@ -221,11 +255,13 @@ namespace MyGame.Combat
             return v;
         }
 
-        private static int SoftCapPercentFromPoints10(int points10, int maxPercent, int k10)
+        private static float SoftCapPercentFromPoints10(int points10, int maxPercent, int k10)
         {
             if (points10 <= 0)
                 return 0;
-            return (points10 * maxPercent) / (points10 + k10);
+
+            float result = (points10 * (float)maxPercent) / (points10 + k10);
+            return result;
         }
 
         // points10 is "speed points * 10"

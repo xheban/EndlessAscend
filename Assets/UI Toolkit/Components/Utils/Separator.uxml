@@ -1,0 +1,3 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="VisualElement" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 8px;" />
+</engine:UXML>

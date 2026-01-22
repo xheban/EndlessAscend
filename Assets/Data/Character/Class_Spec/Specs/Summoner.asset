@@ -21,3 +21,11 @@ MonoBehaviour:
     strength: 0
     spirit: 2
     endurance: 2
+  baseStatMods:
+  - stat: 3
+    op: 1
+    value: 5
+  derivedStatMods:
+  - stat: 9
+    op: 1
+    value: 5

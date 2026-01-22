@@ -15,6 +15,8 @@ MonoBehaviour:
   id: monster_bat
   displayName: Bat
   icon: {fileID: 21300000, guid: 17696ad53e7e0af4ba33aff03cc15183, type: 3}
+  avatar: {fileID: 21300000, guid: d9dced8ebc2d3da4f9cb1b531fc9afd6, type: 3}
+  size: 1
   tier: 0
   rarity: 0
   baseStats:

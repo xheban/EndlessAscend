@@ -1,0 +1,40 @@
+/* ===============================
+   Game Theme – Design Variables
+   =============================== */
+
+:root {
+    /* ---------- Backgrounds ---------- */
+    --color-bg-main: #1e1e1e;
+    --color-bg-panel: #2a2a2a;
+
+    /* ---------- Accent ---------- */
+    --color-accent: #4aa3ff;
+    --color-accent-hover: #6bb7ff;
+
+    /* ---------- Text ---------- */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #C8C8C8;
+    --color-text-white: #ffffff;
+    --color-text-black: #000000;
+    --color-text-muted: #bbbbbb;
+
+    /* ---------- States ---------- */
+    --color-danger: #e05252;
+    --color-hover-success: #89C579;
+    --color-item-selected: #B4E9A6;
+    --color-item-disabled: #DF3939;
+
+    /* ---------- Fonts ---------- */
+    --font-pixel-bold: url(
+        "project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Fonts/PixelSplitter-Bold.ttf?fileID=12800000&guid=2e3a5aea1f0dd0c4ebc494cd10e14c02&type=3#PixelSplitter-Bold"
+    );
+
+    /* ---------- Spacing scale (px) ---------- */
+    --space-xxs: 2px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+}

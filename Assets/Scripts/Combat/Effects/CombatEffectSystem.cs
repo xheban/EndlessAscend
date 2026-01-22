@@ -22,6 +22,7 @@ namespace MyGame.Combat
             public readonly int amount;
             public readonly string effectId;
             public readonly string effectName;
+            public readonly Sprite icon;
 
             public PeriodicTickResult(
                 CombatActorType source,
@@ -29,7 +30,8 @@ namespace MyGame.Combat
                 EffectKind kind,
                 int amount,
                 string effectId,
-                string effectName
+                string effectName,
+                Sprite icon
             )
             {
                 this.source = source;
@@ -38,6 +40,7 @@ namespace MyGame.Combat
                 this.amount = amount;
                 this.effectId = effectId;
                 this.effectName = effectName;
+                this.icon = icon;
             }
         }
 
@@ -215,7 +218,18 @@ namespace MyGame.Combat
                 {
                     // If present -> do nothing
                     if (existing != null)
+                    {
+                        ApplyDurationStacking(
+                            existing,
+                            inst,
+                            spellLevel,
+                            null,
+                            true,
+                            inst.GetScaled(spellLevel).durationTurns
+                        );
                         break;
+                    }
+
                     // Otherwise apply (first contributor)
                     AddStackMergeEffect(
                         attacker,
@@ -241,8 +255,7 @@ namespace MyGame.Combat
             int finalPower
         )
         {
-            CombatActorState target =
-                inst.effect.polarity == EffectPolarity.Buff ? attacker : defender;
+            CombatActorState target = inst.target == EffectTarget.Self ? attacker : defender;
 
             var effects = target.activeEffects;
             var existing = ActiveEffect.FindEffectById(effects, inst.effect.effectId);
@@ -368,45 +381,85 @@ namespace MyGame.Combat
             ActiveEffect effect,
             EffectInstance inst,
             int spellLevel,
-            EffectContributor newContributor
+            EffectContributor newContributor,
+            bool noStackJustDuration = false,
+            int newDurationTurn = 0
         )
         {
             if (effect == null || inst == null)
                 return;
 
             var scaled = inst.GetScaled(spellLevel);
-            switch (inst.durationStackMode)
+            if (noStackJustDuration)
             {
-                case DurationStackMode.Refresh:
-                    for (int i = 0; i < effect.contributors.Count; i++)
-                    {
-                        var c = effect.contributors[i];
-
-                        if (inst.refreshOverridesRemaining)
-                            c.remainingTurns = scaled.durationTurns;
-                        else
-                            c.remainingTurns = Mathf.Max(c.remainingTurns, scaled.durationTurns);
-                    }
-                    break;
-
-                case DurationStackMode.Prolong:
-                    var max = 0;
-                    for (int i = 0; i < effect.contributors.Count; i++)
-                    {
-                        if (ReferenceEquals(effect.contributors[i], newContributor))
+                switch (inst.durationStackMode)
+                {
+                    case DurationStackMode.Refresh:
+                        for (int i = 0; i < effect.contributors.Count; i++)
                         {
-                            continue;
-                        }
-                        effect.contributors[i].remainingTurns += scaled.durationTurns;
-                        max = Math.Max(max, effect.contributors[i].remainingTurns);
-                    }
-                    if (newContributor != null)
-                        newContributor.remainingTurns = max;
-                    break;
+                            var c = effect.contributors[i];
 
-                case DurationStackMode.None:
-                    // intentionally do nothing
-                    break;
+                            if (inst.refreshOverridesRemaining)
+                                c.remainingTurns = newDurationTurn;
+                            else
+                                c.remainingTurns = Mathf.Max(c.remainingTurns, newDurationTurn);
+                        }
+                        break;
+
+                    case DurationStackMode.Prolong:
+                        for (int i = 0; i < effect.contributors.Count; i++)
+                        {
+                            if (ReferenceEquals(effect.contributors[i], newContributor))
+                            {
+                                continue;
+                            }
+                            effect.contributors[i].remainingTurns += newDurationTurn;
+                        }
+                        break;
+
+                    case DurationStackMode.None:
+                        // intentionally do nothing
+                        break;
+                }
+            }
+            else
+            {
+                switch (inst.durationStackMode)
+                {
+                    case DurationStackMode.Refresh:
+                        for (int i = 0; i < effect.contributors.Count; i++)
+                        {
+                            var c = effect.contributors[i];
+
+                            if (inst.refreshOverridesRemaining)
+                                c.remainingTurns = scaled.durationTurns;
+                            else
+                                c.remainingTurns = Mathf.Max(
+                                    c.remainingTurns,
+                                    scaled.durationTurns
+                                );
+                        }
+                        break;
+
+                    case DurationStackMode.Prolong:
+                        var max = 0;
+                        for (int i = 0; i < effect.contributors.Count; i++)
+                        {
+                            if (ReferenceEquals(effect.contributors[i], newContributor))
+                            {
+                                continue;
+                            }
+                            effect.contributors[i].remainingTurns += scaled.durationTurns;
+                            max = Math.Max(max, effect.contributors[i].remainingTurns);
+                        }
+                        if (newContributor != null)
+                            newContributor.remainingTurns = max;
+                        break;
+
+                    case DurationStackMode.None:
+                        // intentionally do nothing
+                        break;
+                }
             }
         }
 
@@ -605,7 +658,8 @@ namespace MyGame.Combat
                             kind: effect.kind,
                             amount: total,
                             effectId: effect.effectId,
-                            effectName: effect.displayName
+                            effectName: effect.displayName,
+                            icon: effect.definition != null ? effect.definition.icon : null
                         )
                     );
                 }
@@ -657,11 +711,6 @@ namespace MyGame.Combat
                 flat += (basisValue * percent) / 100;
                 percent = 0; // consumed into flat
             }
-
-            // Buff = +, Debuff = -
-            int sign = (def != null && def.polarity == EffectPolarity.Debuff) ? -1 : 1;
-            flat *= sign;
-            percent *= sign;
         }
 
         private static void ApplyStatModifierNow(

@@ -15,6 +15,12 @@ public class MonsterDefinition : ScriptableObject
     [SerializeField]
     private Sprite icon;
 
+    [SerializeField]
+    private Sprite avatar;
+
+    [SerializeField]
+    private float size;
+
     [Header("Classification")]
     [SerializeField]
     private Tier tier;
@@ -49,6 +55,7 @@ public class MonsterDefinition : ScriptableObject
     public string Id => id;
     public string DisplayName => displayName;
     public Sprite Icon => icon;
+    public Sprite Avatar => avatar;
 
     public Tier Tier => tier;
     public MonsterRarity Rarity => rarity;
@@ -57,6 +64,7 @@ public class MonsterDefinition : ScriptableObject
 
     public int BaseExp => baseExp;
     public int BaseGold => baseGold;
+    public float Size => size;
 
     public IReadOnlyList<MonsterLootEntry> LootTable => lootTable;
     public MonsterTag Tags => tags;

@@ -17,8 +17,8 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 4ebd6606f414f044da1090cf8eacbb4f, type: 3}
   description: 
   kind: 0
-  polarity: 0
-  stat: 16
+  polarity: 1
+  stat: 18
   op: 0
-  damageType: 01000000
+  damageType: 0a000000
   tickTiming: 1

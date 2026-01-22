@@ -1,0 +1,26 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Detail" style="flex-grow: 1; width: 396px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_316&apos;); padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px;">
+        <engine:VisualElement name="Header" style="flex-grow: 0; flex-direction: row; margin-bottom: 0;">
+            <engine:VisualElement name="Icon" style="flex-grow: 0; width: 96px; height: 96px; margin-right: 16px;" />
+            <engine:VisualElement name="Text" style="flex-grow: 1; justify-content: center;">
+                <engine:Label text="Talisman of Oblivion from an" name="Name" class="header-sm" style="-unity-text-align: upper-left; white-space: normal;" />
+                <engine:Label text="Legendary Main Hand" name="RaritySlot" class="label-sm" />
+                <engine:Label text="Level 1 Tier VI" name="LevelTier" class="label-sm" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="DecoratorLine" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        <engine:VisualElement name="RolledStats" style="flex-grow: 0; margin-bottom: 0;">
+            <engine:Label text="Bonuses" name="RollsTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;" />
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Requirements" style="flex-grow: 0; margin-bottom: 0; margin-top: 0; margin-right: 0; margin-left: 0;">
+            <engine:Label text="Requirements" name="ReqTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RequirmentsList" style="flex-grow: 1;" />
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Detail" style="flex-grow: 0;">
+            <engine:Label text="This is best weapon you can find in any of thee game " name="DetailText" class="label-sm" style="flex-wrap: wrap-reverse; height: auto; white-space: normal;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

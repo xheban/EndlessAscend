@@ -1,79 +1,83 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/Components/Stats/StatsPanel.uss?fileID=7433441132597879392&amp;guid=d37957ba35e3a0247a1716fea4225156&amp;type=3#StatsPanel" />
-    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
     <engine:VisualElement name="StatsPanel" class="stats-panel">
         <engine:VisualElement name="HeaderHolder" class="stats-panel__points-row">
-            <engine:Label text="Points to Allocate:" name="PointsLabel" class="label-3 stats-panel__points-label" />
-            <engine:Label text="3" name="Points" class="label-3 stats-panel__points-value" />
+            <engine:Label text="Points to Allocate:" name="PointsLabel" class="stats-panel__points-label label-sm" />
+            <engine:Label text="3" name="Points" class="stats-panel__points-value label-sm" />
         </engine:VisualElement>
         <engine:VisualElement name="Str" class="stat-row">
             <engine:Button name="Minus" class="stat-btn stat-btn--minus" />
             <engine:Button name="Plus" class="stat-btn stat-btn--plus" />
             <engine:VisualElement name="NumbersHolderStr" class="stat-text">
-                <engine:Label text="Strength" name="Name" class="label-2" />
+                <engine:Label text="Strength" name="Name" class="label-sm" />
                 <engine:VisualElement class="stat-values">
-                    <engine:Label text="0" name="Value" class="label-2" />
-                    <engine:Label name="AddedValue" class="label-2" />
+                    <engine:Label text="0" name="Value" class="label-md" />
+                    <engine:Label name="AddedValue" class="label-md" />
+                    <engine:Label name="BonusValue" class="label-md stat-bonus" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="IconHolder" class="stat-icon-frame">
-                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/30_mace.png?fileID=21300000&amp;guid=45ab5c35e77274643b9dc65e53a4c6d8&amp;type=3#30_mace&quot;);" />
+                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Icons/Stats/str&apos;);" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Agi" class="stat-row">
             <engine:Button name="Minus" class="stat-btn stat-btn--minus" />
             <engine:Button name="Plus" class="stat-btn stat-btn--plus" />
             <engine:VisualElement name="NumbersHolderAgi" class="stat-text">
-                <engine:Label text="Agility" name="Name" class="label-2 stat-name" />
+                <engine:Label text="Agility" name="Name" class="label-sm" />
                 <engine:VisualElement class="stat-values">
-                    <engine:Label text="0" name="Value" class="label-2 stat-value" />
-                    <engine:Label name="AddedValue" class="label-2 stat-added" />
+                    <engine:Label text="0" name="Value" class="label-sm label-md" />
+                    <engine:Label name="AddedValue" class="label-md" />
+                    <engine:Label name="BonusValue" class="label-md stat-bonus" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="IconHolder" class="stat-icon-frame">
-                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/30_mace.png?fileID=21300000&amp;guid=45ab5c35e77274643b9dc65e53a4c6d8&amp;type=3#30_mace&quot;);" />
+                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Icons/Stats/agi&apos;);" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Int" class="stat-row">
             <engine:Button name="Minus" class="stat-btn stat-btn--minus" />
             <engine:Button name="Plus" class="stat-btn stat-btn--plus" />
             <engine:VisualElement name="NumbersHolderInt" class="stat-text">
-                <engine:Label text="Intelligence" name="Name" class="label-2 stat-name" />
+                <engine:Label text="Intelligence" name="Name" class="label-sm" />
                 <engine:VisualElement class="stat-values">
-                    <engine:Label text="0" name="Value" class="label-2 stat-value" />
-                    <engine:Label name="AddedValue" class="label-2 stat-added" />
+                    <engine:Label text="0" name="Value" class="label-md" />
+                    <engine:Label name="AddedValue" class="label-md" />
+                    <engine:Label name="BonusValue" class="label-md stat-bonus" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="IconHolder" class="stat-icon-frame">
-                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/30_mace.png?fileID=21300000&amp;guid=45ab5c35e77274643b9dc65e53a4c6d8&amp;type=3#30_mace&quot;);" />
+                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Icons/Stats/int&apos;);" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="End" class="stat-row">
             <engine:Button name="Minus" class="stat-btn stat-btn--minus" />
             <engine:Button name="Plus" class="stat-btn stat-btn--plus" />
             <engine:VisualElement name="NumbersHolderEnd" class="stat-text">
-                <engine:Label text="Endurance" name="Name" class="label-2 stat-name" />
+                <engine:Label text="Endurance" name="Name" class="label-sm" />
                 <engine:VisualElement class="stat-values">
-                    <engine:Label text="0" name="Value" class="label-2 stat-value" />
-                    <engine:Label name="AddedValue" class="label-2 stat-added" />
+                    <engine:Label text="0" name="Value" class="label-md" />
+                    <engine:Label name="AddedValue" class="label-md" />
+                    <engine:Label name="BonusValue" class="label-md stat-bonus" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="IconHolder" class="stat-icon-frame">
-                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/30_mace.png?fileID=21300000&amp;guid=45ab5c35e77274643b9dc65e53a4c6d8&amp;type=3#30_mace&quot;);" />
+                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Icons/Stats/end&apos;);" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Spr" class="stat-row">
             <engine:Button name="Minus" class="stat-btn stat-btn--minus" />
             <engine:Button name="Plus" class="stat-btn stat-btn--plus" />
             <engine:VisualElement name="NumbersHolderSpr" class="stat-text">
-                <engine:Label text="Spirit" name="Name" class="label-2 stat-name" />
+                <engine:Label text="Spirit" name="Name" class="label-sm" />
                 <engine:VisualElement class="stat-values">
-                    <engine:Label text="0" name="Value" class="label-2 stat-value" />
-                    <engine:Label name="AddedValue" class="label-2 stat-added" />
+                    <engine:Label text="0" name="Value" class="label-md" />
+                    <engine:Label name="AddedValue" class="label-md" />
+                    <engine:Label name="BonusValue" class="label-md stat-bonus" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement name="IconHolder" class="stat-icon-frame">
-                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/Icons/30_mace.png?fileID=21300000&amp;guid=45ab5c35e77274643b9dc65e53a4c6d8&amp;type=3#30_mace&quot;);" />
+                <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Icons/Stats/spr&apos;);" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>

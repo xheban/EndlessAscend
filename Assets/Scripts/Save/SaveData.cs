@@ -9,13 +9,13 @@ namespace MyGame.Save
     public sealed class SaveData
     {
         // Increase when you change the structure
-        public int version = 13;
+        public int version = 15;
 
         // Identity
         public string saveId; // GUID string
         public string characterName;
 
-        public string playerIconId;
+        public string avatarId;
 
         // Character build
         public string classId;
@@ -34,8 +34,8 @@ namespace MyGame.Save
 
         // Experience / Level
         public int level = 1;
-        public int exp = 0;
-        public int expToNextLevel = 100;
+        public long exp = 0;
+        public long expToNextLevel = 100;
 
         public Currency gold = new Currency(5);
         public int currentHp = 100;
@@ -45,6 +45,11 @@ namespace MyGame.Save
 
         // ✅ Spells (player-owned progression + runtime cooldowns)
         public List<SavedSpellEntry> spells = new List<SavedSpellEntry>();
+
+        // ✅ Inventory (starter)
+        public List<SavedItemStackEntry> items = new List<SavedItemStackEntry>();
+        public List<SavedEquipmentInstance> equipmentInstances = new List<SavedEquipmentInstance>();
+        public List<SavedEquippedSlot> equippedSlots = new List<SavedEquippedSlot>();
 
         // Metadata
         public string createdUtc;

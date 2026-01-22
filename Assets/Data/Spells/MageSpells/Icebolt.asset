@@ -25,7 +25,7 @@ MonoBehaviour:
   baseDamage: 10
   damageKind: 1
   intent: 0
-  damageTag: 
+  damageTag: 02000000
   tier: 0
   ignoreDefenseFlat: 20
   ignoreDefensePercent: 10
@@ -37,7 +37,7 @@ MonoBehaviour:
   - effect: {fileID: 11400000, guid: 4053abdb9a144a14fa47fd83875d9e5b, type: 2}
     chancePercent: 0
     durationTurns: 2
-    magnitudeFlat: 30
+    magnitudeFlat: 500
     magnitudePercent: 50
     magnitudeBasis: 1
     stackable: 0

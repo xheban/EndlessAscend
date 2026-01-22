@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MyGame.Common;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,14 +28,18 @@ public sealed class StatsPanelBinder
         public Button Plus;
         public Label BaseValueLabel; // "Value"
         public Label AddedValueLabel; // "AddedValue"
+        public Label BonusValueLabel; // "BonusValue" (optional)
         public int BaseValue;
         public int Added;
+        public string BonusText;
     }
 
     private VisualElement _statsRoot; // the element that contains rows (e.g. the element you currently call "Stats")
     private Label _freePointsLabel; // "Points"
     private int _freePoints;
     private int _startingFreePoints;
+
+    private ScreenSwapper _swapper;
 
     private readonly Dictionary<StatId, StatRow> _rows = new();
 
@@ -48,11 +53,17 @@ public sealed class StatsPanelBinder
     /// statsRoot = the element that contains the row elements (Str/Agi/Int/End/Spr).
     /// freePointsLabel = label that shows remaining points.
     /// </summary>
-    public void Bind(VisualElement statsRoot, Label freePointsLabel, int startingFreePoints = 3)
+    public void Bind(
+        VisualElement statsRoot,
+        Label freePointsLabel,
+        int startingFreePoints = 3,
+        ScreenSwapper swapper = null
+    )
     {
         _statsRoot = statsRoot;
         _freePointsLabel = freePointsLabel;
         _startingFreePoints = startingFreePoints;
+        _swapper = swapper;
 
         if (_statsRoot == null)
         {
@@ -72,11 +83,11 @@ public sealed class StatsPanelBinder
 
         _rows.Clear();
 
-        BindRow(StatId.Str, "Str");
-        BindRow(StatId.Agi, "Agi");
-        BindRow(StatId.Int, "Int");
-        BindRow(StatId.End, "End");
-        BindRow(StatId.Spr, "Spr");
+        BindRow(StatId.Str, "Str", swapper);
+        BindRow(StatId.Agi, "Agi", swapper);
+        BindRow(StatId.Int, "Int", swapper);
+        BindRow(StatId.End, "End", swapper);
+        BindRow(StatId.Spr, "Spr", swapper);
 
         ResetAllocations(); // start at default free points
         RenderAll();
@@ -96,7 +107,17 @@ public sealed class StatsPanelBinder
         _rows.Clear();
         _statsRoot = null;
         _freePointsLabel = null;
+        _swapper = null;
         Changed = null;
+    }
+
+    public void SetBonusText(StatId id, string text)
+    {
+        if (_rows.TryGetValue(id, out var row) && row != null)
+        {
+            row.BonusText = text;
+            RenderRow(row);
+        }
     }
 
     /// <summary>
@@ -140,7 +161,7 @@ public sealed class StatsPanelBinder
 
     // ---------------- Internals ----------------
 
-    private void BindRow(StatId id, string rowName)
+    private void BindRow(StatId id, string rowName, ScreenSwapper swapper)
     {
         var rowVe = _statsRoot.Q<VisualElement>(rowName);
         if (rowVe == null)
@@ -151,8 +172,11 @@ public sealed class StatsPanelBinder
 
         var minus = rowVe.Q<Button>("Minus");
         var plus = rowVe.Q<Button>("Plus");
+        var name = rowVe.Q<Label>("Name");
         var value = rowVe.Q<Label>("Value");
         var added = rowVe.Q<Label>("AddedValue");
+        var bonus = rowVe.Q<Label>("BonusValue");
+        var icon = rowVe.Q<VisualElement>("Icon");
 
         if (minus == null || plus == null || value == null || added == null)
         {
@@ -162,6 +186,23 @@ public sealed class StatsPanelBinder
             return;
         }
 
+        if (swapper != null)
+        {
+            string tooltip = StatTooltipLibrary.GetBaseStatTooltip(rowName);
+
+            if (!string.IsNullOrWhiteSpace(tooltip))
+            {
+                if (name != null)
+                    name.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
+                if (icon != null)
+                    icon.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
+
+                // If user is clicking +/-, hide any tooltip so it doesn't linger.
+                plus.RegisterCallback<PointerEnterEvent>(_ => swapper.HideTooltip());
+                minus.RegisterCallback<PointerEnterEvent>(_ => swapper.HideTooltip());
+            }
+        }
+
         var row = new StatRow
         {
             Id = id,
@@ -169,8 +210,10 @@ public sealed class StatsPanelBinder
             Plus = plus,
             BaseValueLabel = value,
             AddedValueLabel = added,
+            BonusValueLabel = bonus,
             BaseValue = 0,
             Added = 0,
+            BonusText = string.Empty,
         };
 
         SetButtonClick(plus, () => OnPlusClicked(row));
@@ -212,6 +255,11 @@ public sealed class StatsPanelBinder
     {
         row.BaseValueLabel.text = row.BaseValue.ToString();
         row.AddedValueLabel.text = row.Added > 0 ? $"+{row.Added}" : string.Empty;
+
+        if (row.BonusValueLabel != null)
+            row.BonusValueLabel.text = string.IsNullOrWhiteSpace(row.BonusText)
+                ? string.Empty
+                : row.BonusText;
 
         row.Plus.SetEnabled(_freePoints > 0);
         row.Minus.SetEnabled(row.Added > 0);

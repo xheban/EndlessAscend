@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using MyGame.Common;
 using MyGame.Helpers;
+using MyGame.Inventory;
+using MyGame.Run;
 using MyGame.Save;
 using MyGame.Spells;
 using UnityEngine;
@@ -21,6 +23,8 @@ namespace MyGame.Combat
 
         public CombatState State { get; private set; }
         private readonly CombatEffectSystem _effects;
+
+        private PlayerEquipment _playerEquipment;
 
         public CombatEngine(ICombatSpellResolver spellResolver, EffectDatabase effectDb)
         {
@@ -47,6 +51,7 @@ namespace MyGame.Combat
                     new SpellBaseDamageBonusRule(), // správne nastaví baseDamage
                     new PowerScalingDamageRule(percentOfPower: 0.50f), // správne pridá flat damage bonus z AP alebo MP
                     new AttackerTypeBonusDamageRule(), //správne nastaví falt a mult bonus podľa typu spellu
+                    new AttackerRangeBonusDamageRule(), // range-based bonuses (melee/ranged)
                     new DefenderVulnerabilityDamageRule(), //správne pridí do flatDamageBonus a damageMult
                     new AttackerWeakenMitigationDamageRule(), // odoberie z flat a mult final damage
                     new DefenderResistanceMitigationDamageRule(), // odoberie z flat a mult final damage
@@ -82,11 +87,51 @@ namespace MyGame.Combat
             if (spellbook == null)
                 throw new ArgumentNullException(nameof(spellbook));
 
+            // Load equipment first so base-stat rolls can affect derived calculations.
+            var equipment = RunSession.Equipment ?? InventorySaveMapper.LoadEquipmentFromSave(save);
+            _playerEquipment = equipment;
+
+            // Base stats used for derived calculations (flats first, then summed %).
+            var effectiveBaseStats = PlayerBaseStatsResolver.BuildEffectiveBaseStats(
+                save,
+                equipment
+            );
+
             var playerDerived = CombatStatCalculator.CalculateAll(
-                save.finalStats,
+                effectiveBaseStats,
                 save.level,
                 save.tier
             );
+
+            // Apply class/spec derived modifiers (maxHp, power, speed, etc.)
+            var classDb =
+                GameConfigProvider.Instance != null
+                    ? GameConfigProvider.Instance.PlayerClassDatabase
+                    : null;
+            if (classDb != null)
+            {
+                var classSo = classDb.GetClass(save.classId);
+                if (classSo != null)
+                    DerivedModifierApplier.ApplyAll(ref playerDerived, classSo.derivedStatMods);
+
+                var specSo = classDb.GetSpec(save.specId);
+                if (specSo != null)
+                    DerivedModifierApplier.ApplyAll(ref playerDerived, specSo.derivedStatMods);
+            }
+
+            // Apply equipped rolled derived modifiers.
+            if (equipment != null)
+            {
+                foreach (var inst in equipment.GetEquippedInstances())
+                {
+                    if (
+                        inst?.rolledDerivedStatMods == null
+                        || inst.rolledDerivedStatMods.Count == 0
+                    )
+                        continue;
+                    DerivedModifierApplier.ApplyAll(ref playerDerived, inst.rolledDerivedStatMods);
+                }
+            }
             var enemyDerived = CombatStatCalculator.CalculateAll(
                 monsterDef.BaseStats,
                 monsterLevel,
@@ -108,7 +153,7 @@ namespace MyGame.Combat
                         : save.characterName,
                     level: save.level,
                     tier: save.tier,
-                    baseStats: save.finalStats,
+                    baseStats: effectiveBaseStats,
                     derived: playerDerived,
                     startHp: playerHp,
                     startMana: playerMana
@@ -129,6 +174,20 @@ namespace MyGame.Combat
                 waitingForPlayerInput = false,
                 isFinished = false,
             };
+
+            // Apply equipped rolled spell-combat modifiers onto the player's modifier bucket.
+            if (equipment != null)
+            {
+                foreach (var inst in equipment.GetEquippedInstances())
+                {
+                    if (inst?.rolledSpellMods == null || inst.rolledSpellMods.Count == 0)
+                        continue;
+                    SpellCombatModifierApplier.ApplyAll(
+                        State.player.modifiers,
+                        inst.rolledSpellMods
+                    );
+                }
+            }
 
             // Build monster spellbook into CombatState
             State.enemySpellbook = new EnemySpellbookRuntime();
@@ -190,8 +249,8 @@ namespace MyGame.Combat
 
             EnemyQueueNextSpell();
 
-            SetTurnMeter(CombatActorType.Player, State.player.turnMeter);
-            SetTurnMeter(CombatActorType.Enemy, State.enemy.turnMeter);
+            SetTurnMeter(CombatActorType.Player, State.player.turnMeter, DEFAULT_TURN_THRESHOLD);
+            SetTurnMeter(CombatActorType.Enemy, State.enemy.turnMeter, DEFAULT_TURN_THRESHOLD);
 
             State.waitingForPlayerInput = true;
         }
@@ -222,6 +281,7 @@ namespace MyGame.Combat
                 {
                     State.waitingForEnemyDecision = true;
                     Emit(new EnemyDecisionRequestedEvent(State.enemy.displayName));
+
                     return;
                 }
 
@@ -232,8 +292,11 @@ namespace MyGame.Combat
                 float pSpeed = GetActionSpeed(State.player, playerQueued);
                 float eSpeed = GetActionSpeed(State.enemy, enemyQueued);
 
-                float pMissing = TURN_THRESHOLD - State.player.turnMeter;
-                float eMissing = TURN_THRESHOLD - State.enemy.turnMeter;
+                float pThreshold = GetThreshold(playerQueued);
+                float eThreshold = GetThreshold(enemyQueued);
+
+                float pMissing = pThreshold - State.player.turnMeter;
+                float eMissing = eThreshold - State.enemy.turnMeter;
 
                 // If someone already ready, fire immediately
                 if (pMissing <= 0.001f)
@@ -261,17 +324,16 @@ namespace MyGame.Combat
                 float newEMeter = State.enemy.turnMeter + (eSpeed * t);
 
                 // Snap to threshold (avoid 99.9999 issues)
-                if (Mathf.Abs(newPMeter - TURN_THRESHOLD) < 0.001f)
-                    newPMeter = TURN_THRESHOLD;
-                if (Mathf.Abs(newEMeter - TURN_THRESHOLD) < 0.001f)
-                    newEMeter = TURN_THRESHOLD;
+                if (Mathf.Abs(newPMeter - pThreshold) < 0.001f)
+                    newPMeter = pThreshold;
+                if (Mathf.Abs(newEMeter - eThreshold) < 0.001f)
+                    newEMeter = eThreshold;
 
-                SetTurnMeter(CombatActorType.Player, newPMeter);
-                SetTurnMeter(CombatActorType.Enemy, newEMeter);
+                SetTurnMeter(CombatActorType.Player, newPMeter, pThreshold);
+                SetTurnMeter(CombatActorType.Enemy, newEMeter, eThreshold);
 
-                // Decide who fires (tie -> player)
-                bool pReady = State.player.turnMeter >= TURN_THRESHOLD - 0.001f;
-                bool eReady = State.enemy.turnMeter >= TURN_THRESHOLD - 0.001f;
+                bool pReady = State.player.turnMeter >= pThreshold - 0.001f;
+                bool eReady = State.enemy.turnMeter >= eThreshold - 0.001f;
 
                 CombatActorType next;
                 if (pReady && eReady)
@@ -502,16 +564,15 @@ namespace MyGame.Combat
             // 2) DAMAGE / HEAL / SKIP
             if (spell.intent == SpellIntent.Damage)
             {
-                Debug.Log("CTX before damage phase:");
                 _damagePhase.Resolve(ctx, modifiers);
-                Debug.Log($"[CombatEngine] Final Damage after phases: {ctx.finalDamage}");
                 DealDamage(
                     source,
                     target,
                     ctx.finalDamage,
                     fromEffect: false,
                     fromSpell: true,
-                    spell.displayName
+                    spell.displayName,
+                    spell.icon
                 );
             }
             else if (spell.intent == SpellIntent.Heal)
@@ -522,7 +583,8 @@ namespace MyGame.Combat
                     Mathf.Max(0, spell.damage),
                     fromEffect: false,
                     fromSpell: true,
-                    spell.displayName
+                    spell.displayName,
+                    spell.icon
                 );
                 ctx.finalDamage = Mathf.Max(0, spell.damage); // treat as "amount" if needed
             }
@@ -574,7 +636,8 @@ namespace MyGame.Combat
             int amount,
             bool fromEffect,
             bool fromSpell,
-            string damageSourceName
+            string damageSourceName,
+            Sprite icon
         )
         {
             amount = Math.Max(0, amount);
@@ -585,6 +648,8 @@ namespace MyGame.Combat
             t.hp = Math.Max(0, t.hp - amount);
 
             int delta = t.hp - before; // negative on damage
+            int applied = -delta;
+
             if (fromEffect)
             {
                 Emit(
@@ -602,13 +667,27 @@ namespace MyGame.Combat
                     new CombatAdvancedLogEvent(
                         $"{State.Get(source).displayName}'s {damageSourceName} deals",
                         amount,
-                        $"damage to {t.displayName} sssssssssssssssssssssssssssss",
+                        $"damage to {t.displayName}",
                         CombatLogType.Damage
                     )
                 );
             }
 
             Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
+
+            if (applied >= 0)
+            {
+                Emit(
+                    new FloatingNumberEvent(
+                        source: source,
+                        target: target,
+                        amount: applied,
+                        kind: FloatingNumberKind.Damage,
+                        icon: icon, // next step: wire real icon
+                        label: damageSourceName
+                    )
+                );
+            }
 
             if (t.hp <= 0)
                 FinishCombat(source);
@@ -620,7 +699,8 @@ namespace MyGame.Combat
             int amount,
             bool fromEffect,
             bool fromSpell,
-            string healSourceName
+            string healSourceName,
+            Sprite icon
         )
         {
             amount = Math.Max(0, amount);
@@ -656,6 +736,17 @@ namespace MyGame.Combat
                 );
             }
 
+            Emit(
+                new FloatingNumberEvent(
+                    source: source,
+                    target: target,
+                    amount: delta,
+                    kind: FloatingNumberKind.Heal,
+                    icon: icon, // next step: wire real icon
+                    label: healSourceName
+                )
+            );
+
             Emit(new HpChangedEvent(target, t.hp, t.derived.maxHp, delta));
         }
 
@@ -673,7 +764,7 @@ namespace MyGame.Combat
         private void TickEffectsForActor(CombatActorType actorType)
         {
             //LogAllStatModifiers(actorType, "Before ticking effects");
-            DebugLogAllStatModifiers(actorType, "Before ticking effects");
+            //DebugLogAllStatModifiers(actorType, "Before ticking effects");
             if (_effects == null || State == null || State.isFinished)
                 return;
 
@@ -697,7 +788,8 @@ namespace MyGame.Combat
                         amount: amount,
                         fromEffect: true,
                         fromSpell: false,
-                        damageSourceName: t.effectName
+                        damageSourceName: t.effectName,
+                        t.icon
                     );
                 }
                 else if (t.kind == EffectKind.HealOverTime)
@@ -709,7 +801,8 @@ namespace MyGame.Combat
                         amount: amount,
                         fromEffect: true,
                         fromSpell: false,
-                        healSourceName: t.effectName
+                        healSourceName: t.effectName,
+                        t.icon
                     );
                 }
             }
@@ -724,32 +817,35 @@ namespace MyGame.Combat
             return v;
         }
 
-        private const int TURN_THRESHOLD = 100;
-
-        private void SetTurnMeter(CombatActorType actor, float value)
+        private void SetTurnMeter(CombatActorType actor, float value, float threshold)
         {
             var a = State.Get(actor);
 
-            float clamped = Mathf.Clamp(value, 0f, TURN_THRESHOLD);
+            float t = Mathf.Max(1f, threshold);
+            float clamped = Mathf.Clamp(value, 0f, t);
             a.turnMeter = clamped;
 
             Emit(
-                new TurnMeterChangedEvent(
-                    actor,
-                    Mathf.RoundToInt(a.turnMeter),
-                    Mathf.RoundToInt(TURN_THRESHOLD)
-                )
+                new TurnMeterChangedEvent(actor, Mathf.RoundToInt(a.turnMeter), Mathf.RoundToInt(t))
             );
+        }
+
+        private const int DEFAULT_TURN_THRESHOLD = 100;
+
+        private static float GetThreshold(ResolvedSpell s)
+        {
+            if (s == null)
+                return DEFAULT_TURN_THRESHOLD;
+            return Mathf.Max(1, s.castTimeValue);
         }
 
         private float GetActionSpeed(CombatActorState actor, ResolvedSpell queuedSpell)
         {
-            float bonus =
+            float speed =
                 queuedSpell.damageKind == DamageKind.Magical
                     ? actor.derived.castSpeed
                     : actor.derived.attackSpeed;
 
-            float speed = queuedSpell.baseUseSpeed + bonus;
             if (speed < 1f)
                 speed = 1f;
 
@@ -790,6 +886,8 @@ namespace MyGame.Combat
                         $"Could not resolve player spell '{actor.queuedSpellId}'."
                     );
 
+                ApplyPlayerSpellOverridesFromEquipment(resolvedPlayer);
+
                 return resolvedPlayer;
             }
 
@@ -803,18 +901,18 @@ namespace MyGame.Combat
             if (enemySpellState != null)
             {
                 if (
-                    _spellResolver.TryResolve(
+                    !_spellResolver.TryResolve(
                         enemySpellState.spellId,
                         enemySpellState.level,
                         State.enemy.derived,
                         out var resolvedEnemy
                     )
                 )
-                    return resolvedEnemy;
+                    throw new InvalidOperationException(
+                        $"Could not resolve enemy spell '{enemySpellState.spellId}' (Lv {enemySpellState.level})."
+                    );
 
-                throw new InvalidOperationException(
-                    $"Could not resolve enemy spell '{enemySpellState.spellId}' (Lv {enemySpellState.level})."
-                );
+                return resolvedEnemy;
             }
 
             // FALLBACK
@@ -825,16 +923,113 @@ namespace MyGame.Combat
                 cooldownTurns: 0,
                 damage: 5,
                 damageKind: DamageKind.Physical,
+                damageRangeType: DamageRangeType.Melee,
                 ignoreDefenseFlat: 0,
                 ignoreDefensePercent: 0,
                 hitChance: 90,
                 baseUseSpeed: 50,
+                castTimeValue: 100,
                 damageTypes: new[] { DamageType.Slashing },
                 onHitEffects: Array.Empty<EffectInstance>(),
                 onCastEffects: Array.Empty<EffectInstance>(),
                 intent: SpellIntent.Damage,
-                level: 1
+                level: 1,
+                icon: null
             );
+        }
+
+        private void ApplyPlayerSpellOverridesFromEquipment(ResolvedSpell spell)
+        {
+            if (spell == null || _playerEquipment == null)
+                return;
+
+            DamageKind? overrideKind = null;
+            DamageRangeType? overrideRange = null;
+            DamageType? overrideType = null;
+
+            int addIgnoreFlat = 0;
+            int addIgnorePct = 0;
+
+            // Deterministic priority: weapon slots first.
+            var slots = new[]
+            {
+                MyName.Equipment.EquipmentSlot.MainHand,
+                MyName.Equipment.EquipmentSlot.Offhand,
+                MyName.Equipment.EquipmentSlot.Ranged,
+                MyName.Equipment.EquipmentSlot.Head,
+                MyName.Equipment.EquipmentSlot.Chest,
+                MyName.Equipment.EquipmentSlot.Legs,
+                MyName.Equipment.EquipmentSlot.Hands,
+                MyName.Equipment.EquipmentSlot.Feet,
+                MyName.Equipment.EquipmentSlot.Shoulders,
+                MyName.Equipment.EquipmentSlot.Belt,
+                MyName.Equipment.EquipmentSlot.Ring,
+                MyName.Equipment.EquipmentSlot.Amulet,
+                MyName.Equipment.EquipmentSlot.Trinket,
+                MyName.Equipment.EquipmentSlot.Cape,
+                MyName.Equipment.EquipmentSlot.Jewelry,
+                MyName.Equipment.EquipmentSlot.Gloves,
+            };
+
+            for (int s = 0; s < slots.Length; s++)
+            {
+                if (!_playerEquipment.TryGetEquippedInstance(slots[s], out var inst))
+                    continue;
+
+                if (inst?.rolledSpellOverrides == null || inst.rolledSpellOverrides.Count == 0)
+                    continue;
+
+                for (int i = 0; i < inst.rolledSpellOverrides.Count; i++)
+                {
+                    var o = inst.rolledSpellOverrides[i];
+                    switch (o.type)
+                    {
+                        case SpellVariableOverrideType.DamageKind:
+                            overrideKind ??= o.damageKind;
+                            break;
+
+                        case SpellVariableOverrideType.DamageRangeType:
+                            overrideRange ??= o.damageRangeType;
+                            break;
+
+                        case SpellVariableOverrideType.DamageType:
+                            overrideType ??= o.damageType;
+                            break;
+
+                        case SpellVariableOverrideType.IgnoreDefenseFlat:
+                            addIgnoreFlat += o.ignoreDefenseFlat;
+                            break;
+
+                        case SpellVariableOverrideType.IgnoreDefensePercent:
+                            addIgnorePct += o.ignoreDefensePercent;
+                            break;
+                    }
+
+                    if (overrideKind.HasValue && overrideRange.HasValue && overrideType.HasValue)
+                        break;
+                }
+
+                if (overrideKind.HasValue && overrideRange.HasValue && overrideType.HasValue)
+                    break;
+            }
+
+            if (overrideKind.HasValue)
+                spell.damageKind = overrideKind.Value;
+            if (overrideRange.HasValue)
+                spell.damageRangeType = overrideRange.Value;
+            if (overrideType.HasValue)
+                spell.damageTypes = new[] { overrideType.Value };
+
+            // Incorporate ignore-defense overrides by adding onto the spell's base values.
+            if (addIgnoreFlat != 0)
+                spell.ignoreDefenseFlat = Mathf.Max(0, spell.ignoreDefenseFlat + addIgnoreFlat);
+
+            if (addIgnorePct != 0)
+                spell.ignoreDefensePercent = Mathf.Clamp(
+                    spell.ignoreDefensePercent + addIgnorePct,
+                    0,
+                    100
+                );
         }
 
         private void FireQueuedSpell(CombatActorType actorType, ResolvedSpell resolvedQueuedSpell)
@@ -844,6 +1039,16 @@ namespace MyGame.Combat
             attacker.actionIndex++;
             var modsBeforeTick = attacker.modifiers.Clone();
             TickEffectsForActor(actorType);
+            if (State == null || State.isFinished)
+                return;
+
+            // extra safety: if attacker is dead, don't cast
+            if (attacker.hp <= 0)
+                return;
+
+            // (Optional extra safety) if defender died from tick, don't cast
+            if (defender.hp <= 0)
+                return;
 
             if (actorType == CombatActorType.Player)
             {
@@ -881,7 +1086,7 @@ namespace MyGame.Combat
             var a = State.Get(actorType);
 
             // Consume 100 meter
-            SetTurnMeter(actorType, a.turnMeter - TURN_THRESHOLD);
+            SetTurnMeter(actorType, 0, DEFAULT_TURN_THRESHOLD);
 
             // Clear queued spell (it was cast)
             a.queuedSpellId = null;
@@ -1003,12 +1208,12 @@ Evasion:         {d.evasion}
             // Helper for consistent formatting
             static string F(string name, int v) => $"{name}: {v}";
             static string P(string name, float v) => $"{name}: {v:0.###}";
-            static string JoinLines(List<string> lines)
-            {
-                if (lines == null || lines.Count == 0)
-                    return "";
-                return string.Join("\n", lines);
-            }
+            // static string JoinLines(List<string> lines)
+            // {
+            //     if (lines == null || lines.Count == 0)
+            //         return "";
+            //     return string.Join("\n", lines);
+            // }
 
             var lines = new List<string>(128);
 
@@ -1193,6 +1398,9 @@ Evasion:         {d.evasion}
             sb.AppendLine(PF("PowerMultFinal", m.PowerMultFinal));
             sb.AppendLine(PF("AttackPowerMultFinal", m.AttackPowerMultFinal));
             sb.AppendLine(PF("MagicPowerMultFinal", m.MagicPowerMultFinal));
+            sb.AppendLine(PF("AttackSpeedMultFinal", m.AttackSpeedMultFinal));
+            sb.AppendLine(PF("CastingSpeedMultFinal", m.CastingSpeedMultFinal));
+            sb.AppendLine(PF("Defecen final", m.DefenceMultFinal));
 
             sb.AppendLine("--------------------------------------------------------------");
 

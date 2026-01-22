@@ -19,13 +19,6 @@ namespace MyGame.Combat
             System.Func<DamageType, float> getMult
         )
         {
-            int dmg = ctx.finalDamage;
-            if (dmg <= 0)
-            {
-                ctx.finalDamage = 0;
-                return;
-            }
-
             var types = ctx.spell.damageTypes;
             if (types == null || types.Length == 0)
                 types = new[] { DamageType.None };
@@ -39,7 +32,6 @@ namespace MyGame.Combat
                 flat += getFlat(t);
                 mult *= getMult(t);
             }
-            Debug.Log("Flat je :" + flat);
 
             ctx.flatDamageBonus += flat;
             ctx.damageMult *= mult;

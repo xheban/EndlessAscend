@@ -6,18 +6,20 @@
         <engine:VisualElement name="FloorSlot3" style="flex-grow: 0; width: 498px; height: 127px; position: absolute; top: 527px; left: 709px;" />
         <engine:VisualElement name="FloorSlot4" style="flex-grow: 0; width: 498px; height: 127px; position: absolute; top: 677px; left: 709px;" />
         <engine:VisualElement name="FloorSlot5" style="flex-grow: 0; width: 498px; height: 127px; position: absolute; top: 825px; left: 709px;" />
-        <engine:VisualElement name="NameOfTower" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 348px; height: 66px; top: 144px; left: 781px; padding-top: 32px; padding-right: 24px; padding-bottom: 8px; padding-left: 24px;">
-            <engine:Label text="Tower of Beginnings" class="label-2 label-3-bold" style="-unity-text-align: upper-center; font-size: 18px;" />
+        <engine:VisualElement name="NameOfTower" style="flex-grow: 1; position: absolute; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 348px; height: 66px; top: 144px; left: 781px; padding-top: 32px; padding-right: 24px; padding-bottom: 8px; padding-left: 24px;">
+            <engine:Label text="Tower of Beginnings" class="header-md" style="-unity-text-align: lower-center; font-size: 18px;" />
         </engine:VisualElement>
-        <engine:Button text="Back To Map" name="back" enabled="true" class="button" style="position: absolute; top: 32px; left: auto; right: 32px;" />
+        <engine:Button text="Back To Map" name="back" enabled="true" class="btn btn-md btn-violet" style="position: absolute; top: 32px; left: auto; right: 32px;" />
         <engine:VisualElement name="Move" style="flex-grow: 0; width: 480px; height: 99px; bottom: 12px; position: absolute; top: auto; left: 722px; right: 719px; flex-direction: row; -unity-background-scale-mode: scale-to-fit;">
             <engine:VisualElement name="GoToFloor" style="flex-grow: 0; padding-right: 16px;">
-                <engine:Label text="Go To Floor" class="label-3-bold" />
-                <engine:IntegerField value="1" password="false" name="FloorNumber" style="height: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
-                <engine:Button text="Go&#10;" name="Go" class="button-2-variant-o" style="margin-top: 8px;" />
+                <engine:Label text="Go To Floor" class="label-md" />
+                <engine:VisualElement name="GoTo" style="flex-grow: 1; flex-direction: row; align-self: auto; align-items: center;">
+                    <engine:IntegerField value="1" password="false" name="FloorNumber" style="height: 32px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; width: 60px; flex-grow: 1;" />
+                    <engine:Button text="Go&#10;" name="Go" class="btn btn-orange" style="width: 70px;" />
+                </engine:VisualElement>
             </engine:VisualElement>
-            <engine:VisualElement name="Ascend" class="tint" style="flex-grow: 1; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_up.png?fileID=2800000&amp;guid=736e51891d76bc24aa11770a49a47c48&amp;type=3#Arrow_up&quot;); -unity-background-scale-mode: scale-to-fit;" />
-            <engine:VisualElement name="Descend" class="tint" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_down.png?fileID=2800000&amp;guid=cfaf5533b560ea3498bdbdff3e74a0db&amp;type=3#Arrow_down&quot;); padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; -unity-background-scale-mode: scale-to-fit;" />
+            <engine:VisualElement name="Ascend" class="tint" style="flex-grow: 1; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_up.png?fileID=2800000&amp;guid=736e51891d76bc24aa11770a49a47c48&amp;type=3#Arrow_up&quot;); -unity-background-scale-mode: scale-to-fit;" />
+            <engine:VisualElement name="Descend" class="tint" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Arrow_down.png?fileID=2800000&amp;guid=cfaf5533b560ea3498bdbdff3e74a0db&amp;type=3#Arrow_down&quot;); padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 16px; margin-right: 16px; margin-bottom: 16px; margin-left: 16px; -unity-background-scale-mode: scale-to-fit;" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

@@ -1,0 +1,80 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Dashboard/SpellsSection/SpellSlot.uss?fileID=7433441132597879392&amp;guid=dc484df13d0e1284f840b7bf4ee1ee04&amp;type=3#SpellSlot" />
+    <engine:VisualElement name="SpellsPanel" style="flex-grow: 1; min-height: 0; display: flex; flex-direction: row;">
+        <engine:VisualElement name="AllSpells" style="min-height: 0; flex-grow: 0; justify-content: flex-start; margin-right: 0; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; width: 600px;">
+            <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 0; align-self: center; margin-bottom: 16px; flex-shrink: 0;">
+                <engine:Label text="Learned Spells" name="NameLabel" class="label-md" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="Filter" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                <engine:Label text="Search &#10;" name="Label" class="label-sm" style="height: 32px; margin-right: 8px; justify-content: flex-start; align-content: auto; -unity-text-align: lower-left;" />
+                <engine:TextField style="height: 32px; width: auto; flex-grow: 1;" />
+                <engine:Button text="Open filter" name="Filter" class="btn btn-small btn-violet" style="height: 32px;" />
+            </engine:VisualElement>
+            <engine:ScrollView name="SpellList" focusable="false" style="min-height: 0; flex-grow: 1; width: auto; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_316.png?fileID=21300000&amp;guid=f93be2a7f6c09194abd09cff60d2cce7&amp;type=3#Frame_square_316&quot;); padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px; display: flex;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 16px; margin-right: 16px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 4px; margin-bottom: 12px;" />
+        <engine:VisualElement name="ActiveSpells" style="min-height: 0; flex-grow: 0; justify-content: flex-start; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; width: 600px;">
+            <engine:VisualElement name="Separator" style="flex-grow: 0; margin-top: 0; align-self: center; margin-bottom: 16px;">
+                <engine:Label text="Active Spells" name="NameLabel" class="label-md" style="-unity-text-align: upper-center; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+                <engine:VisualElement style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_Title_options_long.png?fileID=21300000&amp;guid=f1858c09da3d5bd498084256678b6814&amp;type=3#Decor_Title_options_long&quot;); width: 390px; height: 22px; align-items: center; margin-bottom: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="ActiveSpellsHolder" style="flex-grow: 1; flex-direction: column;">
+                <engine:VisualElement name="Row1" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                    <engine:VisualElement name="ActiveSpellSlot1" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot2" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot3" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot4" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Row2" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                    <engine:VisualElement name="ActiveSpellSlot5" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot6" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot7" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot8" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Row3" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-bottom: 8px;">
+                    <engine:VisualElement name="ActiveSpellSlot9" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot10" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot11" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="ActiveSpellSlot12" class="active-spell-slot" style="height: 128px; margin-right: 12px; align-items: center;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-background-scale-mode: scale-to-fit; width: 80px; height: 80px; align-items: auto;" />
+                        <engine:Label text="Test spell 1" name="Name" class="label-sm" style="-unity-text-align: upper-center; flex-grow: 0; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1; overflow: hidden; margin-top: 4px;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

@@ -1,0 +1,21 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Footer/Footer.uss?fileID=7433441132597879392&amp;guid=e0a35629ca63a114faf0bfa166c35f50&amp;type=3#Footer" />
+    <engine:VisualElement name="Footer" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; padding-top: 0; padding-right: 32px; padding-bottom: 32px; padding-left: 32px; height: 320px;">
+        <engine:VisualElement name="Character" class="footer-panel" style="flex-grow: 1; margin-right: 24px; -unity-background-image-tint-color: rgb(85, 157, 79);">
+            <engine:VisualElement name="CharacterBg" class="footer-hover footer footer-active" style="flex-grow: 1;" />
+            <engine:Label text="Character" class="header-sm m-0 p-0" style="-unity-text-align: middle-center; position: absolute; top: auto; left: 50%; bottom: 13%; right: 50%;" />
+            <engine:VisualElement name="Image" class="footer-image" style="height: 131px; width: 477px; margin-top: 0; background-image: url(&quot;project://database/Assets/Images/shopImage.png?fileID=2411705469780634932&amp;guid=fae7e4e955d7aa24eaf2a44e8217610a&amp;type=3#shopImage_0&quot;); position: absolute; top: 61px; left: 65px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Tower" class="footer-panel" style="flex-grow: 1; margin-right: 24px;">
+            <engine:VisualElement name="TowerBg" class="footer-hover footer" style="flex-grow: 1; align-items: center; justify-content: center; top: 0; bottom: 0; right: 1px; left: 0;" />
+            <engine:Label text="Tower" class="header-sm m-0 p-0" style="-unity-text-align: upper-center; position: absolute; top: auto; left: 50%; bottom: 13%; right: 50%;" />
+            <engine:VisualElement name="Image" class="footer-image" style="height: 131px; width: 477px; margin-top: 0; background-image: url(&quot;project://database/Assets/Images/towerImage.png?fileID=-1895490986468215360&amp;guid=b31d4ae7378821a4ca63375ace412bdf&amp;type=3#towerImage_0&quot;); position: absolute; top: 61px; left: 65px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="City" class="footer-panel" style="flex-grow: 1;">
+            <engine:VisualElement name="CityBg" class="footer-hover footer" style="flex-grow: 1;" />
+            <engine:Label text="City" name="Label" class="header-sm m-0 p-0" style="-unity-text-align: upper-center; position: absolute; top: auto; left: 50%; bottom: 13%; right: 50%;" />
+            <engine:VisualElement name="Image" class="footer-image" style="height: 131px; width: 477px; margin-top: 0; background-image: url(&quot;project://database/Assets/Images/questImage.png?fileID=124506046302431700&amp;guid=65088614fcfac65428e44f265df7cf55&amp;type=3#questImage_0&quot;); position: absolute; top: 61px; left: 65px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

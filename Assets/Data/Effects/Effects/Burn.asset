@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectId: burn
   displayName: Burn
-  icon: {fileID: -1632327899919742125, guid: 84323e5f44fbd964db44576c0c0645ed, type: 3}
+  icon: {fileID: 21300000, guid: 84323e5f44fbd964db44576c0c0645ed, type: 3}
   description: Burn let them Burnn burnn them all
   kind: 1
   polarity: 1

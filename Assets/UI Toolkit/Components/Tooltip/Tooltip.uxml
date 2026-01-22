@@ -1,7 +1,6 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/Global/Tooltip.uss?fileID=7433441132597879392&amp;guid=a97a3d8ed49e62748b29c3e8b6b192e1&amp;type=3#Tooltip" />
-    <Style src="project://database/Assets/UI%20Toolkit/Global/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
-    <engine:VisualElement name="Body" class="tooltip" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Sprites/DarkPixelRPGUI/Artwok/UI/Description_mini_bar.png?fileID=-703437417&amp;guid=5849867678c137d45b5e3f74d7e383eb&amp;type=3#Description_mini_bar_0&quot;); -unity-slice-scale: 2px; display: none; position: absolute;">
-        <engine:Label text="Label" name="Text" class="label-3" style="flex-grow: 1; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; white-space: normal;" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Tooltip/Tooltip.uss?fileID=7433441132597879392&amp;guid=a97a3d8ed49e62748b29c3e8b6b192e1&amp;type=3#Tooltip" />
+    <engine:VisualElement name="Body" picking-mode="Ignore" class="tooltip" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Description_mini_bar.png?fileID=-703437417&amp;guid=5849867678c137d45b5e3f74d7e383eb&amp;type=3#Description_mini_bar_0&quot;); -unity-slice-scale: 2px; display: none; position: absolute;">
+        <engine:Label text="Label" name="Text" class="label-sm" style="flex-grow: 1; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; white-space: normal;" />
     </engine:VisualElement>
 </engine:UXML>

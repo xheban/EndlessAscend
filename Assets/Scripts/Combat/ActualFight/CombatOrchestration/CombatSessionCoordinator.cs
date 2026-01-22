@@ -151,6 +151,11 @@ public sealed class CombatSessionCoordinator
                 }
                 break;
             }
+            case FloatingNumberEvent f:
+            {
+                _uiSink?.ShowFloatingNumber(f.source, f.target, f.amount, f.kind, f.icon);
+                break;
+            }
 
             case EnemyDecisionRequestedEvent:
                 OnEnemyDecisionRequested?.Invoke();

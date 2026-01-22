@@ -24,3 +24,14 @@ MonoBehaviour:
   spec:
   - {fileID: 11400000, guid: 6e4454fb5c77d7c4ca053fb664abac32, type: 2}
   - {fileID: 11400000, guid: c556e1c3d42d81e4aa9a9adb3c251883, type: 2}
+  baseStatMods:
+  - stat: 2
+    op: 1
+    value: 7
+  - stat: 3
+    op: 1
+    value: 3
+  derivedStatMods:
+  - stat: 1
+    op: 1
+    value: 5

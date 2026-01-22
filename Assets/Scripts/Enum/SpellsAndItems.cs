@@ -26,6 +26,12 @@ namespace MyGame.Combat
         Magical,
     }
 
+    public enum DamageRangeType
+    {
+        Melee,
+        Ranged,
+    }
+
     public enum SpellIntent
     {
         Damage, // deals damage, may also apply effects

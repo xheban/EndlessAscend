@@ -6,13 +6,6 @@ namespace MyGame.Combat
     {
         public void Apply(ActionContext ctx, StatModifiers attackerModifiers)
         {
-            int dmg = ctx.finalDamage;
-            if (dmg <= 0)
-            {
-                ctx.finalDamage = 0;
-                return;
-            }
-
             var types = ctx.spell.damageTypes;
             if (types == null || types.Length == 0)
                 types = new[] { DamageType.None };

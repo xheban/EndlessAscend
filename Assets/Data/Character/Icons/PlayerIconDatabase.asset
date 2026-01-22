@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 027736fd4ef182d4ca202b40708dc2cf, type: 3}
+  m_Name: PlayerIconDatabase
+  m_EditorClassIdentifier: 
+  icons:
+  - id: mage_01
+    displayName: Mage
+    sprite: {fileID: 21300000, guid: e7a987f867845874dafa32559835de84, type: 3}
+  - id: mage_02
+    displayName: Mage
+    sprite: {fileID: 21300000, guid: c01ac7c3851d07f45831f7094a0068f7, type: 3}
+  - id: mage_03
+    displayName: Mage
+    sprite: {fileID: 21300000, guid: 58b6c984d793c1b4fba5430fc1f9fb6e, type: 3}
+  - id: mage_04
+    displayName: Mage
+    sprite: {fileID: 21300000, guid: 435b2c5e32c129e4aa7da47277e682e2, type: 3}
+  - id: mage_05
+    displayName: Mage
+    sprite: {fileID: 21300000, guid: 5121aa4862917e941aec63c4bf4e7d94, type: 3}

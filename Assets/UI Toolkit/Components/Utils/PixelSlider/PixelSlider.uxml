@@ -1,0 +1,4 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelSlider/PixelSlider.uss?fileID=7433441132597879392&amp;guid=e44eac9750d22064396fd835ce1347b6&amp;type=3#PixelSlider" />
+    <engine:Slider label="Slider" value="42" high-value="100" name="MySlider" style="width: 100%; height: 40px; background-image: resource(&apos;UI_Own/Slider&apos;); -unity-slice-scale: 4px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+</engine:UXML>

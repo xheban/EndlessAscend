@@ -19,5 +19,19 @@ namespace MyGame.Helpers
 
             return tierIndex;
         }
+
+        public static string ToTierRoman(Tier tier)
+        {
+            return tier switch
+            {
+                Tier.Tier1 => "Tier I",
+                Tier.Tier2 => "Tier II",
+                Tier.Tier3 => "Tier III",
+                Tier.Tier4 => "Tier IV",
+                Tier.Tier5 => "Tier V",
+                Tier.Tier6 => "Tier VI",
+                _ => "Tier ?",
+            };
+        }
     }
 }

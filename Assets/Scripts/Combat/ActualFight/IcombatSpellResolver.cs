@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace MyGame.Combat
 {
     /// <summary>
@@ -21,13 +23,16 @@ namespace MyGame.Combat
         public int hitChance;
         public int baseUseSpeed;
         public int level;
+        public int castTimeValue;
 
         // Needed for scaling rules now / resistances later
         public DamageKind damageKind;
+        public DamageRangeType damageRangeType;
         public DamageType[] damageTypes;
         public EffectInstance[] onHitEffects;
         public EffectInstance[] onCastEffects;
         public SpellIntent intent;
+        public Sprite icon;
 
         public ResolvedSpell(
             string spellId,
@@ -40,11 +45,14 @@ namespace MyGame.Combat
             int hitChance,
             int baseUseSpeed,
             int level,
+            int castTimeValue,
             DamageKind damageKind,
+            DamageRangeType damageRangeType,
             DamageType[] damageTypes,
             EffectInstance[] onHitEffects,
             EffectInstance[] onCastEffects,
-            SpellIntent intent
+            SpellIntent intent,
+            Sprite icon
         )
         {
             this.spellId = spellId;
@@ -54,6 +62,7 @@ namespace MyGame.Combat
             this.damage = damage;
 
             this.damageKind = damageKind;
+            this.damageRangeType = damageRangeType;
             this.ignoreDefenseFlat = ignoreDefenseFlat;
             this.ignoreDefensePercent = ignoreDefensePercent;
             this.hitChance = hitChance;
@@ -63,6 +72,8 @@ namespace MyGame.Combat
             this.onCastEffects = onCastEffects;
             this.intent = intent;
             this.level = level;
+            this.castTimeValue = castTimeValue;
+            this.icon = icon;
         }
     }
 

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellId: scratch
   displayName: Scratch
-  icon: {fileID: 3853547303424480938, guid: 8ec61f0cee630d44b98e1b373f62d749, type: 3}
+  description: 
+  icon: {fileID: 21300000, guid: 8ec61f0cee630d44b98e1b373f62d749, type: 3}
   allowedClasses: -1
   allowedSpecs: -1
   rarity: 0
@@ -23,12 +24,15 @@ MonoBehaviour:
   maxLevel: 10
   baseDamage: 6
   damageKind: 1
+  intent: 0
   damageTag: 
   tier: 0
   ignoreDefenseFlat: 0
   ignoreDefensePercent: 0
   hitChance: 100
+  castTimeValue: 100
   baseUseSpeed: 100
   damageScalingType: 0
   damageScalingValue: 2
   onHitEffects: []
+  onCastEffects: []

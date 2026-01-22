@@ -14,20 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellId: lightning_bolt
   displayName: Lightning Bolt
+  description: 
   icon: {fileID: 21300000, guid: ba98674a060409949b9de54de7b09588, type: 3}
   allowedClasses: 1
+  allowedSpecs: -1
   rarity: 0
   manaCost: 5
-  cooldownTurns: 2
+  cooldownTurns: 0
   maxLevel: 10
   baseDamage: 3
   damageKind: 1
+  intent: 0
   damageTag: 
   tier: 0
   ignoreDefenseFlat: 0
   ignoreDefensePercent: 0
   hitChance: 100
+  castTimeValue: 100
   baseUseSpeed: 80
   damageScalingType: 0
   damageScalingValue: 3
   onHitEffects: []
+  onCastEffects: []
