@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc72429ab85db374d90833e4fa11b3b5, type: 3}
+  m_Name: MageTrainerDefinition
+  m_EditorClassIdentifier: 
+  trainerId: mage_trainer
+  displayName: Gilbert
+  greetingDialogue: "Ah, an adventurer. I am Gilbert, a great mage. Here you may
+    study powerful spells, purchase insight into their combinations, and\u2014if
+    fortune smiles\u2014learn secrets known to few, for the right price."
+  portrait: {fileID: 21300000, guid: f3215f21811b378468151c262c6003d2, type: 3}
+  teaches:
+  - spellId: burning_sigil
+    goldCost: 200
+    minLevel: 1
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: ember_shot
+    goldCost: 200
+    minLevel: 1
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: flame_flicker
+    goldCost: 200
+    minLevel: 1
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: scorch
+    goldCost: 200
+    minLevel: 1
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: blazing_halo
+    goldCost: 1500
+    minLevel: 3
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: firebrand_lance
+    goldCost: 1500
+    minLevel: 5
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: flare_nova
+    goldCost: 1500
+    minLevel: 5
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: phoenix_spark
+    goldCost: 1500
+    minLevel: 5
+    minTier: 0
+    requiresSpellIds: []
+  - spellId: hearth_of_the_pyre
+    goldCost: 15000
+    minLevel: 10
+    minTier: 0
+    requiresSpellIds: []

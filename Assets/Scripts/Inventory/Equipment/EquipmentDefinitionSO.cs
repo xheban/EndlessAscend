@@ -26,12 +26,18 @@ public sealed class EquipmentDefinitionSO : ScriptableObject
     [Header("Equipment")]
     public EquipmentSlot slot;
 
+    public bool usableInCombat = true;
+
     public Rarity rarity = Rarity.Common;
 
     [Min(1)]
     public int requiredLevel = 1;
 
     public Tier tier = Tier.Tier1;
+
+    [Header("Value")]
+    [Min(0)]
+    public int goldValue = 0;
 
     [Min(1)]
     public int level = 1;

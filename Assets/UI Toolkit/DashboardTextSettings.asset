@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DashboardTextSettings
   m_EditorClassIdentifier: 
   m_Version: 
-  m_DefaultFontAsset: {fileID: 11400000, guid: 454f5e19dc4cfac40a189c74240b012f, type: 2}
-  m_DefaultFontAssetPath: Fonts & Materials/
+  m_DefaultFontAsset: {fileID: 11400000, guid: e747be538fa1f104facde37c358318ba, type: 2}
+  m_DefaultFontAssetPath: Fonts
   m_FallbackFontAssets: []
   m_MatchMaterialPreset: 0
   m_MissingCharacterUnicode: 0

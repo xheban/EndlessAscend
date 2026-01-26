@@ -33,6 +33,24 @@ public class CombatTowerController : MonoBehaviour, IScreenController
     [SerializeField]
     private CombatKeybindInputController _keybindInput;
 
+    private EventCallback<PointerEnterEvent>[] _itemTooltipEnters;
+    private EventCallback<PointerLeaveEvent>[] _itemTooltipLeaves;
+    private EventCallback<PointerOutEvent>[] _itemTooltipOuts;
+
+    private EventCallback<PointerEnterEvent>[] _spellTooltipEnters;
+    private EventCallback<PointerLeaveEvent>[] _spellTooltipLeaves;
+    private EventCallback<PointerOutEvent>[] _spellTooltipOuts;
+
+    private sealed class EffectTooltipBinding
+    {
+        public VisualElement slot;
+        public EventCallback<PointerEnterEvent> enter;
+        public EventCallback<PointerLeaveEvent> leave;
+        public EventCallback<PointerOutEvent> outCb;
+    }
+
+    private readonly List<EffectTooltipBinding> _effectTooltipBindings = new();
+
     public void Bind(VisualElement screenHost, ScreenSwapper swapper, object context)
     {
         _swapper = swapper;
@@ -70,6 +88,7 @@ public class CombatTowerController : MonoBehaviour, IScreenController
         {
             _keybindInput.Engine = _combat?.Engine;
             _keybindInput.SpellSlots = _view?.SpellSlots;
+            _keybindInput.ItemSlots = _view?.ItemSlots;
         }
         else
         {
@@ -81,12 +100,16 @@ public class CombatTowerController : MonoBehaviour, IScreenController
         _input ??= new CombatInputBinder();
         _input.BindRunButton(_view.RunButton, OnRunClicked);
         _input.BindSpellSlots(_view.SpellSlots, OnSpellSlotClicked);
+        _input.BindItemSlots(_view.ItemSlots, OnItemSlotClicked);
+        BindCombatTowerSimpleTooltips();
         _view?.RefreshCooldownUI(_combat?.Engine, _view.SpellSlots, _view.SlotViews);
+        _view?.RefreshItemCooldownUI(_combat?.Engine);
         _view?.SetActionText(CombatActorType.Player, "Choose action...");
     }
 
     public void Unbind()
     {
+        UnbindCombatTowerSimpleTooltips();
         _view?.Unbind();
         _view = null;
         CleanupCombat();
@@ -104,6 +127,320 @@ public class CombatTowerController : MonoBehaviour, IScreenController
         _enemyScheduler?.Cancel();
         _enemyScheduler = null;
         IsInEncounterState.IsInEncounter = false;
+    }
+
+    private void BindCombatTowerSimpleTooltips()
+    {
+        UnbindCombatTowerSimpleTooltips();
+
+        if (_swapper == null || _view == null)
+            return;
+
+        BindItemSlotTooltips(_view.ItemSlots);
+        BindSpellSlotTooltips(_view.SpellSlots);
+        BindEffectSlotTooltips(_view.PlayerBuffSlots);
+        BindEffectSlotTooltips(_view.PlayerDebuffSlots);
+        BindEffectSlotTooltips(_view.EnemyBuffSlots);
+        BindEffectSlotTooltips(_view.EnemyDebuffSlots);
+    }
+
+    private void UnbindCombatTowerSimpleTooltips()
+    {
+        HideSimpleTooltip();
+
+        UnbindItemSlotTooltips();
+        UnbindSpellSlotTooltips();
+        UnbindEffectSlotTooltips();
+    }
+
+    private void BindItemSlotTooltips(VisualElement[] itemSlots)
+    {
+        UnbindItemSlotTooltips();
+
+        if (_swapper == null)
+            return;
+        if (itemSlots == null || itemSlots.Length == 0)
+            return;
+
+        _itemTooltipEnters = new EventCallback<PointerEnterEvent>[itemSlots.Length];
+        _itemTooltipLeaves = new EventCallback<PointerLeaveEvent>[itemSlots.Length];
+        _itemTooltipOuts = new EventCallback<PointerOutEvent>[itemSlots.Length];
+
+        for (int i = 0; i < itemSlots.Length; i++)
+        {
+            var slot = itemSlots[i];
+            if (slot == null)
+                continue;
+
+            // Ensure the slot root receives pointer events even if children overlap.
+            slot.pickingMode = PickingMode.Position;
+
+            int slotIndex = i;
+            EventCallback<PointerEnterEvent> onEnter = _ => ShowCombatItemTooltip(slotIndex, slot);
+            EventCallback<PointerLeaveEvent> onLeave = _ => HideSimpleTooltip();
+            EventCallback<PointerOutEvent> onOut = _ => HideSimpleTooltip();
+
+            _itemTooltipEnters[i] = onEnter;
+            _itemTooltipLeaves[i] = onLeave;
+            _itemTooltipOuts[i] = onOut;
+
+            slot.RegisterCallback(onEnter, TrickleDown.TrickleDown);
+            slot.RegisterCallback(onLeave, TrickleDown.TrickleDown);
+            slot.RegisterCallback(onOut, TrickleDown.TrickleDown);
+        }
+    }
+
+    private void UnbindItemSlotTooltips()
+    {
+        HideSimpleTooltip();
+
+        var slots = _view?.ItemSlots;
+        if (slots == null || _itemTooltipEnters == null)
+        {
+            _itemTooltipEnters = null;
+            _itemTooltipLeaves = null;
+            _itemTooltipOuts = null;
+            return;
+        }
+
+        int count = Mathf.Min(slots.Length, _itemTooltipEnters.Length);
+        for (int i = 0; i < count; i++)
+        {
+            var slot = slots[i];
+            if (slot == null)
+                continue;
+
+            if (_itemTooltipEnters[i] != null)
+                slot.UnregisterCallback(_itemTooltipEnters[i], TrickleDown.TrickleDown);
+            if (
+                _itemTooltipLeaves != null
+                && i < _itemTooltipLeaves.Length
+                && _itemTooltipLeaves[i] != null
+            )
+                slot.UnregisterCallback(_itemTooltipLeaves[i], TrickleDown.TrickleDown);
+            if (
+                _itemTooltipOuts != null
+                && i < _itemTooltipOuts.Length
+                && _itemTooltipOuts[i] != null
+            )
+                slot.UnregisterCallback(_itemTooltipOuts[i], TrickleDown.TrickleDown);
+        }
+
+        _itemTooltipEnters = null;
+        _itemTooltipLeaves = null;
+        _itemTooltipOuts = null;
+    }
+
+    private void ShowCombatItemTooltip(int slotIndex, VisualElement slot)
+    {
+        if (_swapper == null || slot == null)
+            return;
+
+        string name = GetActiveCombatSlotDisplayName(slotIndex);
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        _swapper.ShowTooltipAtElement(slot, name);
+    }
+
+    private void HideSimpleTooltip()
+    {
+        _swapper?.HideTooltip();
+    }
+
+    private string GetActiveCombatSlotDisplayName(int slotIndex)
+    {
+        if (!SaveSession.HasSave || SaveSession.Current == null)
+            return null;
+
+        var save = SaveSession.Current;
+        save.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
+        while (save.activeCombatSlots.Count < 4)
+            save.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());
+
+        if (slotIndex < 0 || slotIndex >= save.activeCombatSlots.Count)
+            return null;
+
+        var entry = save.activeCombatSlots[slotIndex];
+        if (entry == null)
+            return null;
+
+        // Equipment precedence.
+        if (!string.IsNullOrWhiteSpace(entry.equipmentInstanceId))
+        {
+            var equipment = RunSession.Equipment;
+            var inst = equipment != null ? equipment.GetInstance(entry.equipmentInstanceId) : null;
+            if (inst == null)
+                return null;
+
+            var db = GameConfigProvider.Instance?.EquipmentDatabase;
+            var def = db != null ? db.GetById(inst.equipmentId) : null;
+            return string.IsNullOrWhiteSpace(def?.displayName) ? inst.equipmentId : def.displayName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.itemId))
+        {
+            var db = GameConfigProvider.Instance?.ItemDatabase;
+            var def = db != null ? db.GetById(entry.itemId) : null;
+            return string.IsNullOrWhiteSpace(def?.displayName) ? entry.itemId : def.displayName;
+        }
+
+        return null;
+    }
+
+    private void BindSpellSlotTooltips(VisualElement[] spellSlots)
+    {
+        UnbindSpellSlotTooltips();
+
+        if (_swapper == null)
+            return;
+        if (spellSlots == null || spellSlots.Length == 0)
+            return;
+
+        _spellTooltipEnters = new EventCallback<PointerEnterEvent>[spellSlots.Length];
+        _spellTooltipLeaves = new EventCallback<PointerLeaveEvent>[spellSlots.Length];
+        _spellTooltipOuts = new EventCallback<PointerOutEvent>[spellSlots.Length];
+
+        for (int i = 0; i < spellSlots.Length; i++)
+        {
+            var slot = spellSlots[i];
+            if (slot == null)
+                continue;
+
+            // Ensure hover works over child visuals.
+            slot.pickingMode = PickingMode.Position;
+
+            EventCallback<PointerEnterEvent> onEnter = _ => ShowCombatSpellTooltip(slot);
+            EventCallback<PointerLeaveEvent> onLeave = _ => HideSimpleTooltip();
+            EventCallback<PointerOutEvent> onOut = _ => HideSimpleTooltip();
+
+            _spellTooltipEnters[i] = onEnter;
+            _spellTooltipLeaves[i] = onLeave;
+            _spellTooltipOuts[i] = onOut;
+
+            slot.RegisterCallback(onEnter, TrickleDown.TrickleDown);
+            slot.RegisterCallback(onLeave, TrickleDown.TrickleDown);
+            slot.RegisterCallback(onOut, TrickleDown.TrickleDown);
+        }
+    }
+
+    private void UnbindSpellSlotTooltips()
+    {
+        var slots = _view?.SpellSlots;
+        if (slots == null || _spellTooltipEnters == null)
+        {
+            _spellTooltipEnters = null;
+            _spellTooltipLeaves = null;
+            _spellTooltipOuts = null;
+            return;
+        }
+
+        int count = Mathf.Min(slots.Length, _spellTooltipEnters.Length);
+        for (int i = 0; i < count; i++)
+        {
+            var slot = slots[i];
+            if (slot == null)
+                continue;
+
+            if (_spellTooltipEnters[i] != null)
+                slot.UnregisterCallback(_spellTooltipEnters[i], TrickleDown.TrickleDown);
+            if (
+                _spellTooltipLeaves != null
+                && i < _spellTooltipLeaves.Length
+                && _spellTooltipLeaves[i] != null
+            )
+                slot.UnregisterCallback(_spellTooltipLeaves[i], TrickleDown.TrickleDown);
+            if (
+                _spellTooltipOuts != null
+                && i < _spellTooltipOuts.Length
+                && _spellTooltipOuts[i] != null
+            )
+                slot.UnregisterCallback(_spellTooltipOuts[i], TrickleDown.TrickleDown);
+        }
+
+        _spellTooltipEnters = null;
+        _spellTooltipLeaves = null;
+        _spellTooltipOuts = null;
+    }
+
+    private void ShowCombatSpellTooltip(VisualElement slot)
+    {
+        if (_swapper == null || slot == null)
+            return;
+
+        string spellId = slot.userData as string;
+        if (string.IsNullOrWhiteSpace(spellId))
+            return;
+
+        var db = GameConfigProvider.Instance?.SpellDatabase;
+        var def = db != null ? db.GetById(spellId) : null;
+        string name = string.IsNullOrWhiteSpace(def?.displayName) ? spellId : def.displayName;
+        _swapper.ShowTooltipAtElement(slot, name);
+    }
+
+    private void BindEffectSlotTooltips(VisualElement[] effectSlots)
+    {
+        if (_swapper == null)
+            return;
+        if (effectSlots == null || effectSlots.Length == 0)
+            return;
+
+        for (int i = 0; i < effectSlots.Length; i++)
+        {
+            var slot = effectSlots[i];
+            if (slot == null)
+                continue;
+
+            // Ensure hover works over child icon/labels.
+            slot.pickingMode = PickingMode.Position;
+
+            var binding = new EffectTooltipBinding();
+            binding.slot = slot;
+            binding.enter = _ => ShowCombatEffectTooltip(slot);
+            binding.leave = _ => HideSimpleTooltip();
+            binding.outCb = _ => HideSimpleTooltip();
+            _effectTooltipBindings.Add(binding);
+
+            slot.RegisterCallback(binding.enter, TrickleDown.TrickleDown);
+            slot.RegisterCallback(binding.leave, TrickleDown.TrickleDown);
+            slot.RegisterCallback(binding.outCb, TrickleDown.TrickleDown);
+        }
+    }
+
+    private void UnbindEffectSlotTooltips()
+    {
+        for (int i = 0; i < _effectTooltipBindings.Count; i++)
+        {
+            var b = _effectTooltipBindings[i];
+            if (b?.slot == null)
+                continue;
+
+            if (b.enter != null)
+                b.slot.UnregisterCallback(b.enter, TrickleDown.TrickleDown);
+            if (b.leave != null)
+                b.slot.UnregisterCallback(b.leave, TrickleDown.TrickleDown);
+            if (b.outCb != null)
+                b.slot.UnregisterCallback(b.outCb, TrickleDown.TrickleDown);
+        }
+
+        _effectTooltipBindings.Clear();
+    }
+
+    private void ShowCombatEffectTooltip(VisualElement slot)
+    {
+        if (_swapper == null || slot == null)
+            return;
+
+        // CombatTowerView.RenderEffects stores EffectDefinition in userData.
+        var def = slot.userData as EffectDefinition;
+        if (def == null)
+            return;
+
+        string name = string.IsNullOrWhiteSpace(def.displayName) ? def.effectId : def.displayName;
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        _swapper.ShowTooltipAtElement(slot, name);
     }
 
     // -------------------------
@@ -442,6 +779,15 @@ public class CombatTowerController : MonoBehaviour, IScreenController
         engine.TryUseSpell(spellId);
     }
 
+    private void OnItemSlotClicked(int slotIndex)
+    {
+        var engine = _combat?.Engine;
+        if (engine == null)
+            return;
+
+        engine.TryUseActiveCombatItemSlot(slotIndex);
+    }
+
     private void HandleEnemyDecisionRequested()
     {
         // Still controller-owned because it schedules a coroutine/action.
@@ -486,6 +832,8 @@ public class CombatTowerController : MonoBehaviour, IScreenController
             return;
 
         _view.RefreshCooldownUI(_combat.Engine, _view.SpellSlots, _view.SlotViews);
+        _view.RefreshActiveCombatItemSlots();
+        _view.RefreshItemCooldownUI(_combat.Engine);
         var s = _combat.Engine?.State;
         if (s != null)
         {

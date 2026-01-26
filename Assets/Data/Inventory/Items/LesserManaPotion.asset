@@ -14,4 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: lesser_mana_potion
   displayName: Lesser Mana Potion
+  description: 
+  rarity: 0
+  requiredLevel: 1
+  tier: 0
+  goldValue: 2
   icon: {fileID: 21300000, guid: 36170074993a8d94da238b950643a277, type: 3}

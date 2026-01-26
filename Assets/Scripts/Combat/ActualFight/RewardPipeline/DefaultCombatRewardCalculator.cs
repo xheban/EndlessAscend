@@ -10,7 +10,11 @@ namespace MyGame.Rewards
         {
             int exp = CalculateExp(monster, monsterLevel);
             int gold = CalculateGold(monster, monsterLevel);
-            return new CombatRewardResult(exp, gold, Array.Empty<CombatRewardResult.LootItem>());
+            var loot =
+                (monster != null)
+                    ? LootTableRoller.RollLoot(monster.BaseLoot)
+                    : Array.Empty<CombatRewardResult.LootItem>();
+            return new CombatRewardResult(exp, gold, loot);
         }
 
         private int CalculateExp(MonsterDefinition monster, int level)
@@ -35,7 +39,12 @@ namespace MyGame.Rewards
 
         private int CalculateGold(MonsterDefinition monster, int level)
         {
-            int gold = monster.BaseGold;
+            int min = monster.GoldMin;
+            int max = monster.GoldMax;
+            if (max < min)
+                max = min;
+
+            int gold = (max <= min) ? min : UnityEngine.Random.Range(min, max + 1);
 
             //gold += level; // simple scaling
             //gold += TierToFlatBonus(monster.Tier, perTier: 5);

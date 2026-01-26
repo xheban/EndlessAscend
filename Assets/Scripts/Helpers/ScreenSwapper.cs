@@ -89,10 +89,17 @@ public class ScreenSwapper : MonoBehaviour
 
     [SerializeField]
     private VisualTreeAsset inventoryDetailTooltipUxml;
+
+    [SerializeField]
+    private VisualTreeAsset spellDetailTooltipUxml;
+
+    [SerializeField]
+    private VisualTreeAsset effectDetailTooltipUxml;
     private VisualElement _tooltipHost;
     private VisualElement _tooltipContent;
     private VisualElement _customTooltipHost;
     private VisualElement _activeCustomTooltip;
+    private bool _customTooltipFrozen;
 
     private void Awake()
     {
@@ -181,6 +188,54 @@ public class ScreenSwapper : MonoBehaviour
             }
         }
 
+        // Optional: create the spell detail tooltip in the global host.
+        if (spellDetailTooltipUxml != null)
+        {
+            var temp2 = new VisualElement();
+            spellDetailTooltipUxml.CloneTree(temp2);
+
+            if (temp2.childCount > 0)
+            {
+                var detail2 = temp2[0];
+                detail2.RemoveFromHierarchy();
+                detail2.name = "SpellDetailTooltip";
+                detail2.pickingMode = PickingMode.Ignore;
+                detail2.style.display = DisplayStyle.None;
+                detail2.RegisterCallback<PointerLeaveEvent>(_ =>
+                {
+                    if (TryFreezeCustomTooltipIfAltHeld())
+                        return;
+                    HideCustomTooltip(detail2);
+                    HideTooltip();
+                });
+                detail2.RegisterCallback<PointerOutEvent>(_ =>
+                {
+                    if (TryFreezeCustomTooltipIfAltHeld())
+                        return;
+                    HideCustomTooltip(detail2);
+                    HideTooltip();
+                });
+                _customTooltipHost.Add(detail2);
+            }
+        }
+
+        // Optional: create the effect detail tooltip in the global host.
+        if (effectDetailTooltipUxml != null)
+        {
+            var temp3 = new VisualElement();
+            effectDetailTooltipUxml.CloneTree(temp3);
+
+            if (temp3.childCount > 0)
+            {
+                var detail3 = temp3[0];
+                detail3.RemoveFromHierarchy();
+                detail3.name = "EffectDetailTooltip";
+                detail3.pickingMode = PickingMode.Ignore;
+                detail3.style.display = DisplayStyle.None;
+                _customTooltipHost.Add(detail3);
+            }
+        }
+
         // Build modal UI once into modal-body (no extra layer)
         _modalContent.Clear();
         globalModalUxml.CloneTree(_modalContent);
@@ -226,6 +281,12 @@ public class ScreenSwapper : MonoBehaviour
                 CloseOverlay(settingsId);
             else
                 ShowOverlay(settingsId);
+        }
+
+        if (_customTooltipFrozen && !IsAltHeld())
+        {
+            HideCustomTooltip();
+            HideTooltip();
         }
     }
 
@@ -638,7 +699,11 @@ public class ScreenSwapper : MonoBehaviour
         // Hide the standard text tooltip if it's up.
         HideTooltip();
 
+        _customTooltipFrozen = false;
         _activeCustomTooltip = tooltip;
+        bool interactive = IsInteractiveCustomTooltip(tooltip);
+        _customTooltipHost.pickingMode = interactive ? PickingMode.Position : PickingMode.Ignore;
+        _activeCustomTooltip.pickingMode = interactive ? PickingMode.Position : PickingMode.Ignore;
 
         // Reparent into the global tooltip overlay host.
         if (tooltip.parent != _customTooltipHost)
@@ -649,6 +714,8 @@ public class ScreenSwapper : MonoBehaviour
 
         tooltip.style.display = DisplayStyle.Flex;
         tooltip.style.position = Position.Absolute;
+        tooltip.style.visibility = Visibility.Hidden;
+        tooltip.style.opacity = 0f;
         tooltip.BringToFront();
 
         // Delay positioning until layout resolves.
@@ -662,6 +729,8 @@ public class ScreenSwapper : MonoBehaviour
                 fallbackWidthPx,
                 fallbackHeightPx
             );
+            tooltip.style.visibility = Visibility.Visible;
+            tooltip.style.opacity = 1f;
         });
     }
 
@@ -725,7 +794,11 @@ public class ScreenSwapper : MonoBehaviour
             return;
 
         HideTooltip();
+        _customTooltipFrozen = false;
         _activeCustomTooltip = tooltip;
+        bool interactive = IsInteractiveCustomTooltip(tooltip);
+        _customTooltipHost.pickingMode = interactive ? PickingMode.Position : PickingMode.Ignore;
+        _activeCustomTooltip.pickingMode = interactive ? PickingMode.Position : PickingMode.Ignore;
 
         if (tooltip.parent != _customTooltipHost)
         {
@@ -735,6 +808,8 @@ public class ScreenSwapper : MonoBehaviour
 
         tooltip.style.display = DisplayStyle.Flex;
         tooltip.style.position = Position.Absolute;
+        tooltip.style.visibility = Visibility.Hidden;
+        tooltip.style.opacity = 0f;
         tooltip.BringToFront();
 
         tooltip.schedule.Execute(() =>
@@ -747,6 +822,8 @@ public class ScreenSwapper : MonoBehaviour
                 fallbackWidthPx,
                 fallbackHeightPx
             );
+            tooltip.style.visibility = Visibility.Visible;
+            tooltip.style.opacity = 1f;
         });
     }
 
@@ -791,6 +868,52 @@ public class ScreenSwapper : MonoBehaviour
         tooltip.style.top = y;
     }
 
+    public void ShowSecondaryCustomTooltipAboveWorldPosition(
+        VisualElement tooltip,
+        Vector2 worldPos,
+        float offsetPx = 8f,
+        float edgePaddingPx = 8f,
+        float fallbackWidthPx = 360f,
+        float fallbackHeightPx = 180f
+    )
+    {
+        if (
+            tooltip == null
+            || _tooltipContent == null
+            || _customTooltipHost == null
+            || _root == null
+        )
+            return;
+
+        // Do not change active/locked tooltip state.
+        if (tooltip.parent != _customTooltipHost)
+        {
+            tooltip.RemoveFromHierarchy();
+            _customTooltipHost.Add(tooltip);
+        }
+
+        tooltip.pickingMode = PickingMode.Ignore;
+        tooltip.style.display = DisplayStyle.Flex;
+        tooltip.style.position = Position.Absolute;
+        tooltip.style.visibility = Visibility.Hidden;
+        tooltip.style.opacity = 0f;
+        tooltip.BringToFront();
+
+        tooltip.schedule.Execute(() =>
+        {
+            PositionCustomTooltipAboveWorldPosition(
+                tooltip,
+                worldPos,
+                offsetPx,
+                edgePaddingPx,
+                fallbackWidthPx,
+                fallbackHeightPx
+            );
+            tooltip.style.visibility = Visibility.Visible;
+            tooltip.style.opacity = 1f;
+        });
+    }
+
     public void HideCustomTooltip(VisualElement tooltip = null)
     {
         if (_customTooltipHost == null)
@@ -800,10 +923,38 @@ public class ScreenSwapper : MonoBehaviour
         if (t == null)
             return;
 
+        _customTooltipFrozen = false;
+        _customTooltipHost.pickingMode = PickingMode.Ignore;
+        t.pickingMode = PickingMode.Ignore;
         t.style.display = DisplayStyle.None;
 
         if (ReferenceEquals(t, _activeCustomTooltip))
             _activeCustomTooltip = null;
+    }
+
+    public void HideSecondaryCustomTooltip(VisualElement tooltip)
+    {
+        if (_customTooltipHost == null || tooltip == null)
+            return;
+
+        tooltip.pickingMode = PickingMode.Ignore;
+        tooltip.style.display = DisplayStyle.None;
+    }
+
+    public bool TryFreezeCustomTooltipIfAltHeld()
+    {
+        if (!IsAltHeld() || _activeCustomTooltip == null || _customTooltipHost == null)
+            return false;
+
+        _customTooltipFrozen = true;
+        _customTooltipHost.pickingMode = PickingMode.Position;
+        _activeCustomTooltip.pickingMode = PickingMode.Position;
+        return true;
+    }
+
+    private static bool IsAltHeld()
+    {
+        return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
     }
 
     public VisualElement GetCustomTooltipElement(string name)
@@ -812,6 +963,18 @@ public class ScreenSwapper : MonoBehaviour
             return null;
 
         return _customTooltipHost.Q<VisualElement>(name);
+    }
+
+    private static bool IsInteractiveCustomTooltip(VisualElement tooltip)
+    {
+        if (tooltip == null)
+            return false;
+
+        if (tooltip.name == "EffectDetailTooltip")
+            return true;
+
+        // Spell detail tooltips are only interactive when ALT is held (lock mode).
+        return tooltip.name == "SpellDetailTooltip" && IsAltHeld();
     }
 
     public void ShowTooltipAtElement(
@@ -851,11 +1014,15 @@ public class ScreenSwapper : MonoBehaviour
         // Set text first so layout can calculate size
         label.text = text ?? string.Empty;
         body.style.display = DisplayStyle.Flex;
+        body.style.visibility = Visibility.Hidden;
+        body.style.opacity = 0f;
 
         // Delay positioning until layout is resolved (important!)
         body.schedule.Execute(() =>
         {
             PositionTooltip(anchor, body, _offset);
+            body.style.visibility = Visibility.Visible;
+            body.style.opacity = 1f;
         });
     }
 
@@ -911,7 +1078,4 @@ public class ScreenSwapper : MonoBehaviour
         float y = Mathf.Clamp(pos.y, 0, panelH - h);
         return new Vector2(x, y);
     }
-
-    // Convenience public method to open the Settings overlay from code.
-    public void OpenSettingsOverlay() => ShowOverlay("Settings");
 }

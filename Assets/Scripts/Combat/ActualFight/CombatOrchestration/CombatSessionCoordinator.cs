@@ -129,6 +129,8 @@ public sealed class CombatSessionCoordinator
                 string spellName = GameConfigProvider.Instance?.SpellDatabase.GetDisplayName(
                     q.SpellId
                 );
+                if (string.IsNullOrWhiteSpace(spellName))
+                    spellName = q.SpellId;
                 string text = $"{q.CasterName} casting {spellName}…";
                 if (q.Actor == CombatActorType.Player)
                     OnPlayerSpellQueued?.Invoke();

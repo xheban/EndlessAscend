@@ -17,6 +17,9 @@ namespace MyGame.Combat
         public PlayerSpellbook playerSpellbook;
         public EnemySpellbookRuntime enemySpellbook;
 
+        // Item cooldowns are per-encounter (not persisted).
+        public PlayerItemCooldownsRuntime playerItemCooldowns;
+
         public CombatActorState Get(CombatActorType type)
         {
             return type == CombatActorType.Player ? player : enemy;

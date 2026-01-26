@@ -27,6 +27,8 @@ MonoBehaviour:
     endurance: 1
   baseExp: 3
   baseGold: 2
+  goldMin: 2
+  goldMax: 2
   spells:
   - spellId: scratch
     level: 2
@@ -37,5 +39,10 @@ MonoBehaviour:
   - spellId: screech
     level: 0
     weight: 0
-  lootTable: []
+  baseLoot: {fileID: 0}
+  lootTable:
+  - itemId: 
+    chance: 0
+    minAmount: 0
+    maxAmount: 0
   tags: 1

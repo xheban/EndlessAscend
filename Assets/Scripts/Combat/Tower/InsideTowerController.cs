@@ -31,6 +31,12 @@ public class InsideTowerController : MonoBehaviour, IScreenController
     private VisualElement[] _slots;
     private VisualElement[] _cards;
 
+    private sealed class TooltipUserData
+    {
+        public bool registered;
+        public string text;
+    }
+
     // The first floor shown in the 5-card window (1-based)
     private int _windowStartFloor = 1;
 
@@ -48,14 +54,27 @@ public class InsideTowerController : MonoBehaviour, IScreenController
 
         // Rewards (raw numbers)
         public int exp;
-        public int gold;
+        public int goldMin;
+        public int goldMax;
 
         // Icons
         public Sprite monsterIcon;
 
         // Drops
-        public Sprite[] skills; // 0..6
-        public Sprite[] loot; // 0..8
+        public IconPreview[] skills; // 0..6
+        public IconPreview[] loot; // 0..8
+    }
+
+    private readonly struct IconPreview
+    {
+        public readonly Sprite icon;
+        public readonly string tooltip;
+
+        public IconPreview(Sprite icon, string tooltip)
+        {
+            this.icon = icon;
+            this.tooltip = tooltip;
+        }
     }
 
     private sealed class CardClickData
@@ -361,10 +380,11 @@ public class InsideTowerController : MonoBehaviour, IScreenController
                 end = 0,
                 spr = 0,
                 exp = 0,
-                gold = 0,
+                goldMin = 0,
+                goldMax = 0,
                 monsterIcon = null,
-                skills = Array.Empty<Sprite>(),
-                loot = Array.Empty<Sprite>(),
+                skills = Array.Empty<IconPreview>(),
+                loot = Array.Empty<IconPreview>(),
             };
         }
 
@@ -381,10 +401,11 @@ public class InsideTowerController : MonoBehaviour, IScreenController
                 end = 0,
                 spr = 0,
                 exp = 0,
-                gold = 0,
+                goldMin = 0,
+                goldMax = 0,
                 monsterIcon = null,
-                skills = Array.Empty<Sprite>(),
-                loot = Array.Empty<Sprite>(),
+                skills = Array.Empty<IconPreview>(),
+                loot = Array.Empty<IconPreview>(),
             };
         }
 
@@ -393,11 +414,11 @@ public class InsideTowerController : MonoBehaviour, IScreenController
 
         // exp/gold: if you set overrides on the floor, use them; otherwise monster base
         int exp = entry.expOverride > 0 ? entry.expOverride : m.BaseExp;
-        int gold = entry.goldOverride > 0 ? entry.goldOverride : m.BaseGold;
+        int goldMin = entry.goldOverride > 0 ? entry.goldOverride : m.GoldMin;
+        int goldMax = entry.goldOverride > 0 ? entry.goldOverride : m.GoldMax;
 
-        // For now keep empty previews (as you requested)
-        Sprite[] skillsPreview = Array.Empty<Sprite>();
-        Sprite[] lootPreview = Array.Empty<Sprite>();
+        IconPreview[] skillsPreview = BuildSkillPreview(m);
+        IconPreview[] lootPreview = BuildLootPreview(m);
 
         return new FloorData
         {
@@ -412,7 +433,8 @@ public class InsideTowerController : MonoBehaviour, IScreenController
             spr = s.spirit,
 
             exp = exp,
-            gold = gold,
+            goldMin = goldMin,
+            goldMax = goldMax,
 
             monsterIcon = m.Icon,
 
@@ -435,12 +457,12 @@ public class InsideTowerController : MonoBehaviour, IScreenController
         root.Q<Label>("SprValue").text = FormatNumber(data.spr);
 
         PopulateMonsterIcon(root, data.monsterIcon);
-        PopulateExpGold(root, data.exp, data.gold);
+        PopulateExpGold(root, data.exp, data.goldMin, data.goldMax);
         PopulateSkills(root, data.skills);
         PopulateLoot(root, data.loot);
     }
 
-    private void PopulateExpGold(VisualElement root, int exp, int gold)
+    private void PopulateExpGold(VisualElement root, int exp, int goldMin, int goldMax)
     {
         var expLabel = root.Q<Label>("ExpValue");
         if (expLabel != null)
@@ -448,7 +470,7 @@ public class InsideTowerController : MonoBehaviour, IScreenController
 
         var goldLabel = root.Q<Label>("GoldValue");
         if (goldLabel != null)
-            goldLabel.text = FormatNumber(gold);
+            goldLabel.text = $"{FormatNumber(goldMin)} - {FormatNumber(goldMax)}";
     }
 
     private void PopulateMonsterIcon(VisualElement root, Sprite iconSprite)
@@ -458,9 +480,9 @@ public class InsideTowerController : MonoBehaviour, IScreenController
             icon.style.backgroundImage = new StyleBackground(iconSprite);
     }
 
-    private void PopulateSkills(VisualElement root, Sprite[] skills)
+    private void PopulateSkills(VisualElement root, IconPreview[] skills)
     {
-        skills ??= Array.Empty<Sprite>();
+        skills ??= Array.Empty<IconPreview>();
 
         for (int i = 1; i <= 6; i++)
         {
@@ -468,13 +490,29 @@ public class InsideTowerController : MonoBehaviour, IScreenController
             if (slot == null)
                 continue;
 
-            slot.style.display = i <= skills.Length ? DisplayStyle.Flex : DisplayStyle.None;
+            int idx = i - 1;
+            bool has = idx < skills.Length && skills[idx].icon != null;
+            slot.style.display = has ? DisplayStyle.Flex : DisplayStyle.None;
+
+            string tooltipText = has ? (skills[idx].tooltip ?? string.Empty) : string.Empty;
+            SetTooltip(slot, tooltipText);
+
+            var icon = slot.Q<VisualElement>("Icon");
+            if (icon != null)
+            {
+                icon.style.backgroundImage = has
+                    ? new StyleBackground(skills[idx].icon)
+                    : StyleKeyword.None;
+
+                // Make the tooltip work even if the pointer is over the child element.
+                SetTooltip(icon, tooltipText);
+            }
         }
     }
 
-    private void PopulateLoot(VisualElement root, Sprite[] loot)
+    private void PopulateLoot(VisualElement root, IconPreview[] loot)
     {
-        loot ??= Array.Empty<Sprite>();
+        loot ??= Array.Empty<IconPreview>();
 
         for (int i = 1; i <= 8; i++)
         {
@@ -482,8 +520,182 @@ public class InsideTowerController : MonoBehaviour, IScreenController
             if (slot == null)
                 continue;
 
-            slot.style.display = i <= loot.Length ? DisplayStyle.Flex : DisplayStyle.None;
+            int idx = i - 1;
+            bool has = idx < loot.Length && loot[idx].icon != null;
+            slot.style.display = has ? DisplayStyle.Flex : DisplayStyle.None;
+
+            string tooltipText = has ? (loot[idx].tooltip ?? string.Empty) : string.Empty;
+            SetTooltip(slot, tooltipText);
+
+            var icon = slot.Q<VisualElement>("Icon");
+            if (icon != null)
+            {
+                icon.style.backgroundImage = has
+                    ? new StyleBackground(loot[idx].icon)
+                    : StyleKeyword.None;
+
+                SetTooltip(icon, tooltipText);
+            }
         }
+    }
+
+    private void SetTooltip(VisualElement element, string text)
+    {
+        if (element == null)
+            return;
+
+        // This project uses ScreenSwapper's tooltip overlay (not VisualElement.tooltip).
+        if (_swapper == null)
+            return;
+
+        element.pickingMode = PickingMode.Position;
+
+        if (element.userData is not TooltipUserData data)
+        {
+            data = new TooltipUserData();
+            element.userData = data;
+        }
+
+        data.text = text ?? string.Empty;
+
+        if (data.registered)
+            return;
+
+        data.registered = true;
+
+        element.RegisterCallback<PointerEnterEvent>(evt =>
+        {
+            if (evt.currentTarget is not VisualElement ve)
+                return;
+            if (ve.userData is not TooltipUserData d)
+                return;
+            if (string.IsNullOrWhiteSpace(d.text))
+                return;
+
+            _swapper.ShowTooltipAtElement(ve, d.text);
+        });
+
+        element.RegisterCallback<PointerLeaveEvent>(_ =>
+        {
+            _swapper.HideTooltip();
+        });
+
+        element.RegisterCallback<PointerOutEvent>(_ =>
+        {
+            _swapper.HideTooltip();
+        });
+    }
+
+    private static IconPreview[] BuildSkillPreview(MonsterDefinition monster)
+    {
+        if (monster == null)
+            return Array.Empty<IconPreview>();
+
+        var spellDb = GameConfigProvider.Instance?.SpellDatabase;
+        if (spellDb == null)
+            return Array.Empty<IconPreview>();
+
+        var spells = monster.Spells;
+        if (spells == null || spells.Count == 0)
+            return Array.Empty<IconPreview>();
+
+        var icons = new System.Collections.Generic.List<IconPreview>(6);
+        var seen = new System.Collections.Generic.HashSet<string>(
+            System.StringComparer.OrdinalIgnoreCase
+        );
+
+        for (int i = 0; i < spells.Count && icons.Count < 6; i++)
+        {
+            var e = spells[i];
+            if (e == null || string.IsNullOrWhiteSpace(e.SpellId))
+                continue;
+            if (!seen.Add(e.SpellId))
+                continue;
+
+            var icon = spellDb.GetIcon(e.SpellId);
+            if (icon != null)
+            {
+                string name = spellDb.GetDisplayName(e.SpellId);
+                icons.Add(new IconPreview(icon, name));
+            }
+        }
+
+        return icons.ToArray();
+    }
+
+    private static IconPreview[] BuildLootPreview(MonsterDefinition monster)
+    {
+        if (monster == null)
+            return Array.Empty<IconPreview>();
+
+        var table = monster.BaseLoot;
+        if (table == null)
+            return Array.Empty<IconPreview>();
+
+        var cfg = GameConfigProvider.Instance;
+        var itemDb = cfg != null ? cfg.ItemDatabase : null;
+        var equipDb = cfg != null ? cfg.EquipmentDatabase : null;
+
+        var icons = new System.Collections.Generic.List<IconPreview>(8);
+        var seen = new System.Collections.Generic.HashSet<(LootDropKind kind, string id)>();
+
+        bool TryAdd(LootDropDefinition def)
+        {
+            if (def == null)
+                return false;
+            if (icons.Count >= 8)
+                return false;
+
+            string id;
+            Sprite icon;
+            string name;
+
+            if (def.kind == LootDropKind.Item)
+            {
+                id = def.itemId;
+                if (string.IsNullOrWhiteSpace(id))
+                    return false;
+                icon = itemDb != null ? itemDb.GetIcon(id) : null;
+                name = itemDb != null ? itemDb.GetDisplayName(id) : id;
+            }
+            else if (def.kind == LootDropKind.Equipment)
+            {
+                id = def.equipmentId;
+                if (string.IsNullOrWhiteSpace(id))
+                    return false;
+                icon = equipDb != null ? equipDb.GetIcon(id) : null;
+                name = equipDb != null ? equipDb.GetDisplayName(id) : id;
+            }
+            else
+            {
+                return false;
+            }
+
+            if (icon == null)
+                return false;
+
+            if (!seen.Add((def.kind, id)))
+                return false;
+
+            icons.Add(new IconPreview(icon, name));
+            return true;
+        }
+
+        var guaranteed = table.GuaranteedDrops;
+        if (guaranteed != null)
+        {
+            for (int i = 0; i < guaranteed.Count && icons.Count < 8; i++)
+                TryAdd(guaranteed[i]?.drop);
+        }
+
+        var pool = table.WeightedPool;
+        if (pool != null)
+        {
+            for (int i = 0; i < pool.Count && icons.Count < 8; i++)
+                TryAdd(pool[i]?.drop);
+        }
+
+        return icons.ToArray();
     }
 
     private void SetCardInteractable(VisualElement cardRoot, bool interactable)

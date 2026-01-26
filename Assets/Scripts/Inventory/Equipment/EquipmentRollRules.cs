@@ -1191,15 +1191,14 @@ public static class EquipmentRoller
             var r = table[idx];
             float v = RollValue(r.min, r.max, rng);
 
-            if (r.op == ModOp.Flat && r.roundFlatToInt)
-                v = Mathf.RoundToInt(v);
+            int iv = Mathf.RoundToInt(v);
 
             outMods.Add(
                 new BaseStatModifier
                 {
                     stat = r.stat,
                     op = r.op,
-                    value = v,
+                    value = iv,
                 }
             );
         }
@@ -1243,15 +1242,14 @@ public static class EquipmentRoller
             var r = table[idx];
             float v = RollValue(r.min, r.max, rng);
 
-            if (r.op == ModOp.Flat && r.roundFlatToInt)
-                v = Mathf.RoundToInt(v);
+            int iv = Mathf.RoundToInt(v);
 
             outMods.Add(
                 new DerivedStatModifier
                 {
                     stat = r.stat,
                     op = r.op,
-                    value = v,
+                    value = iv,
                 }
             );
         }
@@ -1304,10 +1302,28 @@ public static class EquipmentRoller
                 min = Mathf.Max(0.01f, min);
 
             float v = RollValue(min, max, rng);
-            if (m.op == ModOp.Flat && r.roundFlatToInt)
-                v = Mathf.RoundToInt(v);
 
-            m.value = v;
+            // Default: store as whole number.
+            int iv = Mathf.RoundToInt(v);
+
+            // For scaling-flat targets, store in percent-points (x100) so we can represent 0.50 as 50.
+            if (m.op == ModOp.Flat)
+            {
+                switch (m.target)
+                {
+                    case SpellCombatModifierTarget.PowerScalingFlat:
+                    case SpellCombatModifierTarget.AttackPowerScalingFlat:
+                    case SpellCombatModifierTarget.MagicPowerScalingFlat:
+                    {
+                        // If authoring used 0..1 floats, preserve intent by scaling.
+                        if (max <= 1f)
+                            iv = Mathf.RoundToInt(v * 100f);
+                        break;
+                    }
+                }
+            }
+
+            m.value = iv;
             outMods.Add(m);
         }
     }
@@ -1608,13 +1624,33 @@ public static class EquipmentRoller
             if (mapped == MyGame.Combat.SpellCombatModifierTarget.None)
                 continue;
 
+            // Default: store as whole number.
+            int iv = Mathf.RoundToInt(v);
+
+            // For scaling-flat targets, store in percent-points (x100) so we can represent 0.50 as 50.
+            if (r.op == ModOp.Flat)
+            {
+                switch (mapped)
+                {
+                    case MyGame.Combat.SpellCombatModifierTarget.PowerScalingFlat:
+                    case MyGame.Combat.SpellCombatModifierTarget.AttackPowerScalingFlat:
+                    case MyGame.Combat.SpellCombatModifierTarget.MagicPowerScalingFlat:
+                    {
+                        // If authoring used 0..1 floats, preserve intent by scaling.
+                        if (max <= 1f)
+                            iv = Mathf.RoundToInt(v * 100f);
+                        break;
+                    }
+                }
+            }
+
             outMods.Add(
                 new MyGame.Combat.SpellCombatModifier
                 {
                     target = mapped,
                     scope = MyGame.Combat.SpellModifierScope.Any,
                     op = r.op,
-                    value = v,
+                    value = iv,
                 }
             );
         }
@@ -2515,12 +2551,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new BaseStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2550,12 +2588,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new BaseStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2588,12 +2628,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new BaseStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
 
@@ -2623,12 +2665,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new DerivedStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2658,12 +2702,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new DerivedStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2696,12 +2742,14 @@ public static class EquipmentRoller
         if (r.op == ModOp.Flat && r.roundFlatToInt)
             v = Mathf.RoundToInt(v);
 
+        int iv = Mathf.RoundToInt(v);
+
         outMods.Add(
             new DerivedStatModifier
             {
                 stat = r.stat,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
 
@@ -2775,13 +2823,33 @@ public static class EquipmentRoller
         if (mapped == MyGame.Combat.SpellCombatModifierTarget.None)
             return false;
 
+        // Default: store as whole number.
+        int iv = Mathf.RoundToInt(v);
+
+        // For scaling-flat targets, store in percent-points (x100) so we can represent 0.50 as 50.
+        if (r.op == ModOp.Flat)
+        {
+            switch (mapped)
+            {
+                case MyGame.Combat.SpellCombatModifierTarget.PowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.AttackPowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.MagicPowerScalingFlat:
+                {
+                    // If authoring used 0..1 floats, preserve intent by scaling.
+                    if (max <= 1f)
+                        iv = Mathf.RoundToInt(v * 100f);
+                    break;
+                }
+            }
+        }
+
         outMods.Add(
             new MyGame.Combat.SpellCombatModifier
             {
                 target = mapped,
                 scope = MyGame.Combat.SpellModifierScope.Any,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2855,13 +2923,33 @@ public static class EquipmentRoller
         if (mapped == MyGame.Combat.SpellCombatModifierTarget.None)
             return false;
 
+        // Default: store as whole number.
+        int iv = Mathf.RoundToInt(v);
+
+        // For scaling-flat targets, store in percent-points (x100) so we can represent 0.50 as 50.
+        if (r.op == ModOp.Flat)
+        {
+            switch (mapped)
+            {
+                case MyGame.Combat.SpellCombatModifierTarget.PowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.AttackPowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.MagicPowerScalingFlat:
+                {
+                    // If authoring used 0..1 floats, preserve intent by scaling.
+                    if (max <= 1f)
+                        iv = Mathf.RoundToInt(v * 100f);
+                    break;
+                }
+            }
+        }
+
         outMods.Add(
             new MyGame.Combat.SpellCombatModifier
             {
                 target = mapped,
                 scope = MyGame.Combat.SpellModifierScope.Any,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;
@@ -2938,13 +3026,33 @@ public static class EquipmentRoller
         if (mapped == MyGame.Combat.SpellCombatModifierTarget.None)
             return false;
 
+        // Default: store as whole number.
+        int iv = Mathf.RoundToInt(v);
+
+        // For scaling-flat targets, store in percent-points (x100) so we can represent 0.50 as 50.
+        if (r.op == ModOp.Flat)
+        {
+            switch (mapped)
+            {
+                case MyGame.Combat.SpellCombatModifierTarget.PowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.AttackPowerScalingFlat:
+                case MyGame.Combat.SpellCombatModifierTarget.MagicPowerScalingFlat:
+                {
+                    // If authoring used 0..1 floats, preserve intent by scaling.
+                    if (max <= 1f)
+                        iv = Mathf.RoundToInt(v * 100f);
+                    break;
+                }
+            }
+        }
+
         outMods.Add(
             new MyGame.Combat.SpellCombatModifier
             {
                 target = mapped,
                 scope = MyGame.Combat.SpellModifierScope.Any,
                 op = r.op,
-                value = v,
+                value = iv,
             }
         );
         return true;

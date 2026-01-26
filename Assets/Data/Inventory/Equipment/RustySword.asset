@@ -14,13 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: rusty_sword
   displayName: Rusty Sword
+  description: Most basic rusty sword used to hunt monsters
   slot: 6
+  usableInCombat: 0
+  rarity: 0
+  requiredLevel: 1
+  tier: 0
+  goldValue: 5
+  level: 1
   handedness: 1
+  flatStatRequirements: []
   icon: {fileID: 21300000, guid: b259bce8f8c0e374f80aada828bcba93, type: 3}
   minBaseRolls: 0
   maxBaseRolls: 0
   allowDuplicateBaseRolls: 0
-  baseRollTable: []
+  baseRollTable:
+  - stat: 0
+    op: 0
+    min: 3
+    max: 5
+    weight: 20
+    roundFlatToInt: 0
   minDamageKindRolls: 0
   maxDamageKindRolls: 0
   allowDuplicateDamageKindRolls: 0
@@ -38,9 +52,11 @@ MonoBehaviour:
   allowDuplicateCombatModRolls: 0
   combatModRollTable:
   - target: 0
+    op: 0
     min: 0
     max: 0
     weight: 0
+    roundFlatToInt: 0
   minDerivedRolls: 0
   maxDerivedRolls: 0
   allowDuplicateDerivedRolls: 0

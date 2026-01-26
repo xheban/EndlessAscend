@@ -24,8 +24,8 @@ namespace MyGame.Common
         public BaseStatType stat;
         public ModOp op;
 
-        [Tooltip("Flat = whole number (ex: 5). Percent = percent (ex: 10 means +10%).")]
-        public float value;
+        [Tooltip("Flat = whole number (ex: 5). Percent = whole percent (ex: 10 means +10%).")]
+        public int value;
     }
 
     public enum DerivedStatType
@@ -48,7 +48,7 @@ namespace MyGame.Common
         public DerivedStatType stat;
         public ModOp op;
 
-        [Tooltip("Flat = whole number. Percent = percent (ex: 3 means +3%).")]
-        public float value;
+        [Tooltip("Flat = whole number. Percent = whole percent (ex: 3 means +3%).")]
+        public int value;
     }
 }

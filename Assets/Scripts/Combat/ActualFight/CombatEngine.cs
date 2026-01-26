@@ -171,9 +171,12 @@ namespace MyGame.Combat
                     startMana: enemyMana
                 ),
                 playerSpellbook = spellbook,
+                playerItemCooldowns = new PlayerItemCooldownsRuntime(),
                 waitingForPlayerInput = false,
                 isFinished = false,
             };
+
+            LoadPersistentItemCooldownsIntoRuntime(save, State.playerItemCooldowns);
 
             // Apply equipped rolled spell-combat modifiers onto the player's modifier bucket.
             if (equipment != null)
@@ -253,6 +256,41 @@ namespace MyGame.Combat
             SetTurnMeter(CombatActorType.Enemy, State.enemy.turnMeter, DEFAULT_TURN_THRESHOLD);
 
             State.waitingForPlayerInput = true;
+        }
+
+        private static void LoadPersistentItemCooldownsIntoRuntime(
+            SaveData save,
+            PlayerItemCooldownsRuntime runtime
+        )
+        {
+            if (save == null || runtime == null)
+                return;
+
+            if (save.persistentItemCooldowns == null || save.persistentItemCooldowns.Count == 0)
+                return;
+
+            var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+            var items = RunSession.Items;
+
+            for (int i = 0; i < save.persistentItemCooldowns.Count; i++)
+            {
+                var e = save.persistentItemCooldowns[i];
+                if (e == null)
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(e.itemId) || e.remainingTurns <= 0)
+                    continue;
+
+                var def = itemDb != null ? itemDb.GetById(e.itemId) : null;
+                if (def == null || !def.carryCooldownBetweenFights)
+                    continue;
+
+                // If the player no longer has any stack, ignore the persisted cooldown.
+                if (items == null || items.GetCount(e.itemId) <= 0)
+                    continue;
+
+                runtime.StartCooldown(e.itemId, e.remainingTurns);
+            }
         }
 
         // -------------------------
@@ -514,7 +552,8 @@ namespace MyGame.Combat
             CombatActorType source,
             CombatActorType target,
             ResolvedSpell spell,
-            StatModifiers modifiers
+            StatModifiers modifiers,
+            bool grantSpellXp = true
         )
         {
             var ctx = new ActionContext
@@ -605,7 +644,7 @@ namespace MyGame.Combat
             }
 
             // XP for player spell
-            if (source == CombatActorType.Player)
+            if (grantSpellXp && source == CombatActorType.Player)
             {
                 int xpPerHit =
                     1
@@ -832,6 +871,10 @@ namespace MyGame.Combat
 
         private const int DEFAULT_TURN_THRESHOLD = 100;
 
+        private const float DefaultItemUsageSpeed = 25f;
+        private const string ItemUseQueuedPrefix = "item:";
+        private const string EquipmentUseQueuedPrefix = "equip:";
+
         private static float GetThreshold(ResolvedSpell s)
         {
             if (s == null)
@@ -839,8 +882,41 @@ namespace MyGame.Combat
             return Mathf.Max(1, s.castTimeValue);
         }
 
+        private static bool IsQueuedItemUse(string spellIdOrQueuedId) =>
+            !string.IsNullOrWhiteSpace(spellIdOrQueuedId)
+            && spellIdOrQueuedId.StartsWith(
+                ItemUseQueuedPrefix,
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        private static bool IsQueuedEquipmentUse(string spellIdOrQueuedId) =>
+            !string.IsNullOrWhiteSpace(spellIdOrQueuedId)
+            && spellIdOrQueuedId.StartsWith(
+                EquipmentUseQueuedPrefix,
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        private static int UsageTimeToCastTimeValue(float usageTime)
+        {
+            // Items use the same concept as spells: usageTime == castTimeValue threshold.
+            // If unset, default to 25.
+            if (usageTime <= 0f)
+                return Mathf.Max(1, Mathf.RoundToInt(DefaultItemUsageSpeed));
+            return Mathf.Max(1, Mathf.RoundToInt(usageTime));
+        }
+
         private float GetActionSpeed(CombatActorState actor, ResolvedSpell queuedSpell)
         {
+            if (queuedSpell != null)
+            {
+                // Items use a fixed speed (do NOT use castSpeed/attackSpeed).
+                if (
+                    IsQueuedItemUse(queuedSpell.spellId)
+                    || IsQueuedEquipmentUse(queuedSpell.spellId)
+                )
+                    return Mathf.Max(1f, DefaultItemUsageSpeed);
+            }
+
             float speed =
                 queuedSpell.damageKind == DamageKind.Magical
                     ? actor.derived.castSpeed
@@ -864,6 +940,91 @@ namespace MyGame.Combat
 
             if (string.IsNullOrWhiteSpace(actor.queuedSpellId))
                 throw new InvalidOperationException($"{actor.actorType} has no queued spell.");
+
+            // Pseudo-queued actions: item/equipment usage.
+            // They participate in the timeline (cast time) but do nothing yet.
+            if (actor.actorType == CombatActorType.Player)
+            {
+                if (IsQueuedItemUse(actor.queuedSpellId))
+                {
+                    string itemId = actor.queuedSpellId.Substring(ItemUseQueuedPrefix.Length);
+
+                    var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+                    var def = itemDb != null ? itemDb.GetById(itemId) : null;
+
+                    string displayName =
+                        def != null && !string.IsNullOrWhiteSpace(def.displayName)
+                            ? def.displayName
+                            : itemId;
+
+                    Sprite icon = def != null ? def.icon : null;
+                    float usageTime = def != null ? Mathf.Max(0f, def.usageTime) : 0f;
+
+                    return new ResolvedSpell(
+                        spellId: actor.queuedSpellId,
+                        displayName: displayName,
+                        manaCost: 0,
+                        cooldownTurns: 0,
+                        damage: 0,
+                        damageKind: DamageKind.Magical,
+                        damageRangeType: DamageRangeType.Ranged,
+                        ignoreDefenseFlat: 0,
+                        ignoreDefensePercent: 0,
+                        hitChance: 100,
+                        baseUseSpeed: Mathf.RoundToInt(DefaultItemUsageSpeed),
+                        castTimeValue: UsageTimeToCastTimeValue(usageTime),
+                        damageTypes: Array.Empty<DamageType>(),
+                        onHitEffects: Array.Empty<EffectInstance>(),
+                        onCastEffects: Array.Empty<EffectInstance>(),
+                        intent: SpellIntent.Buff,
+                        level: 1,
+                        icon: icon
+                    );
+                }
+
+                if (IsQueuedEquipmentUse(actor.queuedSpellId))
+                {
+                    string instanceId = actor.queuedSpellId.Substring(
+                        EquipmentUseQueuedPrefix.Length
+                    );
+
+                    string displayName = instanceId;
+                    Sprite icon = null;
+
+                    var equipment = RunSession.Equipment;
+                    var inst = equipment != null ? equipment.GetInstance(instanceId) : null;
+                    if (inst != null)
+                    {
+                        var equipDb = GameConfigProvider.Instance?.EquipmentDatabase;
+                        displayName =
+                            equipDb != null
+                                ? equipDb.GetDisplayName(inst.equipmentId)
+                                : inst.equipmentId;
+                        icon = equipDb != null ? equipDb.GetIcon(inst.equipmentId) : null;
+                    }
+
+                    return new ResolvedSpell(
+                        spellId: actor.queuedSpellId,
+                        displayName: displayName,
+                        manaCost: 0,
+                        cooldownTurns: 0,
+                        damage: 0,
+                        damageKind: DamageKind.Magical,
+                        damageRangeType: DamageRangeType.Ranged,
+                        ignoreDefenseFlat: 0,
+                        ignoreDefensePercent: 0,
+                        hitChance: 100,
+                        baseUseSpeed: Mathf.RoundToInt(DefaultItemUsageSpeed),
+                        castTimeValue: UsageTimeToCastTimeValue(0f),
+                        damageTypes: Array.Empty<DamageType>(),
+                        onHitEffects: Array.Empty<EffectInstance>(),
+                        onCastEffects: Array.Empty<EffectInstance>(),
+                        intent: SpellIntent.Buff,
+                        level: 1,
+                        icon: icon
+                    );
+                }
+            }
 
             // PLAYER
             if (actor.actorType == CombatActorType.Player)
@@ -1050,14 +1211,26 @@ namespace MyGame.Combat
             if (defender.hp <= 0)
                 return;
 
+            bool isPseudoItemUse =
+                actorType == CombatActorType.Player
+                && resolvedQueuedSpell != null
+                && (
+                    IsQueuedItemUse(resolvedQueuedSpell.spellId)
+                    || IsQueuedEquipmentUse(resolvedQueuedSpell.spellId)
+                );
+
             if (actorType == CombatActorType.Player)
             {
                 State.playerSpellbook.TickCooldowns();
-                ChangeMana(CombatActorType.Player, -resolvedQueuedSpell.manaCost);
-                State.playerSpellbook.StartCooldown(
-                    resolvedQueuedSpell.spellId,
-                    resolvedQueuedSpell.cooldownTurns
-                );
+                State.playerItemCooldowns?.TickCooldowns();
+                if (!isPseudoItemUse)
+                {
+                    ChangeMana(CombatActorType.Player, -resolvedQueuedSpell.manaCost);
+                    State.playerSpellbook.StartCooldown(
+                        resolvedQueuedSpell.spellId,
+                        resolvedQueuedSpell.cooldownTurns
+                    );
+                }
             }
             else
             {
@@ -1067,6 +1240,154 @@ namespace MyGame.Combat
                     resolvedQueuedSpell.spellId,
                     resolvedQueuedSpell.cooldownTurns
                 );
+            }
+
+            if (isPseudoItemUse)
+            {
+                // If this is an ITEM action, consume stack + start item cooldown.
+                if (resolvedQueuedSpell != null && IsQueuedItemUse(resolvedQueuedSpell.spellId))
+                {
+                    string itemId = resolvedQueuedSpell.spellId.Substring(
+                        ItemUseQueuedPrefix.Length
+                    );
+
+                    var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+                    var itemDef = itemDb != null ? itemDb.GetById(itemId) : null;
+
+                    // Spell scrolls: cast the referenced spell (no spellbook cooldown) using item cooldown.
+                    if (itemDef != null && itemDef.isSpellScroll)
+                    {
+                        var sd = itemDef.scrollData;
+                        if (sd == null || string.IsNullOrWhiteSpace(sd.spellId))
+                        {
+                            Emit(new CombatLogEvent($"Scroll '{itemId}' is missing scrollData."));
+                            Emit(new SpellFiredEvent(actorType));
+                            return;
+                        }
+
+                        int scrollLevel = Mathf.Max(1, sd.spellLevel);
+
+                        if (
+                            !_spellResolver.TryResolve(
+                                sd.spellId,
+                                scrollLevel,
+                                State.player.derived,
+                                out var resolvedScroll
+                            )
+                        )
+                        {
+                            Emit(
+                                new CombatLogEvent(
+                                    $"Scroll '{itemDef.displayName}' failed to resolve spell '{sd.spellId}'."
+                                )
+                            );
+                            Emit(new SpellFiredEvent(actorType));
+                            return;
+                        }
+
+                        ApplyPlayerSpellOverridesFromEquipment(resolvedScroll);
+
+                        if (sd.usesPlayerMana && State.player.mana < resolvedScroll.manaCost)
+                        {
+                            Emit(
+                                new CombatLogEvent(
+                                    $"Not enough mana for {resolvedScroll.displayName} (needs {resolvedScroll.manaCost})."
+                                )
+                            );
+                            Emit(new SpellFiredEvent(actorType));
+                            return;
+                        }
+
+                        // Consume 1 scroll stack.
+                        bool removedScrollStack =
+                            RunSession.Items != null && RunSession.Items.Remove(itemId, 1);
+                        if (!removedScrollStack)
+                        {
+                            Emit(
+                                new CombatLogEvent(
+                                    $"Tried to use '{itemId}' but no stack was available."
+                                )
+                            );
+                            Emit(new SpellFiredEvent(actorType));
+                            return;
+                        }
+
+                        // If this was the last stack, remove it from all active combat slots.
+                        if (RunSession.Items == null || RunSession.Items.GetCount(itemId) <= 0)
+                        {
+                            var save = SaveSession.Current;
+                            if (save != null)
+                                ActiveCombatSlotsCleanup.RemoveItemFromAllActiveCombatSlots(
+                                    save,
+                                    itemId
+                                );
+                        }
+
+                        if (SaveSession.HasSave && SaveSession.Current != null)
+                            SaveSessionRuntimeSave.SaveNowWithRuntime();
+
+                        int cdTurns = Mathf.Max(0, itemDef.cooldownTurns);
+                        if (cdTurns > 0)
+                            State.playerItemCooldowns?.StartCooldown(itemId, cdTurns);
+
+                        // Pay mana and cast the scroll spell.
+                        if (sd.usesPlayerMana)
+                            ChangeMana(CombatActorType.Player, -resolvedScroll.manaCost);
+
+                        ResolveAction(
+                            attacker: attacker,
+                            defender: defender,
+                            source: actorType,
+                            target: defender.actorType,
+                            spell: resolvedScroll,
+                            modifiers: modsBeforeTick,
+                            grantSpellXp: false
+                        );
+
+                        Emit(new SpellFiredEvent(actorType));
+                        return;
+                    }
+
+                    bool removed = RunSession.Items != null && RunSession.Items.Remove(itemId, 1);
+                    if (removed)
+                    {
+                        // If this was the last stack, remove it from all active combat slots.
+                        if (RunSession.Items == null || RunSession.Items.GetCount(itemId) <= 0)
+                        {
+                            var save = SaveSession.Current;
+                            if (save != null)
+                            {
+                                ActiveCombatSlotsCleanup.RemoveItemFromAllActiveCombatSlots(
+                                    save,
+                                    itemId
+                                );
+                            }
+                        }
+
+                        if (SaveSession.HasSave && SaveSession.Current != null)
+                            SaveSessionRuntimeSave.SaveNowWithRuntime();
+
+                        int cdTurns = itemDef != null ? Mathf.Max(0, itemDef.cooldownTurns) : 0;
+                        if (cdTurns > 0)
+                            State.playerItemCooldowns?.StartCooldown(itemId, cdTurns);
+                    }
+                    else
+                    {
+                        Emit(
+                            new CombatLogEvent(
+                                $"Tried to use '{itemId}' but no stack was available."
+                            )
+                        );
+                    }
+                }
+
+                Emit(
+                    new CombatLogEvent(
+                        $"{attacker.displayName} uses {resolvedQueuedSpell.displayName} (no effect yet)."
+                    )
+                );
+                Emit(new SpellFiredEvent(actorType));
+                return;
             }
 
             ResolveAction(
@@ -1079,6 +1400,187 @@ namespace MyGame.Combat
             );
 
             Emit(new SpellFiredEvent(actorType));
+        }
+
+        public bool TryUseActiveCombatItemSlot(int slotIndex)
+        {
+            if (State == null || State.isFinished)
+                return false;
+            if (!State.waitingForPlayerInput)
+                return false;
+            if (!SaveSession.HasSave || SaveSession.Current == null)
+                return false;
+
+            var save = SaveSession.Current;
+            save.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
+            while (save.activeCombatSlots.Count < 4)
+                save.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());
+
+            if (slotIndex < 0 || slotIndex >= 4)
+                return false;
+
+            var entry = save.activeCombatSlots[slotIndex];
+            if (entry == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(entry.itemId))
+            {
+                var items = RunSession.Items;
+                if (items == null || items.GetCount(entry.itemId) <= 0)
+                {
+                    Emit(new CombatLogEvent($"You don't have '{entry.itemId}'."));
+                    return false;
+                }
+
+                int remainingCd =
+                    State.playerItemCooldowns != null
+                        ? State.playerItemCooldowns.GetRemaining(entry.itemId)
+                        : 0;
+                if (remainingCd > 0)
+                {
+                    Emit(new CombatLogEvent($"Item is on cooldown ({remainingCd} turns)."));
+                    return false;
+                }
+
+                var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+                var def = itemDb != null ? itemDb.GetById(entry.itemId) : null;
+                if (def != null && !def.usableInCombat)
+                {
+                    Emit(new CombatLogEvent($"'{def.displayName}' cannot be used in combat."));
+                    return false;
+                }
+
+                // Scrolls use mana and must be queueable like spells.
+                if (def != null && def.isSpellScroll)
+                {
+                    var sd = def.scrollData;
+                    if (sd == null || string.IsNullOrWhiteSpace(sd.spellId))
+                    {
+                        Emit(
+                            new CombatLogEvent($"Scroll '{def.displayName}' is missing scrollData.")
+                        );
+                        return false;
+                    }
+
+                    if (sd.usesPlayerMana)
+                    {
+                        int scrollLevel = Mathf.Max(1, sd.spellLevel);
+
+                        if (
+                            !_spellResolver.TryResolve(
+                                sd.spellId,
+                                scrollLevel,
+                                State.player.derived,
+                                out var resolvedScroll
+                            )
+                        )
+                        {
+                            Emit(
+                                new CombatLogEvent(
+                                    $"Scroll '{def.displayName}' failed to resolve spell '{sd.spellId}'."
+                                )
+                            );
+                            return false;
+                        }
+
+                        ApplyPlayerSpellOverridesFromEquipment(resolvedScroll);
+
+                        if (State.player.mana < resolvedScroll.manaCost)
+                        {
+                            Emit(
+                                new CombatLogEvent(
+                                    $"Not enough mana for {resolvedScroll.displayName} (needs {resolvedScroll.manaCost})."
+                                )
+                            );
+                            return false;
+                        }
+                    }
+                }
+
+                State.player.queuedSpellId = ItemUseQueuedPrefix + entry.itemId;
+
+                string name =
+                    def != null && !string.IsNullOrWhiteSpace(def.displayName)
+                        ? def.displayName
+                        : entry.itemId;
+
+                Emit(new SpellQueuedEvent(CombatActorType.Player, State.player.displayName, name));
+                State.waitingForPlayerInput = false;
+
+                if (!State.isFinished)
+                    AdvanceUntilPlayerInputOrEnd();
+
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(entry.equipmentInstanceId))
+            {
+                var equipment = RunSession.Equipment;
+                var inst =
+                    equipment != null ? equipment.GetInstance(entry.equipmentInstanceId) : null;
+                if (inst == null)
+                {
+                    Emit(
+                        new CombatLogEvent(
+                            $"Missing equipment instance '{entry.equipmentInstanceId}'."
+                        )
+                    );
+                    return false;
+                }
+
+                var equipDb = GameConfigProvider.Instance?.EquipmentDatabase;
+                var equipDef = equipDb != null ? equipDb.GetById(inst.equipmentId) : null;
+                if (equipDef != null && !equipDef.usableInCombat)
+                {
+                    Emit(new CombatLogEvent($"'{equipDef.displayName}' cannot be used in combat."));
+                    return false;
+                }
+
+                State.player.queuedSpellId = EquipmentUseQueuedPrefix + entry.equipmentInstanceId;
+
+                string name =
+                    equipDb != null ? equipDb.GetDisplayName(inst.equipmentId) : inst.equipmentId;
+                Emit(new SpellQueuedEvent(CombatActorType.Player, State.player.displayName, name));
+                State.waitingForPlayerInput = false;
+
+                if (!State.isFinished)
+                    AdvanceUntilPlayerInputOrEnd();
+
+                return true;
+            }
+
+            Emit(new CombatLogEvent($"Combat item slot {slotIndex + 1} is empty."));
+            return false;
+        }
+
+        public bool TryGetPlayerItemCooldown(
+            string itemId,
+            out int remainingTurns,
+            out int maxTurns
+        )
+        {
+            remainingTurns = 0;
+            maxTurns = 0;
+
+            if (State == null || State.isFinished)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(itemId))
+                return false;
+
+            remainingTurns =
+                State.playerItemCooldowns != null
+                    ? Mathf.Max(0, State.playerItemCooldowns.GetRemaining(itemId))
+                    : 0;
+
+            var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+            var def = itemDb != null ? itemDb.GetById(itemId) : null;
+            maxTurns = def != null ? Mathf.Max(1, def.cooldownTurns) : Mathf.Max(1, remainingTurns);
+
+            if (remainingTurns > maxTurns)
+                maxTurns = remainingTurns;
+
+            return true;
         }
 
         private void AfterActorFired(CombatActorType actorType)

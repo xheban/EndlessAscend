@@ -1,0 +1,85 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Detail" style="flex-grow: 0; width: 396px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_316&apos;); padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px;">
+        <engine:VisualElement name="Header" style="flex-grow: 0; flex-direction: row; margin-bottom: 0; align-self: auto;">
+            <engine:VisualElement name="Icon" style="flex-grow: 0; width: 96px; height: 96px; margin-right: 24px;" />
+            <engine:VisualElement name="Text" style="flex-grow: 1; justify-content: center;">
+                <engine:Label text="Talisman of Oblivion from an" name="Name" class="header-sm" style="-unity-text-align: upper-center; white-space: normal;" />
+                <engine:Label text="Fire, Piercing" name="Tags" class="label-sm" style="-unity-text-align: upper-center; height: 16px;" />
+                <engine:Label text="Mastery Level 1  Tier II" name="MasteryLevel" class="label-sm" style="-unity-text-align: upper-center; height: 16px;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="DecoratorLine" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        <engine:VisualElement name="Info" style="flex-grow: 0; margin-bottom: 0;">
+            <engine:Label text="Info" name="InfoTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;">
+                <engine:VisualElement name="Damage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Damage" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="138" name="DamageValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="BaseDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Base Damage" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="100" name="BaseDamageValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="BonusDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Bonus Damage" name="Title" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="38" name="BonusDamageValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="ScalingTypeDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Bonus Damage" name="Title" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label name="ScalingTypeValue" text="Additive" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="ManaCost" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Mana Cost" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="25" name="ManaCostValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Cooldown" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Cooldown" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="2 turn&#10;" name="CooldownValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="CastTime" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Cast Time" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="150" name="CastTimeValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="DamageType" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Damage Type" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Magical" name="DamageType" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="RangeType" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Range Type" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Ranged" name="DamageType" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="IgnoreDefence" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Ignore Defence" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="15 + 30%" name="IgnoreDefenceValue" class="label-sm" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Effects" style="flex-grow: 0; margin-bottom: 0;">
+            <engine:Label text="Effects" name="InfoTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;">
+                <engine:VisualElement name="OnHitEffects" style="flex-grow: 1; flex-direction: column; margin-bottom: 4px;">
+                    <engine:Label text="On hit effects" name="Label" class="label-sm" style="margin-bottom: 4px;" />
+                    <engine:VisualElement name="OnHitEffectsList" style="flex-grow: 1; flex-direction: column;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="OnCastEffects" style="flex-grow: 1; flex-direction: column;">
+                    <engine:Label text="On cast effects" name="Label" class="label-sm" style="margin-bottom: 4px;" />
+                    <engine:VisualElement name="OnCastEffectsList" style="flex-grow: 1; flex-direction: column;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Requirements" style="flex-grow: 0; margin-bottom: 0; margin-top: 0; margin-right: 0; margin-left: 0;">
+            <engine:Label text="Requirements" name="ReqTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RequirmentsList" style="flex-grow: 1;">
+                <engine:Label text="Level 15" name="LevelReq" class="label-sm" />
+                <engine:Label text="Mage" name="ClassReq" class="label-sm" />
+                <engine:Label text="Elementalist" name="SpecReq" class="label-sm" />
+            </engine:VisualElement>
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Detail" style="flex-grow: 0;">
+            <engine:Label text="This is best weapon you can find in any of thee game " name="DetailText" class="label-sm" style="flex-wrap: wrap-reverse; height: auto; white-space: normal;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

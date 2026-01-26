@@ -34,20 +34,21 @@ namespace MyGame.Combat
             Tier tier
         )
         {
-            int end = ClampMin(s.endurance, 0);
+            int str = ClampMin(s.strength, 0);
             int spi = ClampMin(s.spirit, 0);
 
             int t = (int)tier;
 
-            // Base: 1% of max HP.
+            // Base: 1% of max mana.
             float baseRegen = maxHp / 100f;
 
-            // Bonus: percent of max HP from stats (soft-capped).
+            // Bonus: percent of max mana from stats (soft-capped).
             // END:SPIRIT = 2:8 ratio (fixed-point x10).
-            int points10 = (end * 2 + spi * 8) * 10;
+            int points10 = (str * 2 + spi * 8) * 10;
 
-            // Up to +4% from stats (+1% per tier)
-            int maxBonusPercent = 4 + t; // Tier VI (5) => +9%
+            // Slightly higher early-game impact than HP regen.
+            // Example target: at maxMana=200 and Spirit=10, bonus ~ +3 per 10s.
+            int maxBonusPercent = 6 + t;
             int k10 = (200 + level * 20 + t * 300) * 10;
 
             float bonusPercent = SoftCapPercentFromPoints10(points10, maxBonusPercent, k10);

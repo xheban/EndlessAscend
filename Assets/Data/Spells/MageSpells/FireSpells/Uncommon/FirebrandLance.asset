@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0231aa55bd3a84eb427efb064502e3, type: 3}
+  m_Name: FirebrandLance
+  m_EditorClassIdentifier: 
+  spellId: firebrand_lance
+  displayName: Firebrand Lance
+  description: A tightly focused lance of fire driven straight toward its target.
+  icon: {fileID: 21300000, guid: 30a05537a89a8c342b78800afdd26248, type: 3}
+  allowedClasses: -1
+  allowedSpecs: -1
+  rarity: 1
+  manaCost: 25
+  cooldownTurns: 1
+  maxLevel: 20
+  baseDamage: 25
+  damageKind: 1
+  damageRangeType: 0
+  intent: 0
+  damageTag: 010000000a000000
+  tier: 0
+  ignoreDefenseFlat: 0
+  ignoreDefensePercent: 0
+  hitChance: 100
+  castTimeValue: 100
+  baseUseSpeed: 100
+  value: 100
+  damageScalingType: 0
+  damageScalingValue: 15
+  onHitEffects: []
+  onCastEffects: []

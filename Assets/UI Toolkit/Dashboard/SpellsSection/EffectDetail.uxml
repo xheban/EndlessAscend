@@ -1,0 +1,59 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="Detail" style="flex-grow: 0; width: 396px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_316&apos;); padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px;">
+        <engine:VisualElement name="Header" style="flex-grow: 0; flex-direction: row; margin-bottom: 0; align-self: auto;">
+            <engine:VisualElement name="Icon" style="flex-grow: 0; width: 96px; height: 96px; margin-right: 24px;" />
+            <engine:VisualElement name="Text" style="flex-grow: 1; justify-content: center;">
+                <engine:Label text="Burn" name="Name" class="header-sm" style="-unity-text-align: upper-center; white-space: normal;" />
+                <engine:Label text="Damage over time" name="Tags" class="label-sm" style="-unity-text-align: upper-center; height: 16px; margin-bottom: 2px;" />
+                <engine:Label text="Debuff" name="MasteryLevel" class="label-sm" style="-unity-text-align: upper-center; height: 16px;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="DecoratorLine" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        <engine:VisualElement name="Info" style="flex-grow: 0; margin-bottom: 0;">
+            <engine:Label text="Info" name="InfoTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;">
+                <engine:VisualElement name="Damage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Damage" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="200" name="DamageValue" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="of MP" name="DamageFrom" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Chance" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Chance" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="25%" name="ChanceValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Stacks" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Max stacks" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="1" name="StackValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Duration" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Duration" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="2 turns" name="DurationValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="DurationStacking" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Duration stacking" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Prolong" name="DurationStackingValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Stackable" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Stackable" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="True" name="StackableValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Mergeable" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Mergeable" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="True" name="MergeableValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="ReapplyRule" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Reapply Rule" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Ovverwreite if stringer" name="ReapplyRuleValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="RemoveWhen" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Remove when" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="duration of last stack end" name="RemoveWhenValue" class="label-sm" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Detail" style="flex-grow: 0;">
+            <engine:Label text="This is best weapon you can find in any of thee game " name="DetailText" class="label-sm" style="flex-wrap: wrap-reverse; height: auto; white-space: normal;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

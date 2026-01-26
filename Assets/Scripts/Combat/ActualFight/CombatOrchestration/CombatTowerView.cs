@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using MyGame.Combat;
 using MyGame.Common;
+using MyGame.Run;
+using MyGame.Save;
 using MyGame.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -50,6 +52,11 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
     // Buttons
     public Button RunButton { get; private set; }
 
+    // Items
+    public VisualElement ItemsPanel { get; private set; }
+    public VisualElement[] ItemSlots { get; private set; }
+    public SpellSlotView[] ItemSlotViews { get; private set; }
+
     public void Bind(VisualElement screenHost)
     {
         if (screenHost == null)
@@ -91,6 +98,9 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
                 SlotViews[i] = new SpellSlotView(SpellSlots[i]);
         }
 
+        CacheItemSlots(screenHost);
+        RefreshActiveCombatItemSlots();
+
         CacheCombatHud(screenHost);
     }
 
@@ -123,6 +133,168 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
 
         PlayerPlaceholder = null;
         EnemyPlaceholder = null;
+
+        ItemsPanel = null;
+        ItemSlots = null;
+        ItemSlotViews = null;
+    }
+
+    private void CacheItemSlots(VisualElement screenHost)
+    {
+        ItemsPanel = screenHost?.Q<VisualElement>("Items");
+
+        ItemSlots = new VisualElement[4];
+        if (ItemsPanel != null)
+        {
+            for (int i = 0; i < ItemSlots.Length; i++)
+            {
+                ItemSlots[i] = ItemsPanel.Q<VisualElement>($"ItemSlot{i + 1}");
+                if (ItemSlots[i] != null)
+                    ItemSlots[i].pickingMode = PickingMode.Position;
+            }
+        }
+
+        ItemSlotViews = new SpellSlotView[ItemSlots.Length];
+        for (int i = 0; i < ItemSlots.Length; i++)
+        {
+            if (ItemSlots[i] != null)
+                ItemSlotViews[i] = new SpellSlotView(ItemSlots[i]);
+        }
+    }
+
+    public void RefreshActiveCombatItemSlots()
+    {
+        if (ItemSlots == null || ItemSlots.Length == 0)
+            return;
+
+        // Clear visuals.
+        for (int i = 0; i < ItemSlots.Length; i++)
+        {
+            var slotRoot = ItemSlots[i];
+            if (slotRoot == null)
+                continue;
+
+            slotRoot.userData = null;
+            var imageVe = slotRoot.Q<VisualElement>("Image");
+            if (imageVe != null)
+                imageVe.style.backgroundImage = StyleKeyword.None;
+
+            var stacksLabel = slotRoot.Q<Label>("Stacks");
+            if (stacksLabel != null)
+            {
+                stacksLabel.text = string.Empty;
+                stacksLabel.style.display = DisplayStyle.None;
+            }
+
+            ItemSlotViews?[i]?.ResetCooldownVisuals();
+        }
+
+        if (!SaveSession.HasSave || SaveSession.Current == null)
+            return;
+
+        var save = SaveSession.Current;
+
+        // Ensure list exists and is 4 entries.
+        save.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
+        while (save.activeCombatSlots.Count < 4)
+            save.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());
+
+        var itemDb = GameConfigProvider.Instance?.ItemDatabase;
+        var equipDb = GameConfigProvider.Instance?.EquipmentDatabase;
+        var equipment = RunSession.Equipment;
+        var items = RunSession.Items;
+
+        for (int i = 0; i < 4 && i < ItemSlots.Length; i++)
+        {
+            var slotEl = ItemSlots[i];
+            if (slotEl == null)
+                continue;
+
+            var entry = save.activeCombatSlots[i];
+            if (entry == null)
+                continue;
+
+            // Equipment precedence.
+            if (!string.IsNullOrWhiteSpace(entry.equipmentInstanceId))
+            {
+                var inst =
+                    equipment != null ? equipment.GetInstance(entry.equipmentInstanceId) : null;
+                if (inst == null)
+                    continue;
+
+                var sprite = equipDb != null ? equipDb.GetIcon(inst.equipmentId) : null;
+                var imageVe = slotEl.Q<VisualElement>("Image");
+                if (sprite != null && imageVe != null)
+                    imageVe.style.backgroundImage = new StyleBackground(sprite);
+
+                // Equipment currently has no cooldown visuals.
+                slotEl.userData = null;
+
+                var stacksLabel = slotEl.Q<Label>("Stacks");
+                if (stacksLabel != null)
+                {
+                    stacksLabel.text = string.Empty;
+                    stacksLabel.style.display = DisplayStyle.None;
+                }
+
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(entry.itemId))
+            {
+                if (
+                    items == null
+                    || !items.Counts.TryGetValue(entry.itemId, out var qty)
+                    || qty <= 0
+                )
+                    continue;
+
+                var sprite = itemDb != null ? itemDb.GetIcon(entry.itemId) : null;
+                var imageVe = slotEl.Q<VisualElement>("Image");
+                if (sprite != null && imageVe != null)
+                    imageVe.style.backgroundImage = new StyleBackground(sprite);
+
+                slotEl.userData = entry.itemId;
+
+                var stacksLabel = slotEl.Q<Label>("Stacks");
+                if (stacksLabel != null)
+                {
+                    stacksLabel.text = qty.ToString();
+                    stacksLabel.style.display = DisplayStyle.Flex;
+                }
+            }
+        }
+    }
+
+    public void RefreshItemCooldownUI(CombatEngine engine)
+    {
+        if (engine == null || engine.State == null)
+            return;
+
+        if (ItemSlots == null || ItemSlotViews == null)
+            return;
+
+        int count = Mathf.Min(ItemSlots.Length, ItemSlotViews.Length);
+
+        for (int i = 0; i < count; i++)
+        {
+            var slotRoot = ItemSlots[i];
+            var view = ItemSlotViews[i];
+            if (slotRoot == null || view == null)
+                continue;
+
+            string itemId = slotRoot.userData as string;
+            if (string.IsNullOrWhiteSpace(itemId))
+            {
+                view.ResetCooldownVisuals();
+                continue;
+            }
+
+            if (engine.TryGetPlayerItemCooldown(itemId, out int remaining, out int max))
+                view.SetCooldown(remaining, max);
+            else
+                view.ResetCooldownVisuals();
+        }
     }
 
     public void LogLine(string line) => AppendLog(line);
@@ -255,6 +427,8 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
         slot.style.visibility = Visibility.Hidden;
         slot.pickingMode = PickingMode.Ignore; // no hover/click/tooltip
 
+        slot.userData = null;
+
         // Reset visuals
         var icon = slot.Q<VisualElement>("Icon");
         if (icon != null)
@@ -335,6 +509,9 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
 
         ShowSlot(slot);
 
+        // Store definition so CombatTowerController can show name-only tooltips.
+        slot.userData = e.definition;
+
         // ICON
         // Replace "icon" with your real field name in EffectDefinition
         Sprite iconSprite = e.definition.icon; // <-- adjust if needed
@@ -354,8 +531,11 @@ public sealed class CombatTowerView : ICombatLogSink, ICombatUiSink
         if (duration != null)
             duration.text = e.MaxRemainingTurns > 0 ? e.MaxRemainingTurns.ToString() : "";
 
-        // Tooltip (nice for debugging)
-        slot.tooltip = $"{e.effectId} ({e.polarity})";
+        // Keep UI Toolkit tooltip simple (combat uses ScreenSwapper overlay tooltips).
+        string name = string.IsNullOrWhiteSpace(e.definition.displayName)
+            ? e.effectId
+            : e.definition.displayName;
+        slot.tooltip = name;
     }
 
     // -------------------------

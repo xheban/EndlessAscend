@@ -27,9 +27,12 @@ MonoBehaviour:
     endurance: 1
   baseExp: 2
   baseGold: 1
+  goldMin: 3
+  goldMax: 5
   spells:
   - spellId: slime_attack
     level: 1
     weight: 1
+  baseLoot: {fileID: 11400000, guid: ce376c58d68ebd146a38046cb17cdd2f, type: 2}
   lootTable: []
   tags: 131072

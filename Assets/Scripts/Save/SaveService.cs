@@ -9,6 +9,7 @@ namespace MyGame.Save
 {
     public static class SaveService
     {
+        private const int CurrentSaveVersion = 19;
         private const int MaxSlots = 5;
         private const string FilePrefix = "save_slot_";
         private const string FileExt = ".json";
@@ -169,6 +170,36 @@ namespace MyGame.Save
                     data.version = 15;
                 }
 
+                if (data.version < 16)
+                {
+                    data.equipmentInventorySlots ??= new List<SavedEquipmentInventorySlotEntry>();
+                    data.version = 16;
+                }
+
+                if (data.version < 17)
+                {
+                    // Rolled modifier values are now stored as ints.
+                    // No migration needed (legacy float values will be dropped/rounded by Unity deserialization).
+                    data.version = 17;
+                }
+
+                if (data.version < 18)
+                {
+                    data.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
+
+                    // Ensure exactly 4 entries exist (Slot1..Slot4)
+                    while (data.activeCombatSlots.Count < 4)
+                        data.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());
+
+                    data.version = 18;
+                }
+
+                if (data.version < 19)
+                {
+                    data.persistentItemCooldowns ??= new List<SavedItemCooldownEntry>();
+                    data.version = 19;
+                }
+
                 NormalizeInventoryRollLists(data);
 
                 return data;
@@ -202,8 +233,8 @@ namespace MyGame.Save
                 if (data.version < 4)
                     data.version = 4;
 
-                if (data.version < 15)
-                    data.version = 15;
+                if (data.version < CurrentSaveVersion)
+                    data.version = CurrentSaveVersion;
 
                 var json = JsonUtility.ToJson(data, prettyPrint: true);
                 File.WriteAllText(GetSlotPath(slot), json);
@@ -246,6 +277,11 @@ namespace MyGame.Save
             data.items ??= new List<SavedItemStackEntry>();
             data.equipmentInstances ??= new List<SavedEquipmentInstance>();
             data.equippedSlots ??= new List<SavedEquippedSlot>();
+            data.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
+            data.persistentItemCooldowns ??= new List<SavedItemCooldownEntry>();
+
+            while (data.activeCombatSlots.Count < 4)
+                data.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());
 
             if (data.equipmentInstances == null)
                 return;

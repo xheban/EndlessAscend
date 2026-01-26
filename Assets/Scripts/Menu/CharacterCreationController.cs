@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MyGame.Common;
 using MyGame.Economy;
+using MyGame.Inventory;
 using MyGame.Run;
 using MyGame.Save;
 using MyName.Equipment;
@@ -665,6 +666,11 @@ public class CharacterCreationController : MonoBehaviour, IScreenController
 
         ApplyStarterInventory(data);
 
+        // Start at full vitals based on final stats + starter gear bonuses.
+        var derived = PlayerDerivedStatsResolver.BuildEffectiveDerivedStats(data);
+        data.currentHp = Mathf.Max(1, derived.maxHp);
+        data.currentMana = Mathf.Max(0, derived.maxMana);
+
         if (SaveService.TryCreateNewSave(data, out int outSlot))
         {
             SaveSession.SetCurrent(outSlot, data);
@@ -763,93 +769,7 @@ public class CharacterCreationController : MonoBehaviour, IScreenController
 
     private static void GrantAndEquipEquipment(SaveData data, string equipmentId)
     {
-        if (data == null || string.IsNullOrWhiteSpace(equipmentId))
-            return;
-
-        data.equipmentInstances ??= new List<SavedEquipmentInstance>();
-        data.equippedSlots ??= new List<SavedEquippedSlot>();
-
-        // Create a unique instance so we can support random rolls.
-        string instanceId = Guid.NewGuid().ToString("N");
-
-        var inst = new SavedEquipmentInstance
-        {
-            instanceId = instanceId,
-            equipmentId = equipmentId,
-            rolledBaseStatMods = new List<BaseStatModifier>(),
-            rolledDerivedStatMods = new List<DerivedStatModifier>(),
-            rolledSpellMods = new List<MyGame.Combat.SpellCombatModifier>(),
-            rolledSpellOverrides = new List<MyGame.Combat.SpellVariableOverride>(),
-        };
-
-        data.equipmentInstances.Add(inst);
-
-        // Determine equip slot from definition (preferred), else fallback heuristics.
-        var def =
-            GameConfigProvider.Instance != null
-                ? GameConfigProvider.Instance.EquipmentDatabase?.GetById(equipmentId)
-                : null;
-        EquipmentSlot slot = def != null ? def.slot : EquipmentSlot.None;
-
-        // Roll affixes (save explicit rolled values)
-        if (def != null)
-        {
-            var rng = new System.Random(instanceId.GetHashCode());
-
-            // New: rarity-driven roll system.
-            // Total rolls come from rarity, and each roll is assigned to a roll group
-            // weighted by that group’s remaining eligible rules.
-            EquipmentRoller.RollAllByRarity(
-                def,
-                rng,
-                inst.rolledBaseStatMods,
-                inst.rolledDerivedStatMods,
-                inst.rolledSpellMods,
-                inst.rolledSpellOverrides
-            );
-        }
-
-        if (slot == EquipmentSlot.None)
-        {
-            var key = equipmentId.Trim().ToLowerInvariant();
-            if (key.Contains("boot"))
-                slot = EquipmentSlot.Feet;
-            else if (key.Contains("bow") || key.Contains("ranged"))
-                slot = EquipmentSlot.Ranged;
-            else
-                slot = EquipmentSlot.MainHand;
-        }
-
-        UpsertEquippedSlot(data, slot, instanceId);
-    }
-
-    private static void UpsertEquippedSlot(
-        SaveData data,
-        EquipmentSlot slot,
-        string equipmentInstanceId
-    )
-    {
-        if (data == null || slot == EquipmentSlot.None)
-            return;
-
-        data.equippedSlots ??= new List<SavedEquippedSlot>();
-
-        for (int i = 0; i < data.equippedSlots.Count; i++)
-        {
-            var e = data.equippedSlots[i];
-            if (e == null)
-                continue;
-
-            if (e.slot == slot)
-            {
-                e.equipmentInstanceId = equipmentInstanceId;
-                return;
-            }
-        }
-
-        data.equippedSlots.Add(
-            new SavedEquippedSlot { slot = slot, equipmentInstanceId = equipmentInstanceId }
-        );
+        InventoryGrantService.GrantAndEquipEquipment(data, equipmentId);
     }
 
     private void ApplyBaseStats()

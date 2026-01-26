@@ -22,8 +22,12 @@ namespace MyGame.Rewards
 
         public sealed class LootItem
         {
+            public LootDropKind kind;
             public string lootId; // e.g. "potion_small"
             public int stackCount; // e.g. 3
+
+            // Populated when granting equipment (runtime/save). Null for items.
+            public string equipmentInstanceId;
         }
     }
 }

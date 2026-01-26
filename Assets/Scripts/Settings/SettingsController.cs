@@ -11,6 +11,7 @@ public sealed class SettingsController : MonoBehaviour, IOverlayController
         public VisualElement Panel;
         public ISettingsTabController Controller;
         public string Name; // optional, for debugging
+        public EventCallback<PointerDownEvent> OnHeaderClick;
     }
 
     private const string PickedClass = "panel-picked";
@@ -164,11 +165,12 @@ public sealed class SettingsController : MonoBehaviour, IOverlayController
             if (tab.Header == null)
                 continue;
 
-            tab.Header.RegisterCallback<PointerDownEvent>(_ =>
+            tab.OnHeaderClick = _ =>
             {
                 SelectHeader(tab.Header);
                 ShowTab(tab);
-            });
+            };
+            tab.Header.RegisterCallback(tab.OnHeaderClick);
         }
 
         // Default tab
@@ -186,7 +188,11 @@ public sealed class SettingsController : MonoBehaviour, IOverlayController
             _activeTab.Controller?.OnHide();
 
         foreach (var tab in _tabs)
+        {
+            if (tab.Header != null && tab.OnHeaderClick != null)
+                tab.Header.UnregisterCallback(tab.OnHeaderClick);
             tab.Controller?.Unbind();
+        }
 
         _tabs.Clear();
         _activeTab = null;

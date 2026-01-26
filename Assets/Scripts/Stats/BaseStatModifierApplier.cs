@@ -58,11 +58,11 @@ namespace MyGame.Common
                 flatInt = 0,
                 flatSpr = 0,
                 flatEnd = 0;
-            float pctStr = 0f,
-                pctAgi = 0f,
-                pctInt = 0f,
-                pctSpr = 0f,
-                pctEnd = 0f;
+            int pctStr = 0,
+                pctAgi = 0,
+                pctInt = 0,
+                pctSpr = 0,
+                pctEnd = 0;
 
             foreach (var m in mods)
             {
@@ -70,35 +70,35 @@ namespace MyGame.Common
                 {
                     case BaseStatType.Strength:
                         if (m.op == ModOp.Flat)
-                            flatStr += Mathf.RoundToInt(m.value);
+                            flatStr += m.value;
                         else if (m.op == ModOp.Percent)
                             pctStr += m.value;
                         break;
 
                     case BaseStatType.Agility:
                         if (m.op == ModOp.Flat)
-                            flatAgi += Mathf.RoundToInt(m.value);
+                            flatAgi += m.value;
                         else if (m.op == ModOp.Percent)
                             pctAgi += m.value;
                         break;
 
                     case BaseStatType.Intelligence:
                         if (m.op == ModOp.Flat)
-                            flatInt += Mathf.RoundToInt(m.value);
+                            flatInt += m.value;
                         else if (m.op == ModOp.Percent)
                             pctInt += m.value;
                         break;
 
                     case BaseStatType.Spirit:
                         if (m.op == ModOp.Flat)
-                            flatSpr += Mathf.RoundToInt(m.value);
+                            flatSpr += m.value;
                         else if (m.op == ModOp.Percent)
                             pctSpr += m.value;
                         break;
 
                     case BaseStatType.Endurance:
                         if (m.op == ModOp.Flat)
-                            flatEnd += Mathf.RoundToInt(m.value);
+                            flatEnd += m.value;
                         else if (m.op == ModOp.Percent)
                             pctEnd += m.value;
                         break;
@@ -114,9 +114,10 @@ namespace MyGame.Common
             return baseStats;
         }
 
-        private static int Apply(int baseValue, int flatAdd, float pctAdd)
+        private static int Apply(int baseValue, int flatAdd, int pctAdd)
         {
-            int pctFromBase = Mathf.RoundToInt(baseValue * (pctAdd / 100f));
+            // pctAdd is whole percent (10 => +10%). Round to nearest int.
+            int pctFromBase = (baseValue * pctAdd + (pctAdd >= 0 ? 50 : -50)) / 100;
             int outV = baseValue + flatAdd + pctFromBase;
             return outV < 0 ? 0 : outV;
         }

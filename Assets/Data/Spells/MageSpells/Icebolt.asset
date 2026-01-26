@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spellId: icebolt
   displayName: Icebolt
-  description: 
+  description: Ice go brrrr
   icon: {fileID: 21300000, guid: c0ba3f4e726debe4387c6d0b3d709017, type: 3}
   allowedClasses: 1
   allowedSpecs: -1
@@ -24,13 +24,16 @@ MonoBehaviour:
   maxLevel: 10
   baseDamage: 10
   damageKind: 1
+  damageRangeType: 0
   intent: 0
   damageTag: 02000000
   tier: 0
   ignoreDefenseFlat: 20
   ignoreDefensePercent: 10
   hitChance: 100
+  castTimeValue: 100
   baseUseSpeed: 100
+  value: 100
   damageScalingType: 0
   damageScalingValue: 5
   onHitEffects:

@@ -14,10 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: wooden_wand
   displayName: Wooden Wand
+  description: 
   slot: 6
+  usableInCombat: 0
   rarity: 1
+  requiredLevel: 1
+  tier: 0
+  goldValue: 0
+  level: 1
   handedness: 1
-  icon: {fileID: -4618416492961402784, guid: 09b7753b4dd660447bd6c136ff857902, type: 3}
+  flatStatRequirements: []
+  icon: {fileID: 21300000, guid: 09b7753b4dd660447bd6c136ff857902, type: 3}
   minBaseRolls: 0
   maxBaseRolls: 2
   allowDuplicateBaseRolls: 0

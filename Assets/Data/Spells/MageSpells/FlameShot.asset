@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0231aa55bd3a84eb427efb064502e3, type: 3}
+  m_Name: FlameShot
+  m_EditorClassIdentifier: 
+  spellId: flame_shot
+  displayName: Flame Shot
+  description: Flame shot one of more advanced mage spells
+  icon: {fileID: 21300000, guid: 96ca7098947388d40b7f072c3d89e40b, type: 3}
+  allowedClasses: 1
+  allowedSpecs: -1
+  rarity: 1
+  manaCost: 25
+  cooldownTurns: 2
+  maxLevel: 20
+  baseDamage: 40
+  damageKind: 1
+  damageRangeType: 1
+  intent: 0
+  damageTag: 01000000
+  tier: 0
+  ignoreDefenseFlat: 0
+  ignoreDefensePercent: 0
+  hitChance: 100
+  castTimeValue: 100
+  baseUseSpeed: 100
+  damageScalingType: 0
+  damageScalingValue: 10
+  onHitEffects: []
+  onCastEffects: []

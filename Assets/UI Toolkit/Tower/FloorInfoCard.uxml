@@ -5,7 +5,7 @@
             <engine:Label text="FLOOR 1" name="Floor" class="header-sm" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
             <engine:Label text="Giant RAT" name="MonsterName" class="header-sm" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-text-align: upper-center; flex-grow: 1;" />
         </engine:VisualElement>
-        <engine:VisualElement name="MonsterInfo" style="flex-grow: 1; flex-direction: row; display: none;">
+        <engine:VisualElement name="MonsterInfo" style="flex-grow: 1; flex-direction: row; display: flex;">
             <engine:VisualElement name="MonsterIconFrame" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decorated_bar.png?fileID=2800000&amp;guid=b31566610f7bd834996d9729526d39de&amp;type=3#Decorated_bar&quot;); background-size: 100% 100%; width: 80px; height: 80px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 6px; margin-bottom: 0; margin-left: 6px; justify-content: flex-start; align-self: center;">
                 <engine:VisualElement name="MonsterIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/Icons/26_apple.png?fileID=2800000&amp;guid=5c99ae1e6ada67540bb7da32fb57884d&amp;type=3#26_apple&quot;); margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px; justify-content: flex-start;" />
             </engine:VisualElement>
@@ -108,7 +108,7 @@
                 </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement name="Lock" style="flex-grow: 1; display: flex;">
+        <engine:VisualElement name="Lock" style="flex-grow: 1; display: none;">
             <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;Downloaded/Pixel Art Padlock Pack - Animated/BLACK/Sprites/Old Padlock - BLACK - 0015&apos;); -unity-background-scale-mode: scale-to-fit; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px;" />
         </engine:VisualElement>
     </engine:VisualElement>

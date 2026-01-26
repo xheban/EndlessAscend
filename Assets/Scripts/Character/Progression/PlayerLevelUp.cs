@@ -1,6 +1,7 @@
 using System;
 using MyGame.Combat;
 using MyGame.Common;
+using MyGame.Helpers;
 using MyGame.Save;
 using UnityEngine;
 
@@ -37,6 +38,9 @@ namespace MyGame.Progression
 
             int gained = 0;
 
+            int pointsPerLevel = 4 * HelperFunctions.TierToFlatBonusMultiplier(save.tier);
+            pointsPerLevel = Mathf.Max(0, pointsPerLevel);
+
             while (true)
             {
                 long required = GetXpRequiredForLevel(save.level);
@@ -46,6 +50,9 @@ namespace MyGame.Progression
                 save.exp -= required;
                 save.level += 1;
                 gained += 1;
+
+                // Grant free stat points each level-up (scales with player tier)
+                save.unspentStatPoints += pointsPerLevel;
 
                 // Optional: heal on level up (use fully bonused max values)
                 var derived = PlayerDerivedStatsResolver.BuildEffectiveDerivedStats(save);

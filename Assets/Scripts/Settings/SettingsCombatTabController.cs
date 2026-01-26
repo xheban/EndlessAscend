@@ -49,7 +49,9 @@ public sealed class SettingsCombatTabController : ISettingsTabController
             return;
 
         KeybindPrefs.EnsureSpellDefaults();
+        KeybindPrefs.EnsureItemDefaults();
         PopulateSpellBindings();
+        PopulateItemBindings();
     }
 
     public void OnHide()
@@ -99,6 +101,41 @@ public sealed class SettingsCombatTabController : ISettingsTabController
                 OpenKeyBindOverlay(capturedSlotIndex, valueBox);
             });
         }
+
+        // UXML path: CombatSettings / Binding / Items / ItemBindingList
+        var itemBindingList = _panel.Q<VisualElement>("ItemBindingList");
+        if (itemBindingList == null)
+        {
+            Debug.LogError(
+                "SettingsCombatTabController.RegisterValueClicks: ItemBindingList not found."
+            );
+            return;
+        }
+
+        for (int slotIndex = 0; slotIndex < KeybindPrefs.ItemSlotCount; slotIndex++)
+        {
+            var row = itemBindingList.Q<VisualElement>($"Slot{slotIndex + 1}");
+            if (row == null)
+                continue;
+
+            var valueBox = row.Q<VisualElement>("Value");
+            if (valueBox == null)
+                continue;
+
+            valueBox.pickingMode = PickingMode.Position;
+
+            // Inner label shouldn't steal clicks
+            var valueLabel = valueBox.Q<Label>();
+            if (valueLabel != null)
+                valueLabel.pickingMode = PickingMode.Ignore;
+
+            int capturedSlotIndex = slotIndex;
+
+            valueBox.RegisterCallback<PointerDownEvent>(_ =>
+            {
+                OpenItemKeyBindOverlay(capturedSlotIndex, valueBox);
+            });
+        }
     }
 
     private void OpenKeyBindOverlay(int slotIndex, VisualElement valueBox)
@@ -123,10 +160,46 @@ public sealed class SettingsCombatTabController : ISettingsTabController
                 // When user confirms binding in the overlay:
                 OnBound = newKey =>
                 {
-                    KeybindPrefs.SetSpellSlotKey(slotIndex, newKey);
+                    KeybindPrefs.ReplaceSpellSlotKey(slotIndex, newKey);
 
-                    if (valueLabel != null)
-                        valueLabel.text = FormatKey(newKey);
+                    // Refresh both lists so any cleared duplicates update immediately.
+                    PopulateSpellBindings();
+                    PopulateItemBindings();
+                },
+
+                OnCancelled = () => {
+                    // no-op
+                },
+
+                IgnoreMouseButtons = true,
+            }
+        );
+    }
+
+    private void OpenItemKeyBindOverlay(int slotIndex, VisualElement valueBox)
+    {
+        var currentKey = KeybindPrefs.GetItemSlotKey(slotIndex);
+
+        var valueLabel = valueBox.Q<Label>();
+
+        int slotNumber = slotIndex + 1;
+
+        _swapper.ShowOverlay(
+            KeyBindOverlayId,
+            new KeyBindOverlayContext
+            {
+                Title = "Bind",
+                TargetName = $"Item {slotNumber}",
+                Message = $"Press any new keybind you want to bind for Item {slotNumber}.",
+                CurrentKey = currentKey,
+
+                OnBound = newKey =>
+                {
+                    KeybindPrefs.ReplaceItemSlotKey(slotIndex, newKey);
+
+                    // Refresh both lists so any cleared duplicates update immediately.
+                    PopulateSpellBindings();
+                    PopulateItemBindings();
                 },
 
                 OnCancelled = () => {
@@ -161,6 +234,32 @@ public sealed class SettingsCombatTabController : ISettingsTabController
                 continue;
 
             valueLabel.text = FormatKey(KeybindPrefs.GetSpellSlotKey(slotIndex));
+        }
+    }
+
+    private void PopulateItemBindings()
+    {
+        var itemBindingList = _panel.Q<VisualElement>("ItemBindingList");
+        if (itemBindingList == null)
+        {
+            Debug.LogError(
+                "SettingsCombatTabController.PopulateItemBindings: ItemBindingList not found."
+            );
+            return;
+        }
+
+        for (int slotIndex = 0; slotIndex < KeybindPrefs.ItemSlotCount; slotIndex++)
+        {
+            var row = itemBindingList.Q<VisualElement>($"Slot{slotIndex + 1}");
+            if (row == null)
+                continue;
+
+            var valueBox = row.Q<VisualElement>("Value");
+            var valueLabel = valueBox?.Q<Label>();
+            if (valueLabel == null)
+                continue;
+
+            valueLabel.text = FormatKey(KeybindPrefs.GetItemSlotKey(slotIndex));
         }
     }
 

@@ -9,7 +9,7 @@ namespace MyGame.Save
     public sealed class SaveData
     {
         // Increase when you change the structure
-        public int version = 15;
+        public int version = 19;
 
         // Identity
         public string saveId; // GUID string
@@ -50,6 +50,21 @@ namespace MyGame.Save
         public List<SavedItemStackEntry> items = new List<SavedItemStackEntry>();
         public List<SavedEquipmentInstance> equipmentInstances = new List<SavedEquipmentInstance>();
         public List<SavedEquippedSlot> equippedSlots = new List<SavedEquippedSlot>();
+
+        // ✅ Equipment Inventory UI layout (fixed slot positions)
+        // Stores where equipment instances appear in the Equipment Inventory grid.
+        public List<SavedEquipmentInventorySlotEntry> equipmentInventorySlots =
+            new List<SavedEquipmentInventorySlotEntry>();
+
+        // ✅ Active combat item slots (Inventory UI)
+        // 4 fixed slots which can hold either an itemId OR an equipmentInstanceId.
+        public List<SavedCombatActiveSlotEntry> activeCombatSlots =
+            new List<SavedCombatActiveSlotEntry>();
+
+        // ✅ Persistent item cooldowns (optional)
+        // Only used for items flagged to carry cooldown between fights.
+        public List<SavedItemCooldownEntry> persistentItemCooldowns =
+            new List<SavedItemCooldownEntry>();
 
         // Metadata
         public string createdUtc;

@@ -1,4 +1,5 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="InventoryDetail" src="project://database/Assets/UI%20Toolkit/Dashboard/InventorySection/InventoryDetail.uxml?fileID=9197481963319205126&amp;guid=36fb6c1b1888bc24491de2cc90c3d0d4&amp;type=3#InventoryDetail" />
     <engine:VisualElement name="Holder" style="flex-grow: 0; height: auto;">
         <engine:VisualElement name="Modal" style="flex-grow: 1; width: 640px; height: auto; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256.png?fileID=1422470188&amp;guid=79edde4c35b3a5a4aa4a5455f0b557a5&amp;type=3#Frame_square_256_0&quot;); margin-top: 32px;">
             <engine:VisualElement name="Body" style="flex-grow: 0; padding-top: 48px; padding-right: 32px; padding-bottom: 16px; padding-left: 32px;">
@@ -49,5 +50,7 @@
         <engine:VisualElement name="Header" style="flex-grow: 0; height: 66px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Title_frame_0L.png?fileID=21300000&amp;guid=a973f2edcb1f395428f9fa415189d698&amp;type=3#Title_frame_0L&quot;); width: 232px; position: absolute; top: 1px; left: 205px; right: 204px; bottom: auto; justify-content: flex-end;">
             <engine:Label text="Load Game" name="Title" class="header-md" style="align-self: center; -unity-text-align: middle-center; color: rgb(164, 164, 164);" />
         </engine:VisualElement>
+
+        <engine:Instance template="InventoryDetail" name="InventoryDetailTooltip" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; display: none;" />
     </engine:VisualElement>
 </engine:UXML>

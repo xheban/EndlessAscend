@@ -39,13 +39,23 @@ public class MonsterDefinition : ScriptableObject
     [SerializeField]
     private int baseGold;
 
+    [SerializeField]
+    private int goldMin;
+
+    [SerializeField]
+    private int goldMax;
+
     [Header("Spells")]
     [SerializeField]
     private List<MonsterSpellEntry> spells = new();
     public IReadOnlyList<MonsterSpellEntry> Spells => spells;
 
-    [Header("Loot Table (empty for now)")]
+    [Header("Loot (Items + Equipment)")]
     [SerializeField]
+    private LootTableDefinition baseLoot;
+
+    [Header("Legacy Loot (deprecated)")]
+    [SerializeField, HideInInspector]
     private List<MonsterLootEntry> lootTable = new();
 
     [Header("Tags")]
@@ -64,9 +74,14 @@ public class MonsterDefinition : ScriptableObject
 
     public int BaseExp => baseExp;
     public int BaseGold => baseGold;
+
+    public int GoldMin => (goldMin == 0 && goldMax == 0) ? baseGold : Mathf.Min(goldMin, goldMax);
+    public int GoldMax => (goldMin == 0 && goldMax == 0) ? baseGold : Mathf.Max(goldMin, goldMax);
     public float Size => size;
 
     public IReadOnlyList<MonsterLootEntry> LootTable => lootTable;
+
+    public LootTableDefinition BaseLoot => baseLoot;
     public MonsterTag Tags => tags;
 
 #if UNITY_EDITOR
@@ -74,6 +89,25 @@ public class MonsterDefinition : ScriptableObject
     {
         if (string.IsNullOrWhiteSpace(id))
             id = name.Trim().Replace(" ", "_").ToLowerInvariant();
+
+        // Keep gold range sane in the inspector.
+        if (goldMin < 0)
+            goldMin = 0;
+        if (goldMax < 0)
+            goldMax = 0;
+
+        // One-time-ish convenience: if this monster was authored with legacy baseGold,
+        // and the new range is still unset, mirror it into the range.
+        if (goldMin == 0 && goldMax == 0 && baseGold > 0)
+        {
+            goldMin = baseGold;
+            goldMax = baseGold;
+        }
+
+        // If a designer sets a fixed range (min==max), keep legacy baseGold aligned
+        // so older reward code paths remain consistent until we migrate them.
+        if (goldMin > 0 && goldMin == goldMax)
+            baseGold = goldMin;
     }
 #endif
 }

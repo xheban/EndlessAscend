@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a0a6edff5f45040bdacd84c74502ac, type: 3}
+  m_Name: SlimeLoot
+  m_EditorClassIdentifier: 
+  dropCountCdf:
+  - count: 1
+    chanceAtLeastPercent: 100
+  - count: 2
+    chanceAtLeastPercent: 50
+  - count: 3
+    chanceAtLeastPercent: 15
+  guaranteedDrops:
+  - drop:
+      kind: 0
+      itemId: lesser_health_potion
+      itemMinAmount: 1
+      itemMaxAmount: 2
+      equipmentId: 
+    guaranteedCount: 1
+  pickMode: 0
+  weightedPool:
+  - drop:
+      kind: 0
+      itemId: lesser_health_potion
+      itemMinAmount: 1
+      itemMaxAmount: 1
+      equipmentId: 
+    weight: 20
+  - drop:
+      kind: 1
+      itemId: 
+      itemMinAmount: 1
+      itemMaxAmount: 1
+      equipmentId: rusty_sword
+    weight: 80
+  - drop:
+      kind: 1
+      itemId: 
+      itemMinAmount: 1
+      itemMaxAmount: 1
+      equipmentId: rusty_sword
+    weight: 40

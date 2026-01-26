@@ -91,12 +91,31 @@
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="VisualSeparator" style="flex-grow: 0; flex-shrink: 0; width: 32px; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Decor_cross_vert.png?fileID=21300000&amp;guid=7bc6b269c7d8e8f4fa0c16c429e1c669&amp;type=3#Decor_cross_vert&quot;); -unity-background-scale-mode: scale-to-fit; background-repeat: repeat repeat; margin-left: 0; margin-right: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 6px; margin-bottom: 12px;" />
-        <engine:VisualElement name="Currencies" style="flex-grow: 0; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; width: 240px;">
-            <engine:Label text="Currencies" name="EquippedItemsTitle" double-click-selects-word="false" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; margin-bottom: 24px;" />
-            <engine:VisualElement name="CurrencyList" style="flex-grow: 1;">
+        <engine:VisualElement name="CurrenciesActiveItems" style="flex-grow: 0; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; width: 240px;">
+            <engine:Label text="Currencies" name="CurrencyTitle" double-click-selects-word="false" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; margin-bottom: 24px;" />
+            <engine:VisualElement name="CurrencyList" style="flex-grow: 0; margin-bottom: 16px;">
                 <engine:VisualElement name="Gold" style="flex-grow: 0; flex-direction: row;">
                     <engine:VisualElement name="Icon" style="flex-grow: 0; width: 48px; height: 48px; margin-right: 8px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/Icons/32_coin&apos;);" />
                     <engine:Label text="1200" name="Value" class="label-md" style="-unity-text-align: middle-left;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:Label text="Combat Item&#10;Slots" name="ActiveItems" double-click-selects-word="false" class="label-md" style="align-content: flex-end; justify-content: flex-end; -unity-text-align: upper-center; margin-bottom: 24px;" />
+            <engine:VisualElement name="ActiveCombatItems" style="flex-grow: 0; align-self: center;">
+                <engine:VisualElement name="Row1" style="flex-grow: 0; flex-direction: row; margin-bottom: 8px;">
+                    <engine:VisualElement name="Slot1" style="flex-grow: 0; width: 80px; height: 80px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory&apos;); margin-right: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Slot2" style="flex-grow: 0; width: 80px; height: 80px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Row2" style="flex-grow: 0; flex-direction: row;">
+                    <engine:VisualElement name="Slot3" style="flex-grow: 0; width: 80px; height: 80px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory&apos;); margin-right: 8px; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Slot4" style="flex-grow: 0; width: 80px; height: 80px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Icon_inventory&apos;); padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                        <engine:VisualElement name="Icon" style="flex-grow: 1;" />
+                    </engine:VisualElement>
                 </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>

@@ -9,6 +9,8 @@ namespace MyGame.UI.Spells
         private readonly VisualElement _root;
         private readonly Func<int, bool> _isSlotUnlocked;
         private readonly Action<int> _onDropToSlotIndex;
+        private readonly Action _onDragStarted;
+        private readonly Action _onDragEnded;
 
         private VisualElement _ghost;
         private int _pointerId = -1;
@@ -17,12 +19,16 @@ namespace MyGame.UI.Spells
         public SpellDragController(
             VisualElement root,
             Func<int, bool> isSlotUnlocked,
-            Action<int> onDropToSlotIndex
+            Action<int> onDropToSlotIndex,
+            Action onDragStarted = null,
+            Action onDragEnded = null
         )
         {
             _root = root;
             _isSlotUnlocked = isSlotUnlocked;
             _onDropToSlotIndex = onDropToSlotIndex;
+            _onDragStarted = onDragStarted;
+            _onDragEnded = onDragEnded;
         }
 
         public void BeginDrag(PointerDownEvent evt, Sprite iconSprite)
@@ -31,6 +37,7 @@ namespace MyGame.UI.Spells
                 return;
 
             _dragging = true;
+            _onDragStarted?.Invoke();
             _pointerId = evt.pointerId;
             _root.RegisterCallback<PointerCaptureOutEvent>(OnCaptureOut);
 
@@ -85,9 +92,19 @@ namespace MyGame.UI.Spells
 
         private void MoveGhost(Vector2 pos)
         {
-            // slight offset so cursor doesn't sit directly on top
-            _ghost.style.left = pos.x - 32;
-            _ghost.style.top = pos.y - 40;
+            if (_ghost == null || _root == null)
+                return;
+
+            // `pos` is in panel/world space; absolute positioning expects coordinates in the parent's local space.
+            var local = _root.WorldToLocal(pos);
+
+            float halfW = _ghost.resolvedStyle.width > 1f ? _ghost.resolvedStyle.width * 0.5f : 32f;
+            float halfH =
+                _ghost.resolvedStyle.height > 1f ? _ghost.resolvedStyle.height * 0.5f : 32f;
+
+            _ghost.style.left = local.x - halfW;
+            _ghost.style.top = local.y - halfH;
+            _ghost.BringToFront();
         }
 
         private int TryGetSlotIndexUnderPointer(Vector2 pos)
@@ -117,6 +134,7 @@ namespace MyGame.UI.Spells
 
         private void Cleanup()
         {
+            bool wasDragging = _dragging;
             _dragging = false;
 
             if (_root != null && _pointerId != -1)
@@ -134,6 +152,9 @@ namespace MyGame.UI.Spells
 
             _ghost = null;
             _pointerId = -1;
+
+            if (wasDragging)
+                _onDragEnded?.Invoke();
         }
 
         public void CancelDrag()

@@ -2,7 +2,7 @@
     <engine:Template name="Separator" src="project://database/Assets/UI%20Toolkit/Components/Utils/Separator.uxml?fileID=9197481963319205126&amp;guid=0455613e7a8639a42a23c1a0065e009a&amp;type=3#Separator" />
     <Style src="project://database/Assets/UI%20Toolkit/Components/Settings.uss?fileID=7433441132597879392&amp;guid=b0e04a19d44a5944986e8a3311c721df&amp;type=3#Settings" />
     <engine:VisualElement name="Settings" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_bg_big_and_title&apos;); background-size: 100% 100%; width: 60%; height: 80%; -unity-slice-scale: 1.5px;">
-        <engine:VisualElement name="Header" style="flex-grow: 0; background-size: 100% 64px; height: 48px; flex-direction: row; justify-content: center; padding-top: 8px; padding-bottom: 6px;">
+        <engine:VisualElement name="Header" style="flex-grow: 0; background-size: 100% 64px; height: 48px; flex-direction: row; justify-content: center; padding-top: 14px; padding-bottom: 10px;">
             <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 20px; height: 20px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
             <engine:VisualElement name="GameSettings" class="panel-picked header-item clickable" style="flex-grow: 0; display: flex;">
                 <engine:Label text="Game" class="header-xs" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 8px; padding-bottom: 0; padding-left: 8px; align-self: auto; flex-grow: 1; -unity-text-align: middle-center;" />
@@ -14,7 +14,7 @@
             <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 20px; height: 20px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
         </engine:VisualElement>
         <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 16px; padding-right: 16px; padding-bottom: 16px; padding-left: 16px; min-height: 0;">
-            <engine:VisualElement name="GameSettings" style="flex-grow: 1; flex-direction: row; display: flex; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; align-self: center; width: 100%;">
+            <engine:VisualElement name="GameSettings" style="flex-grow: 1; flex-direction: row; display: none; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px; align-self: center; width: 100%;">
                 <engine:VisualElement name="Audio" style="flex-grow: 1; flex-basis: 1px;">
                     <engine:Label text="Audio" parse-escape-sequences="false" class="header-sm" style="-unity-text-align: upper-center;" />
                     <engine:Instance template="Separator" style="align-self: center; margin-bottom: 8px;" />
@@ -30,92 +30,122 @@
                     <engine:Instance template="Separator" style="align-self: center;" />
                 </engine:VisualElement>
             </engine:VisualElement>
-            <engine:VisualElement name="CombatSettings" style="flex-grow: 1; display: none; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
-                <engine:Label text="Key Bindings" class="header-sm" style="-unity-text-align: upper-center;" />
-                <engine:Instance template="Separator" style="align-self: center;" />
-                <engine:VisualElement name="Binding" style="flex-grow: 1; flex-direction: row; width: 100%;">
-                    <engine:VisualElement name="Spells" style="flex-grow: 1; flex-basis: 1px;">
-                        <engine:Label text="SPells" name="Spells" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
-                        <engine:VisualElement name="SpellBindingList" style="flex-grow: 1;">
-                            <engine:VisualElement name="Slot1" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 1" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="CombatSettings" style="flex-grow: 1; display: flex; padding-top: 8px; padding-right: 8px; padding-bottom: 8px; padding-left: 8px;">
+                <engine:ScrollView>
+                    <engine:Label text="Key Bindings" class="header-sm" style="-unity-text-align: upper-center;" />
+                    <engine:Instance template="Separator" style="align-self: center;" />
+                    <engine:VisualElement name="Binding" style="flex-grow: 1; flex-direction: row; width: 100%;">
+                        <engine:VisualElement name="Spells" style="flex-grow: 1; flex-basis: 1px;">
+                            <engine:Label text="SPells" name="Spells" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
+                            <engine:VisualElement name="SpellBindingList" style="flex-grow: 1;">
+                                <engine:VisualElement name="Slot1" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 1" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot2" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 2" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot3" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 3" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot4" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 4" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot5" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 5" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot6" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 6" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot7" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 7" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot8" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 8" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot9" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 9" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot10" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 10" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot11" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 11" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
+                                </engine:VisualElement>
+                                <engine:VisualElement name="Slot12" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 12" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
                                 </engine:VisualElement>
                             </engine:VisualElement>
-                            <engine:VisualElement name="Slot2" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 2" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                        </engine:VisualElement>
+                        <engine:VisualElement name="Items" style="flex-grow: 1; flex-basis: 1px;">
+                            <engine:Label text="Items" name="Items" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
+                            <engine:VisualElement name="ItemBindingList" style="flex-grow: 1;">
+                                <engine:VisualElement name="Slot1" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 1" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
                                 </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot3" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 3" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                <engine:VisualElement name="Slot2" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 2" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
                                 </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot4" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 4" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                <engine:VisualElement name="Slot3" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 3" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
                                 </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot5" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 5" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot6" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 6" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot7" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 7" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot8" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 8" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot9" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 9" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot10" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 10" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot11" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 11" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
-                                </engine:VisualElement>
-                            </engine:VisualElement>
-                            <engine:VisualElement name="Slot12" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
-                                <engine:Label text="Slot 12" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
-                                <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
-                                    <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                <engine:VisualElement name="Slot4" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; margin-bottom: 8px;">
+                                    <engine:Label text="Slot 4" class="label-md" style="-unity-text-align: middle-left; margin-right: 16px; width: 120px;" />
+                                    <engine:VisualElement name="Value" class="clickable" style="flex-grow: 0; height: 48px; width: 160px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Quest_bot_frame&apos;);">
+                                        <engine:Label text="1" class="header-sm" style="-unity-text-align: upper-center;" />
+                                    </engine:VisualElement>
                                 </engine:VisualElement>
                             </engine:VisualElement>
                         </engine:VisualElement>
                     </engine:VisualElement>
-                    <engine:VisualElement name="Items" style="flex-grow: 1; flex-basis: 1px;">
-                        <engine:Label text="Items" name="Items" class="header-xs" style="-unity-text-align: upper-center; margin-bottom: 8px;" />
-                        <engine:VisualElement name="ItemBindingList" style="flex-grow: 1;" />
-                    </engine:VisualElement>
-                </engine:VisualElement>
+                    <engine:Label text="Combat Options" name="CombatOptions" class="header-sm" style="-unity-text-align: upper-center;" />
+                    <engine:Instance template="Separator" style="align-self: center;" />
+                    <engine:VisualElement name="CombatOptionsList" style="flex-grow: 1;" />
+                </engine:ScrollView>
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>

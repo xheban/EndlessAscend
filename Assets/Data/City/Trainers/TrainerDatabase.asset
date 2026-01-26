@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 131f3e7b869d8f14fa6988b35c3dbcb9, type: 3}
+  m_Name: TrainerDatabase
+  m_EditorClassIdentifier: 
+  trainers:
+  - {fileID: 11400000, guid: c6d70b9d9d3833f49a69a3e772e7b816, type: 2}
+  - {fileID: 11400000, guid: 1f65cd43a0e1631439423c1a0bfc20a3, type: 2}
+  - {fileID: 11400000, guid: 2cad84b825dd35448930ae0215ddaf3c, type: 2}

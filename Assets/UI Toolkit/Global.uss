@@ -1,9 +1,3 @@
-
-/* ===============================
-   Global.uss
-   Typography system
-   =============================== */
-
 :root {
     --rarity-common: rgb(200, 200, 200);
     --rarity-uncommon: rgb(90, 220, 110);
@@ -14,15 +8,34 @@
     --rarity-forbidden: rgb(255, 60, 60);
 }
 
-.rarity-common { color: var(--rarity-common); }
-.rarity-uncommon { color: var(--rarity-uncommon); }
-.rarity-rare { color: var(--rarity-rare); }
-.rarity-epic { color: var(--rarity-epic); }
-.rarity-legendary { color: var(--rarity-legendary); }
-.rarity-mythical { color: var(--rarity-mythical); }
-.rarity-forbidden { color: var(--rarity-forbidden); }
+.rarity-common {
+    color: var(--rarity-common);
+}
 
-/* ----- Headers (16 → 48, step 8) ----- */
+.rarity-uncommon {
+    color: var(--rarity-uncommon);
+}
+
+.rarity-rare {
+    color: var(--rarity-rare);
+}
+
+.rarity-epic {
+    color: var(--rarity-epic);
+}
+
+.rarity-legendary {
+    color: var(--rarity-legendary);
+}
+
+.rarity-mythical {
+    color: var(--rarity-mythical);
+}
+
+.rarity-forbidden {
+    color: var(--rarity-forbidden);
+}
+
 .header-xxs {
     font-size: 8px;
     -unity-font-definition: var(--font-pixel-bold);
@@ -41,14 +54,33 @@
     color: var(--color-text-primary);
 }
 
-/* Ensure rarity color can override header defaults (used by inventory tooltip title). */
-.header-sm.rarity-common { color: var(--rarity-common); }
-.header-sm.rarity-uncommon { color: var(--rarity-uncommon); }
-.header-sm.rarity-rare { color: var(--rarity-rare); }
-.header-sm.rarity-epic { color: var(--rarity-epic); }
-.header-sm.rarity-legendary { color: var(--rarity-legendary); }
-.header-sm.rarity-mythical { color: var(--rarity-mythical); }
-.header-sm.rarity-forbidden { color: var(--rarity-forbidden); }
+.header-sm.rarity-common {
+    color: var(--rarity-common);
+}
+
+.header-sm.rarity-uncommon {
+    color: var(--rarity-uncommon);
+}
+
+.header-sm.rarity-rare {
+    color: var(--rarity-rare);
+}
+
+.header-sm.rarity-epic {
+    color: var(--rarity-epic);
+}
+
+.header-sm.rarity-legendary {
+    color: var(--rarity-legendary);
+}
+
+.header-sm.rarity-mythical {
+    color: var(--rarity-mythical);
+}
+
+.header-sm.rarity-forbidden {
+    color: var(--rarity-forbidden);
+}
 
 .header-md {
     font-size: 32px;
@@ -68,8 +100,6 @@
     color: var(--color-text-primary);
 }
 
-/* ----- Labels (8 → 24, step 4) ----- */
-
 .label-sm {
     font-size: 16px;
     padding: 0;
@@ -84,12 +114,10 @@
     color: var(--color-text-primary);
 }
 
-/* ----- Typography modifiers ----- */
 .label-bold {
     -unity-font-definition: var(--font-pixel-bold);
 }
 
-/* ----- Text color modifiers ----- */
 .text-white {
     color: var(--color-text-white);
 }
@@ -110,48 +138,40 @@
     color: var(--color-hover-success);
 }
 
-/* ===============================
-   Inventory – equipped slot icons
-   =============================== */
-
 .equip-slot-icon {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
 }
 
-/* ===============================
-   Buttons – Base
-   =============================== */
-
 .btn {
     -unity-font-definition: var(--font-pixel-bold);
     color: var(--color-text-white);
-
     align-self: center;
     transition-duration: 0.25s;
     -unity-background-image-tint-color: rgb(255, 255, 255);
-
     border-top-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
     border-left-width: 0;
 }
 
-/* Disabled state */
 .btn:disabled {
     -unity-background-image-tint-color: rgba(255, 255, 255, 0.55);
     cursor: default;
 }
 
-/* ===============================
-   Button sizes
-   =============================== */
+.btn-xl {
+    font-size: 24px;
+    width: 320px;
+    height: 60px;
+    margin-bottom: 16px;
+}
 
 .btn-lg {
     font-size: 24px;
-    width: 300px;
-    height: 60px;
+    width: 240px;
+    height: 50px;
     margin-bottom: 16px;
 }
 
@@ -169,33 +189,18 @@
     margin-bottom: 4px;
 }
 
-/* ===============================
-   Button size – content based
-   =============================== */
-
 .btn-auto {
     font-size: 16px;
     height: 40px;
-
     padding-left: 16px;
     padding-right: 16px;
-
-    min-width: 64px; /* prevents tiny buttons */
+    min-width: 64px;
 }
-
-/* ===============================
-   Button hover modifiers
-   =============================== */
 
 .btn-hover-scale:hover:enabled {
     scale: 1.1 1.1;
 }
 
-/* ===============================
-   Button skins
-   =============================== */
-
-/* Violet */
 .btn-violet {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_violet_button.png?fileID=21300000&guid=9c435796e90a49345ab2c4822551231a&type=3#1_violet_button");
 }
@@ -204,7 +209,6 @@
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_violet_button_pick.png?fileID=21300000&guid=d3541c23df621ad4ab6c710ade40fe5a&type=3#1_violet_button_pick");
 }
 
-/* Orange */
 .btn-orange {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_orange_button.png?fileID=21300000&guid=e6989eb00b9d34e47be8dcc487fc4af7&type=3#1_orange_button");
 }
@@ -213,7 +217,6 @@
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_orange_button_pick.png?fileID=21300000&guid=c0a53c757cbed194e8904b240206afb5&type=3#1_orange_button_pick");
 }
 
-/* Gray */
 .btn-gray {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_gray_button.png?fileID=21300000&guid=d058ede54744a294aa4572098e83c0ea&type=3#1_gray_button");
 }
@@ -221,10 +224,6 @@
 .btn-gray:hover:enabled {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/1_gray_button_pick.png?fileID=21300000&guid=e94b0fba3c9d1b44c96f91e1654abb90&type=3#1_gray_button_pick");
 }
-
-/* ===============================
-   Common tint style
-   =============================== */
 
 .tint {
     cursor: pointer;
@@ -266,17 +265,16 @@
     top: 8px;
 }
 
-/*empty for clickable behavior*/
-.clickable{}
+.clickable {
+}
 
-.p-0{
+.p-0 {
     padding: 0;
 }
 
-.m-0{
+.m-0 {
     margin: 0;
 }
-
 
 .text-field > .unity-label {
     font-size: 32px;
@@ -287,13 +285,6 @@
 .text-field > #unity-text-input {
     font-size: 16px;
     color: rgb(0, 0, 0);
-}
-
-
-
-.header-item:hover {
-    background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_pickzone.png?fileID=2800000&guid=fb7e760734747bd48be14ef642fb6303&type=3#Frame_title_pickzone");
-    -unity-background-image-tint-color: rgb(160, 160, 160);
 }
 
 .combat-log-line {
@@ -307,16 +298,42 @@
 
 .panel-picked {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_pickzone.png?fileID=2800000&guid=fb7e760734747bd48be14ef642fb6303&type=3#Frame_title_pickzone");
-    margin-top: 4px;
-    margin-bottom: 4px;
+}
+
+/* Picked button visual: purple glowing border */
+.picked-button {
+    border-top-width: 6px;
+    border-right-width: 6px;
+    border-bottom-width: 6px;
+    border-left-width: 6px;
+
+    border-top-color: rgba(170, 120, 255, 1);
+    border-right-color: rgba(170, 120, 255, 1);
+    border-bottom-color: rgba(170, 120, 255, 1);
+    border-left-color: rgba(170, 120, 255, 1);
+
+    border-radius: 0px;
 }
 
 .header-item:hover {
     background-image: url("project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_pickzone.png?fileID=2800000&guid=fb7e760734747bd48be14ef642fb6303&type=3#Frame_title_pickzone");
     -unity-background-image-tint-color: rgb(160, 160, 160);
-    margin-top: 4px;
-    margin-bottom: 4px;
 }
 
+.tooltip-effect-row {
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
 
-
+.tooltip-effect-row:hover {
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-color: var(--color-hover-success);
+    border-right-color: var(--color-hover-success);
+    border-bottom-color: var(--color-hover-success);
+    border-left-color: var(--color-hover-success);
+}

@@ -86,7 +86,7 @@ namespace MyGame.Combat
 
                 int updated = m.op switch
                 {
-                    ModOp.Flat => current + Mathf.RoundToInt(m.value),
+                    ModOp.Flat => current + m.value,
                     ModOp.Percent => ApplyPercent(current, m.value),
                     _ => current,
                 };
@@ -99,11 +99,11 @@ namespace MyGame.Combat
             }
         }
 
-        private static int ApplyPercent(int baseValue, float percent)
+        private static int ApplyPercent(int baseValue, int percent)
         {
             // percent = 3 => +3%
-            float mult = 1f + (percent / 100f);
-            return Mathf.RoundToInt(baseValue * mult);
+            int delta = (baseValue * percent + (percent >= 0 ? 50 : -50)) / 100;
+            return baseValue + delta;
         }
     }
 }

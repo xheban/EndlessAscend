@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0231aa55bd3a84eb427efb064502e3, type: 3}
+  m_Name: HearthOfThePyre
+  m_EditorClassIdentifier: 
+  spellId: hearth_of_the_pyre
+  displayName: Hearth of the Pyre
+  description: A condensed core of fire that releases its stored heat in a single
+    surge.
+  icon: {fileID: 21300000, guid: 8261edc85ad3e5d459c360dd9c0ecbd2, type: 3}
+  allowedClasses: -1
+  allowedSpecs: -1
+  rarity: 2
+  manaCost: 100
+  cooldownTurns: 4
+  maxLevel: 30
+  baseDamage: 50
+  damageKind: 1
+  damageRangeType: 0
+  intent: 0
+  damageTag: 01000000
+  tier: 0
+  ignoreDefenseFlat: 0
+  ignoreDefensePercent: 0
+  hitChance: 100
+  castTimeValue: 150
+  baseUseSpeed: 100
+  value: 100
+  damageScalingType: 1
+  damageScalingValue: 1.5
+  onHitEffects: []
+  onCastEffects: []

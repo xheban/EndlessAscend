@@ -96,7 +96,6 @@ namespace MyGame.UI
 
         private void EnsureBuilt()
         {
-            Debug.Log("PixelSlider EnsureBuilt attempt.");
             if (_built)
             {
                 if (_dragger == null)

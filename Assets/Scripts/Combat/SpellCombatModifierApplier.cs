@@ -23,10 +23,10 @@ namespace MyGame.Combat
                 return;
 
             int flat = 0;
-            float pct = 0f;
+            int pct = 0;
 
             if (m.op == ModOp.Flat)
-                flat = Mathf.RoundToInt(m.value);
+                flat = m.value;
             else if (m.op == ModOp.Percent)
                 pct = m.value;
 
@@ -84,7 +84,7 @@ namespace MyGame.Combat
             StatModifiers target,
             SpellCombatModifier m,
             int flat,
-            float pct
+            int pct
         )
         {
             // For Percent, SpellCombatModifier.value is in "percent" units (10 => 10%),
@@ -166,17 +166,17 @@ namespace MyGame.Combat
 
                 case SpellCombatModifierTarget.PowerScalingFlat:
                     if (m.op == ModOp.Flat)
-                        target.AddPowerScalingFlat(m.value);
+                        target.AddPowerScalingFlat(m.value / 100f);
                     break;
 
                 case SpellCombatModifierTarget.AttackPowerScalingFlat:
                     if (m.op == ModOp.Flat)
-                        target.AddAttackPowerScalingFlat(m.value);
+                        target.AddAttackPowerScalingFlat(m.value / 100f);
                     break;
 
                 case SpellCombatModifierTarget.MagicPowerScalingFlat:
                     if (m.op == ModOp.Flat)
-                        target.AddMagicPowerScalingFlat(m.value);
+                        target.AddMagicPowerScalingFlat(m.value / 100f);
                     break;
 
                 // ---------- More/Less buckets (Percent) ----------

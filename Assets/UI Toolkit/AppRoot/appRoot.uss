@@ -6,7 +6,7 @@
     position: relative;
 
     /* Default/base font for the whole UI (inherits unless overridden) */
-    -unity-font-definition: resource("Fonts & Materials/PixellariRaster");
+    -unity-font-definition: resource("Fonts/alagard");
     width: 100%;
     height: 100%;
 }

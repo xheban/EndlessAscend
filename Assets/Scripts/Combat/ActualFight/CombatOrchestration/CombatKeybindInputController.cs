@@ -17,8 +17,12 @@ namespace MyGame.Combat
         // You can assign this from your combat controller after CombatTowerView.Bind().
         public VisualElement[] SpellSlots;
 
+        // Combat item slots (index 0..3)
+        public VisualElement[] ItemSlots;
+
         // Cached key -> slot mapping
-        private readonly Dictionary<KeyCode, int> _keyToSlot = new();
+        private readonly Dictionary<KeyCode, int> _keyToSpellSlot = new();
+        private readonly Dictionary<KeyCode, int> _keyToItemSlot = new();
 
         // Detect changes in PlayerPrefs without scanning every frame
         private int _prefsVersion;
@@ -26,6 +30,7 @@ namespace MyGame.Combat
         private void OnEnable()
         {
             KeybindPrefs.EnsureSpellDefaults();
+            KeybindPrefs.EnsureItemDefaults();
             RebuildBindingsCache(force: true);
         }
 
@@ -37,36 +42,60 @@ namespace MyGame.Combat
             if (!Engine.State.waitingForPlayerInput)
                 return;
 
-            if (SpellSlots == null || SpellSlots.Length == 0)
+            bool hasSpellSlots = SpellSlots != null && SpellSlots.Length > 0;
+            bool hasItemSlots = ItemSlots != null && ItemSlots.Length > 0;
+            if (!hasSpellSlots && !hasItemSlots)
                 return;
 
             // Rebuild if prefs changed
             if (KeybindPrefs.Version != _prefsVersion)
                 RebuildBindingsCache(force: true);
 
-            if (_keyToSlot.Count == 0)
+            if (_keyToSpellSlot.Count == 0 && _keyToItemSlot.Count == 0)
                 return;
 
-            foreach (var kv in _keyToSlot)
+            // Spells first
+            if (hasSpellSlots)
             {
-                var key = kv.Key;
-                if (!Input.GetKeyDown(key))
-                    continue;
+                foreach (var kv in _keyToSpellSlot)
+                {
+                    var key = kv.Key;
+                    if (!Input.GetKeyDown(key))
+                        continue;
 
-                int slotIndex = kv.Value;
-                if (slotIndex < 0 || slotIndex >= SpellSlots.Length)
-                    continue;
+                    int slotIndex = kv.Value;
+                    if (slotIndex < 0 || slotIndex >= SpellSlots.Length)
+                        continue;
 
-                var slotRoot = SpellSlots[slotIndex];
-                if (slotRoot == null)
-                    continue;
+                    var slotRoot = SpellSlots[slotIndex];
+                    if (slotRoot == null)
+                        continue;
 
-                string spellId = slotRoot.userData as string;
-                if (string.IsNullOrWhiteSpace(spellId))
+                    string spellId = slotRoot.userData as string;
+                    if (string.IsNullOrWhiteSpace(spellId))
+                        return;
+
+                    Engine.TryUseSpell(spellId);
                     return;
+                }
+            }
 
-                Engine.TryUseSpell(spellId);
-                return;
+            // Items
+            if (hasItemSlots)
+            {
+                foreach (var kv in _keyToItemSlot)
+                {
+                    var key = kv.Key;
+                    if (!Input.GetKeyDown(key))
+                        continue;
+
+                    int slotIndex = kv.Value;
+                    if (slotIndex < 0 || slotIndex >= ItemSlots.Length)
+                        continue;
+
+                    Engine.TryUseActiveCombatItemSlot(slotIndex);
+                    return;
+                }
             }
         }
 
@@ -82,7 +111,8 @@ namespace MyGame.Combat
 
             _prefsVersion = KeybindPrefs.Version;
 
-            _keyToSlot.Clear();
+            _keyToSpellSlot.Clear();
+            _keyToItemSlot.Clear();
 
             for (int slotIndex = 0; slotIndex < KeybindPrefs.SpellSlotCount; slotIndex++)
             {
@@ -91,7 +121,17 @@ namespace MyGame.Combat
                     continue;
 
                 // If duplicate keys exist, last one wins
-                _keyToSlot[key] = slotIndex;
+                _keyToSpellSlot[key] = slotIndex;
+            }
+
+            for (int slotIndex = 0; slotIndex < KeybindPrefs.ItemSlotCount; slotIndex++)
+            {
+                var key = KeybindPrefs.GetItemSlotKey(slotIndex);
+                if (key == KeyCode.None)
+                    continue;
+
+                // If duplicate keys exist, last one wins
+                _keyToItemSlot[key] = slotIndex;
             }
         }
     }

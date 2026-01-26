@@ -132,7 +132,8 @@ namespace MyGame.Combat
 
         public ModOp op;
 
-        // Flat: whole-number-ish. Percent: 10 means +10%.
-        public float value;
+        // Flat: whole number. Percent: 10 means +10%.
+        // For *ScalingFlat targets, this is stored in "percent points" (e.g. 50 => 0.50).
+        public int value;
     }
 }

@@ -58,6 +58,8 @@ public class SpellDefinition : ScriptableObject
 
     public int baseUseSpeed = 100;
 
+    public int value = 100;
+
     // ✅ This is the field your code must reference
     public DamageScalingType damageScalingType = DamageScalingType.Additive;
 
@@ -75,17 +77,22 @@ public class SpellDefinition : ScriptableObject
         int clamped = Mathf.Clamp(level, 1, maxLevel);
         int l = clamped - 1;
 
+        // Treat damageScalingValue as percentage (20 => 0.2)
+        float percent = damageScalingValue / 100f;
+
         return damageScalingType switch
         {
+            // +X flat damage per level (still raw value)
             DamageScalingType.Additive => Mathf.RoundToInt(baseDamage + l * damageScalingValue),
 
+            // +X% per level (20 => +20%)
             DamageScalingType.Multiplicative => Mathf.RoundToInt(
-                baseDamage * Mathf.Pow(damageScalingValue, l)
+                baseDamage * Mathf.Pow(1f + percent, l)
             ),
 
-            DamageScalingType.Exponential => Mathf.RoundToInt(
-                baseDamage * Mathf.Exp(damageScalingValue * l)
-            ),
+            // Exponential, but controlled:
+            // percent = 20 => exp(0.2) ≈ 1.22 per level
+            DamageScalingType.Exponential => Mathf.RoundToInt(baseDamage * Mathf.Exp(percent * l)),
 
             _ => baseDamage,
         };

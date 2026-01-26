@@ -11,6 +11,9 @@ public sealed class CombatInputBinder
     private VisualElement[] _spellSlots;
     private EventCallback<ClickEvent>[] _slotCallbacks;
 
+    private VisualElement[] _itemSlots;
+    private EventCallback<ClickEvent>[] _itemSlotCallbacks;
+
     private Button _runButton;
     private Action _runHandler;
 
@@ -68,6 +71,57 @@ public sealed class CombatInputBinder
         _slotCallbacks = null;
     }
 
+    public void BindItemSlots(VisualElement[] itemSlots, Action<int> onItemClicked)
+    {
+        UnbindItemSlots();
+
+        if (itemSlots == null || itemSlots.Length == 0)
+            return;
+
+        _itemSlots = itemSlots;
+        _itemSlotCallbacks = new EventCallback<ClickEvent>[itemSlots.Length];
+
+        for (int i = 0; i < itemSlots.Length; i++)
+        {
+            var slot = itemSlots[i];
+            if (slot == null)
+                continue;
+
+            int slotIndex = i;
+            EventCallback<ClickEvent> cb = _ =>
+            {
+                onItemClicked?.Invoke(slotIndex);
+            };
+
+            _itemSlotCallbacks[i] = cb;
+            slot.RegisterCallback(cb);
+        }
+    }
+
+    public void UnbindItemSlots()
+    {
+        if (_itemSlots == null || _itemSlotCallbacks == null)
+        {
+            _itemSlots = null;
+            _itemSlotCallbacks = null;
+            return;
+        }
+
+        int count = Mathf.Min(_itemSlots.Length, _itemSlotCallbacks.Length);
+
+        for (int i = 0; i < count; i++)
+        {
+            var slot = _itemSlots[i];
+            var cb = _itemSlotCallbacks[i];
+
+            if (slot != null && cb != null)
+                slot.UnregisterCallback(cb);
+        }
+
+        _itemSlots = null;
+        _itemSlotCallbacks = null;
+    }
+
     public void BindRunButton(Button runButton, Action onRunClicked)
     {
         UnbindRunButton();
@@ -94,6 +148,7 @@ public sealed class CombatInputBinder
     public void UnbindAll()
     {
         UnbindSpellSlots();
+        UnbindItemSlots();
         UnbindRunButton();
     }
 }

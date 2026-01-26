@@ -32,6 +32,8 @@ public sealed class StatsPanelBinder
         public int BaseValue;
         public int Added;
         public string BonusText;
+        public EventCallback<PointerEnterEvent> OnPlusEnter;
+        public EventCallback<PointerEnterEvent> OnMinusEnter;
     }
 
     private VisualElement _statsRoot; // the element that contains rows (e.g. the element you currently call "Stats")
@@ -102,6 +104,10 @@ public sealed class StatsPanelBinder
                 ClearButtonClick(row.Plus);
             if (row?.Minus != null)
                 ClearButtonClick(row.Minus);
+            if (row?.Plus != null && row.OnPlusEnter != null)
+                row.Plus.UnregisterCallback(row.OnPlusEnter);
+            if (row?.Minus != null && row.OnMinusEnter != null)
+                row.Minus.UnregisterCallback(row.OnMinusEnter);
         }
 
         _rows.Clear();
@@ -186,23 +192,6 @@ public sealed class StatsPanelBinder
             return;
         }
 
-        if (swapper != null)
-        {
-            string tooltip = StatTooltipLibrary.GetBaseStatTooltip(rowName);
-
-            if (!string.IsNullOrWhiteSpace(tooltip))
-            {
-                if (name != null)
-                    name.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
-                if (icon != null)
-                    icon.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
-
-                // If user is clicking +/-, hide any tooltip so it doesn't linger.
-                plus.RegisterCallback<PointerEnterEvent>(_ => swapper.HideTooltip());
-                minus.RegisterCallback<PointerEnterEvent>(_ => swapper.HideTooltip());
-            }
-        }
-
         var row = new StatRow
         {
             Id = id,
@@ -215,6 +204,25 @@ public sealed class StatsPanelBinder
             Added = 0,
             BonusText = string.Empty,
         };
+
+        if (swapper != null)
+        {
+            string tooltip = StatTooltipLibrary.GetBaseStatTooltip(rowName);
+
+            if (!string.IsNullOrWhiteSpace(tooltip))
+            {
+                if (name != null)
+                    name.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
+                if (icon != null)
+                    icon.EnableTooltip(swapper, tooltip, offset: 10f, maxWidth: 320f);
+
+                // If user is clicking +/-, hide any tooltip so it doesn't linger.
+                row.OnPlusEnter = _ => swapper.HideTooltip();
+                row.OnMinusEnter = _ => swapper.HideTooltip();
+                plus.RegisterCallback(row.OnPlusEnter);
+                minus.RegisterCallback(row.OnMinusEnter);
+            }
+        }
 
         SetButtonClick(plus, () => OnPlusClicked(row));
         SetButtonClick(minus, () => OnMinusClicked(row));
