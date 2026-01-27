@@ -1255,7 +1255,7 @@ namespace MyGame.Combat
                     var itemDef = itemDb != null ? itemDb.GetById(itemId) : null;
 
                     // Spell scrolls: cast the referenced spell (no spellbook cooldown) using item cooldown.
-                    if (itemDef != null && itemDef.isSpellScroll)
+                    if (itemDef != null && itemDef.itemType == ItemDefinitionType.SpellScroll)
                     {
                         var sd = itemDef.scrollData;
                         if (sd == null || string.IsNullOrWhiteSpace(sd.spellId))
@@ -1451,7 +1451,7 @@ namespace MyGame.Combat
                 }
 
                 // Scrolls use mana and must be queueable like spells.
-                if (def != null && def.isSpellScroll)
+                if (def != null && def.itemType == ItemDefinitionType.SpellScroll)
                 {
                     var sd = def.scrollData;
                     if (sd == null || string.IsNullOrWhiteSpace(sd.spellId))

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using MyGame.Combat;
 using MyGame.Common;
 using MyGame.Helpers;
+using MyGame.Run;
 using MyGame.Save;
 using UnityEngine;
 
@@ -58,8 +60,52 @@ namespace MyGame.Progression
                 var derived = PlayerDerivedStatsResolver.BuildEffectiveDerivedStats(save);
                 save.currentHp = Mathf.Max(1, derived.maxHp);
                 save.currentMana = Mathf.Max(0, derived.maxMana);
+
+                ApplyLevelUnlocks(save);
             }
             return gained;
+        }
+
+        private static void ApplyLevelUnlocks(SaveData save)
+        {
+            if (save == null)
+                return;
+
+            var db = GameConfigProvider.Instance?.UnlockDatabase;
+            if (db == null || db.All == null)
+                return;
+
+            save.unlockedIds ??= new List<string>();
+
+            var all = db.All;
+            for (int i = 0; i < all.Count; i++)
+            {
+                var def = all[i];
+                if (def == null || string.IsNullOrWhiteSpace(def.unlockId))
+                    continue;
+
+                if (def.requiredLevel > save.level)
+                    continue;
+
+                if (HasUnlockId(save.unlockedIds, def.unlockId))
+                    continue;
+
+                save.unlockedIds.Add(def.unlockId);
+            }
+        }
+
+        private static bool HasUnlockId(List<string> ids, string unlockId)
+        {
+            if (ids == null || string.IsNullOrWhiteSpace(unlockId))
+                return false;
+
+            for (int i = 0; i < ids.Count; i++)
+            {
+                if (string.Equals(ids[i], unlockId, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

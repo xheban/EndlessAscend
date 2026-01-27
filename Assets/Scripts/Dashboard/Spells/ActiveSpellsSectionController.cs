@@ -52,6 +52,7 @@ public sealed class ActiveSpellsSectionController
         _panelRoot = null;
         _screenSwapper = null;
         RequestBeginDragFromSlot = null;
+        IsDraggingSpell = null;
     }
 
     public void SetUnlockedSlots(int unlockedSlots)
@@ -85,7 +86,10 @@ public sealed class ActiveSpellsSectionController
             return;
 
         var book = RunSession.Spellbook;
-        var db = GameConfigProvider.Instance.SpellDatabase;
+        var config = GameConfigProvider.Instance;
+        if (config == null || config.SpellDatabase == null)
+            return;
+        var db = config.SpellDatabase;
 
         foreach (var kv in _slots)
         {

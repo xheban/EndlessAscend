@@ -7,6 +7,7 @@ public static class FooterBinding
     public const string ScreenCharacter = "character";
     public const string ScreenTower = "tower";
     public const string ScreenCity = "city";
+    public const string ScreenHomestead = "homestead";
 
     // One place to define the tile->screen mapping
     private static readonly Dictionary<string, string> Map = new()
@@ -14,6 +15,7 @@ public static class FooterBinding
         { "Character", ScreenCharacter },
         { "Tower", ScreenTower },
         { "City", ScreenCity },
+        { "Homestead", ScreenHomestead },
     };
 
     public static FooterSectionController BindFooter(

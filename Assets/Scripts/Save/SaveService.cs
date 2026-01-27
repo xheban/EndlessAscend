@@ -9,7 +9,7 @@ namespace MyGame.Save
 {
     public static class SaveService
     {
-        private const int CurrentSaveVersion = 19;
+        private const int CurrentSaveVersion = 20;
         private const int MaxSlots = 5;
         private const string FilePrefix = "save_slot_";
         private const string FileExt = ".json";
@@ -200,6 +200,12 @@ namespace MyGame.Save
                     data.version = 19;
                 }
 
+                if (data.version < 20)
+                {
+                    data.unlockedIds ??= new List<string>();
+                    data.version = 20;
+                }
+
                 NormalizeInventoryRollLists(data);
 
                 return data;
@@ -279,6 +285,7 @@ namespace MyGame.Save
             data.equippedSlots ??= new List<SavedEquippedSlot>();
             data.activeCombatSlots ??= new List<SavedCombatActiveSlotEntry>();
             data.persistentItemCooldowns ??= new List<SavedItemCooldownEntry>();
+            data.unlockedIds ??= new List<string>();
 
             while (data.activeCombatSlots.Count < 4)
                 data.activeCombatSlots.Add(new SavedCombatActiveSlotEntry());

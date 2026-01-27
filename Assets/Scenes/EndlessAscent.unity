@@ -343,6 +343,10 @@ MonoBehaviour:
     uxml: {fileID: 9197481963319205126, guid: 3d0b5b9679fd4e2408df2a137adeece6, type: 3}
     controllers:
     - {fileID: 254522290}
+  - screenId: homestead
+    uxml: {fileID: 9197481963319205126, guid: 866783f4338570c4c81ac94d216c73f9, type: 3}
+    controllers:
+    - {fileID: 1265890570}
   overlays:
   - overlayId: load_game
     uxml: {fileID: 9197481963319205126, guid: 950b7fcb1de008d4e905b957ee20d64e, type: 3}
@@ -880,6 +884,7 @@ MonoBehaviour:
   playerClassDatabase: {fileID: 11400000, guid: e46449af69105dc41b503f8f75c6c2c2, type: 2}
   itemDatabase: {fileID: 11400000, guid: b8c79889e9d3b7a4bb44460dcaf8748f, type: 2}
   equipmentDatabase: {fileID: 11400000, guid: af66b00651a5ea44c929c06016a46857, type: 2}
+  unlockDatabase: {fileID: 0}
 --- !u!1 &1110039943
 GameObject:
   m_ObjectHideFlags: 0
@@ -1139,8 +1144,60 @@ Transform:
   - {fileID: 1538656919}
   - {fileID: 965126182}
   - {fileID: 1688892224}
+  - {fileID: 1265890569}
   m_Father: {fileID: 251120974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1265890568
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1265890569}
+  - component: {fileID: 1265890570}
+  m_Layer: 0
+  m_Name: HomesteadController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1265890569
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265890568}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1259121016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1265890570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265890568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cef908998d2e9547972389a8d850b7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _houseTabUxml: {fileID: 0}
+  _spellMergeRoomTabUxml: {fileID: 0}
+  _smithyTabUxml: {fileID: 0}
+  _alchemyRoomTabUxml: {fileID: 0}
+  _tbd1TabUxml: {fileID: 0}
+  _tbd2TabUxml: {fileID: 0}
+  _tbd3TabUxml: {fileID: 0}
 --- !u!1 &1285096023
 GameObject:
   m_ObjectHideFlags: 0

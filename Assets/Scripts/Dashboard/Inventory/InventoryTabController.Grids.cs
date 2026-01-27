@@ -245,7 +245,7 @@ public sealed partial class InventoryTabController
         }
 
         // "Learning Scroll": reuses scrollData, but only when NOT usable in combat.
-        if (!itemDef.isSpellScroll)
+        if (itemDef.itemType != ItemDefinitionType.SpellScroll)
             return;
 
         if (itemDef.usableInCombat)

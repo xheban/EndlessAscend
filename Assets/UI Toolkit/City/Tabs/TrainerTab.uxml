@@ -1,7 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <engine:Template name="Separator" src="project://database/Assets/UI%20Toolkit/Components/Utils/Separator.uxml?fileID=9197481963319205126&amp;guid=0455613e7a8639a42a23c1a0065e009a&amp;type=3#Separator" />
     <engine:VisualElement name="TrainerTab" style="flex-grow: 1; min-height: 0; flex-direction: row;">
-        <engine:VisualElement name="FrontDesk" style="flex-grow: 0; width: 536px;">
+        <engine:VisualElement name="FrontDesk" style="flex-grow: 0; width: 536px; justify-content: center;">
             <engine:VisualElement name="DeskFrame" style="flex-grow: 0; flex-shrink: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_square_256&apos;); width: 536px; height: 296px; padding-top: 12px; padding-right: 12px; padding-bottom: 12px; padding-left: 12px;">
                 <engine:VisualElement name="Icon" style="flex-grow: 0; background-image: resource(&apos;Sprites/City/deskManager&apos;); width: 512px; height: 272px;" />
             </engine:VisualElement>

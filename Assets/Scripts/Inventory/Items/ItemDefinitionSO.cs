@@ -13,6 +13,38 @@ public sealed class SpellScrollData
     public bool usesPlayerMana = true;
 }
 
+[Serializable]
+public sealed class ConsumableData
+{
+    [Min(0f)]
+    public float value = 0f;
+
+    public ConsumableValueFrom valueFrom = ConsumableValueFrom.Flat;
+
+    public ConsumableRefillType refillType = ConsumableRefillType.Health;
+}
+
+public enum ItemDefinitionType
+{
+    Material = 0,
+    SpellScroll = 1,
+    Consumable = 2,
+}
+
+public enum ConsumableValueFrom
+{
+    Flat = 0,
+    PercentMax = 1,
+    PercentPower = 2,
+}
+
+public enum ConsumableRefillType
+{
+    Health = 0,
+    Mana = 1,
+    Both = 2,
+}
+
 [CreateAssetMenu(fileName = "Item", menuName = "MyGame/Inventory/Item")]
 public sealed class ItemDefinitionSO : ScriptableObject
 {
@@ -35,6 +67,9 @@ public sealed class ItemDefinitionSO : ScriptableObject
     [Min(0)]
     public int goldValue = 0;
 
+    [Header("Type")]
+    public ItemDefinitionType itemType = ItemDefinitionType.Material;
+
     [Header("Use")]
     [Min(0f)]
     public float usageTime = 0f;
@@ -47,9 +82,10 @@ public sealed class ItemDefinitionSO : ScriptableObject
     public bool carryCooldownBetweenFights = false;
 
     [Header("Spell Scroll")]
-    public bool isSpellScroll = false;
-
     public SpellScrollData scrollData;
+
+    [Header("Consumable")]
+    public ConsumableData consumableData;
 
     [Header("Visuals")]
     public Sprite icon;

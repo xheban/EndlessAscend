@@ -20,5 +20,5 @@ MonoBehaviour:
   polarity: 1
   stat: 0
   op: 1
-  damageType: 01000000
+  damageType: 0100000005000000
   tickTiming: 1

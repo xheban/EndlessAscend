@@ -21,13 +21,14 @@ namespace MyGame.Helpers
 
             var icon = tooltip.Q<VisualElement>("Icon");
             var name = tooltip.Q<Label>("Name");
+            var kindAndPolarity = tooltip.Q<Label>("KindAndPolarity");
+            var stat = tooltip.Q<Label>("Stat");
             var tags = tooltip.Q<Label>("Tags");
-            var polarity = tooltip.Q<Label>("MasteryLevel");
 
-            var damageRow = tooltip.Q<VisualElement>("Damage");
-            var damageLabel = damageRow?.Q<Label>("Label");
-            var damageValue = tooltip.Q<Label>("DamageValue");
-            var damageFrom = tooltip.Q<Label>("DamageFrom");
+            var damageRow = tooltip.Q<VisualElement>("Value");
+            var valueLabel = damageRow?.Q<Label>("Label");
+            var valueValue = tooltip.Q<Label>("ValueValue");
+            var valueFrom = tooltip.Q<Label>("ValueFrom");
 
             var chanceRow = tooltip.Q<VisualElement>("Chance");
             var chanceValue = tooltip.Q<Label>("ChanceValue");
@@ -65,10 +66,7 @@ namespace MyGame.Helpers
             );
 
             var tagParts = new List<string>();
-            if (def.kind != default)
-                tagParts.Add(NiceEnum(def.kind.ToString()));
-            if (def.kind == EffectKind.StatModifier && def.stat != EffectStat.None)
-                tagParts.Add(NiceEnum(def.stat.ToString()));
+
             if (def.damageType != null && def.damageType.Length > 0)
                 tagParts.Add(
                     string.Join(
@@ -77,28 +75,44 @@ namespace MyGame.Helpers
                     )
                 );
 
-            SetLabelText(tags, string.Join(", ", tagParts));
-            SetLabelText(polarity, NiceEnum(def.polarity.ToString()));
+            if (def.kind == EffectKind.StatModifier && def.stat != EffectStat.None)
+            {
+                SetLabelText(stat, NiceEnum(def.stat.ToString()));
+            }
+            else
+            {
+                SetRowVisible(stat, false);
+            }
+
+            if (tagParts.Count > 0)
+                SetLabelText(tags, string.Join(" ", tagParts));
+            else
+                SetRowVisible(tags, false);
+
+            SetLabelText(
+                kindAndPolarity,
+                NiceEnum(def.kind.ToString()) + " " + def.polarity.ToString()
+            );
 
             string magnitudeText = BuildMagnitudeText(def, scaled);
-            if (damageLabel != null)
-                damageLabel.text = def.kind switch
+
+            if (valueLabel != null)
+                valueLabel.text = def.kind switch
                 {
                     EffectKind.HealOverTime => "Healing",
                     EffectKind.DamageOverTime => "Damage",
                     _ => "Magnitude",
                 };
 
-            SetLabelText(damageValue, magnitudeText);
-            if (damageFrom != null)
+            SetLabelText(valueValue, magnitudeText);
+            if (valueFrom != null)
             {
-                string from = BuildMagnitudeFromText(def, scaled);
-                damageFrom.text = from;
-                damageFrom.style.display = string.IsNullOrWhiteSpace(from)
+                string from = BuildMagnitudeFromText(def, inst);
+                valueFrom.text = from;
+                valueFrom.style.display = string.IsNullOrWhiteSpace(from)
                     ? DisplayStyle.None
                     : DisplayStyle.Flex;
             }
-            SetRowVisible(damageRow, !string.IsNullOrWhiteSpace(magnitudeText));
 
             if (chanceValue != null)
                 chanceValue.text =
@@ -184,21 +198,17 @@ namespace MyGame.Helpers
             };
         }
 
-        private static string BuildMagnitudeFromText(
-            EffectDefinition def,
-            EffectInstanceScaledIntValues scaled
-        )
+        private static string BuildMagnitudeFromText(EffectDefinition def, EffectInstance inst)
         {
-            if (def == null)
-                return null;
-
-            if (def.kind == EffectKind.StatModifier && def.stat != EffectStat.None)
-                return NiceEnum(def.stat.ToString());
-
-            if (scaled.magnitudeBasis != EffectMagnitudeBasis.None)
-                return NiceEnum(scaled.magnitudeBasis.ToString());
-
-            return def.op == EffectOp.Flat ? "Flat" : "Percent";
+            return def.op == EffectOp.Flat
+                ? "Flat"
+                : "Percent of"
+                    + inst.magnitudeBasis switch
+                    {
+                        EffectMagnitudeBasis.DamageDealt => " Last Damage Dealt",
+                        EffectMagnitudeBasis.Power => " Current Power",
+                        _ => string.Empty,
+                    };
         }
 
         private static string FormatTurns(int turns)

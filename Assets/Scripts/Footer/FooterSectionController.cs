@@ -20,7 +20,6 @@ public sealed class FooterSectionController
         public string screenId;
 
         public VisualElement tileRoot; // "Character", "Tower", "City"
-        public VisualElement bg; // "CharacterBg", "TowerBg", "CityBg"
 
         public EventCallback<PointerDownEvent> onDown;
         public EventCallback<PointerEnterEvent> onEnter;
@@ -91,11 +90,7 @@ public sealed class FooterSectionController
             }
 
             // Prefer strict naming: "<TileName>Bg"
-            var bg = tileRoot.Q<VisualElement>($"{tileName}Bg");
-
-            // Fallback: first child with class "footer"
-            if (bg == null)
-                bg = tileRoot.Q<VisualElement>(className: "footer");
+            var bg = tileRoot.Q<VisualElement>($"{tileName}");
 
             if (bg == null)
             {
@@ -115,7 +110,6 @@ public sealed class FooterSectionController
                 tileName = tileName,
                 screenId = screenId,
                 tileRoot = tileRoot,
-                bg = bg,
             };
 
             // Click: navigate + set active
@@ -128,14 +122,14 @@ public sealed class FooterSectionController
             // Hover: add/remove class on BG (not on tile root)
             b.onEnter = _ =>
             {
-                if (b.bg != null)
-                    b.bg.AddToClassList(HoveringClass);
+                if (b != null)
+                    b.tileRoot.AddToClassList(HoveringClass);
             };
 
             b.onLeave = _ =>
             {
-                if (b.bg != null)
-                    b.bg.RemoveFromClassList(HoveringClass);
+                if (b.tileRoot != null)
+                    b.tileRoot.RemoveFromClassList(HoveringClass);
             };
 
             // Register hover callbacks on the tile root:
@@ -168,13 +162,13 @@ public sealed class FooterSectionController
         for (int i = 0; i < _bindings.Count; i++)
         {
             var b = _bindings[i];
-            if (b.bg == null)
+            if (b.tileRoot == null)
                 continue;
 
             if (string.Equals(b.tileName, tileName, StringComparison.OrdinalIgnoreCase))
-                b.bg.AddToClassList(ActiveClass);
+                b.tileRoot.AddToClassList(ActiveClass);
             else
-                b.bg.RemoveFromClassList(ActiveClass);
+                b.tileRoot.RemoveFromClassList(ActiveClass);
         }
     }
 

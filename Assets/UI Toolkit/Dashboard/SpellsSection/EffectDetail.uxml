@@ -4,30 +4,31 @@
             <engine:VisualElement name="Icon" style="flex-grow: 0; width: 96px; height: 96px; margin-right: 24px;" />
             <engine:VisualElement name="Text" style="flex-grow: 1; justify-content: center;">
                 <engine:Label text="Burn" name="Name" class="header-sm" style="-unity-text-align: upper-center; white-space: normal;" />
-                <engine:Label text="Damage over time" name="Tags" class="label-sm" style="-unity-text-align: upper-center; height: 16px; margin-bottom: 2px;" />
-                <engine:Label text="Debuff" name="MasteryLevel" class="label-sm" style="-unity-text-align: upper-center; height: 16px;" />
+                <engine:Label text="Damage over time" name="KindAndPolarity" class="label-sm" style="-unity-text-align: upper-center; height: 16px; margin-bottom: 2px;" />
+                <engine:Label text="Intelligence" name="Stat" class="label-sm" style="-unity-text-align: upper-center; height: 16px; margin-bottom: 2px;" />
+                <engine:Label text="Debuff" name="Tags" class="label-sm" style="-unity-text-align: upper-center; height: 16px;" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="DecoratorLine" style="flex-grow: 0; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
         <engine:VisualElement name="Info" style="flex-grow: 0; margin-bottom: 0;">
             <engine:Label text="Info" name="InfoTitle" class="label-sm" style="-unity-text-align: upper-center;" />
-            <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;">
-                <engine:VisualElement name="Damage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
-                    <engine:Label text="Damage" name="Label" class="label-sm" style="margin-right: 8px;" />
-                    <engine:Label text="200" name="DamageValue" class="label-sm" style="margin-right: 8px;" />
-                    <engine:Label text="of MP" name="DamageFrom" class="label-sm" />
+            <engine:VisualElement name="InfoList" style="flex-grow: 1;">
+                <engine:VisualElement name="Value" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Value" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="200" name="ValueValue" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="of MP" name="ValueFrom" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="Chance" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
                     <engine:Label text="Chance" name="Label" class="label-sm" style="margin-right: 8px;" />
                     <engine:Label text="25%" name="ChanceValue" class="label-sm" />
                 </engine:VisualElement>
-                <engine:VisualElement name="Stacks" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
-                    <engine:Label text="Max stacks" name="Label" class="label-sm" style="margin-right: 8px;" />
-                    <engine:Label text="1" name="StackValue" class="label-sm" />
-                </engine:VisualElement>
                 <engine:VisualElement name="Duration" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
                     <engine:Label text="Duration" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />
                     <engine:Label text="2 turns" name="DurationValue" class="label-sm" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Stacks" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Max stacks" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="1" name="StackValue" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="DurationStacking" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
                     <engine:Label text="Duration stacking" name="Label" parse-escape-sequences="false" selectable="false" class="label-sm" style="margin-right: 8px;" />

@@ -1,0 +1,46 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" xmlns:my="MyGame.UI" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Footer" src="project://database/Assets/UI%20Toolkit/Components/Footer/Footer.uxml?fileID=9197481963319205126&amp;guid=51ecaeee97a9196409e3b9656ec1fd17&amp;type=3#Footer" />
+    <Style src="project://database/Assets/UI%20Toolkit/Global.uss?fileID=7433441132597879392&amp;guid=a0f6915d60add7f4e83d32d9285b9939&amp;type=3#Global" />
+    <Style src="project://database/Assets/UI%20Toolkit/Components/Utils/PixelProgressBar/PixelProgressBarStyle.uss?fileID=7433441132597879392&amp;guid=376b38c98fa84a74c9509e7f58f1adff&amp;type=3#PixelProgressBarStyle" />
+    <engine:VisualElement name="MainCanvas" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/unlimited_tower.png?fileID=-1796747440384222005&amp;guid=1149dba4da9a8284c8733f1146732b6e&amp;type=3#unlimited_tower_0&quot;);">
+        <engine:VisualElement name="TopPart" style="flex-grow: 1; padding-top: 32px; padding-right: 32px; padding-bottom: 32px; padding-left: 32px;">
+            <engine:VisualElement name="MainFrame" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_bg_big_and_title.png?fileID=21300000&amp;guid=3ae6fb90d0f420f4c878f3710d3071d1&amp;type=3#Frame_bg_big_and_title&quot;); -unity-slice-scale: 1.5px;">
+                <engine:VisualElement name="Header" style="flex-grow: 0; background-size: 100% 100%; height: 48px; flex-direction: row; justify-content: center; padding-top: 14px; padding-bottom: 10px;">
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="HouseTab" class="header-item clickable panel-picked" style="flex-grow: 0; display: flex; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
+                        <engine:Label text="House" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="SpellMergeRoomTab" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="Spell Merge Room" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="SmithyTab" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="Smithy" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="AlchemyRoomTab" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="Alchemy room" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="TBD1" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="TBD1" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="TBD2" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="TBD2" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                    <engine:VisualElement name="TBD3" class="header-item" style="flex-grow: 0;">
+                        <engine:Label text="TBD3" class="header-xs" style="padding-right: 8px; padding-left: 8px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 12px; height: 12px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                    <engine:VisualElement name="ContentHost" style="flex-grow: 1; min-height: 0; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:Instance template="Footer" name="Footer" />
+    </engine:VisualElement>
+</engine:UXML>

@@ -21,7 +21,7 @@
                     <engine:Label text="100" name="BaseDamageValue" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="BonusDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
-                    <engine:Label text="Bonus Damage" name="Title" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Bonus Damage Scale" name="Title" class="label-sm" style="margin-right: 8px;" />
                     <engine:Label text="38" name="BonusDamageValue" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="ScalingTypeDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">

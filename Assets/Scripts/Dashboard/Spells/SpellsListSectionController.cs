@@ -79,6 +79,7 @@ public sealed class SpellsListSectionController
         RequestRefreshAll = null;
         RequestBeginDrag = null;
         RequestSelectSpell = null;
+        IsDraggingSpell = null;
     }
 
     public void RebuildList()
@@ -88,7 +89,14 @@ public sealed class SpellsListSectionController
 
         _list.contentContainer.Clear();
 
-        var db = GameConfigProvider.Instance.SpellDatabase;
+        var config = GameConfigProvider.Instance;
+        if (config == null || config.SpellDatabase == null)
+        {
+            Debug.LogError("SpellsListSectionController: SpellDatabase not available.");
+            return;
+        }
+
+        var db = config.SpellDatabase;
         var book = RunSession.Spellbook;
         int activeCount = CountActiveSpells(book);
 
@@ -135,6 +143,16 @@ public sealed class SpellsListSectionController
                 evt =>
                 {
                     if (evt.button != 0)
+                        return;
+
+                    var target = evt.target as VisualElement;
+                    if (
+                        IsWithin(target, setActiveBtn)
+                        || IsWithin(target, detailBtn)
+                        || IsWithin(target, iconFrame)
+                        || IsWithin(target, iconPart)
+                        || IsWithin(target, icon)
+                    )
                         return;
 
                     RequestSelectSpell?.Invoke(spellId);
@@ -367,5 +385,19 @@ public sealed class SpellsListSectionController
             return false;
 
         return tooltip.worldBound.Contains(pointerPosition);
+    }
+
+    private static bool IsWithin(VisualElement target, VisualElement ancestor)
+    {
+        if (target == null || ancestor == null)
+            return false;
+
+        for (var ve = target; ve != null; ve = ve.parent)
+        {
+            if (ve == ancestor)
+                return true;
+        }
+
+        return false;
     }
 }

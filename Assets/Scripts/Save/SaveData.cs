@@ -9,7 +9,7 @@ namespace MyGame.Save
     public sealed class SaveData
     {
         // Increase when you change the structure
-        public int version = 19;
+        public int version = 20;
 
         // Identity
         public string saveId; // GUID string
@@ -42,6 +42,9 @@ namespace MyGame.Save
         public int currentMana = 50;
         public Tier tier = Tier.Tier1;
         public SpellActiveSlotProgress spellActiveSlotProgress = new();
+
+        // Unlocks (one-off, persisted by id)
+        public List<string> unlockedIds = new List<string>();
 
         // ✅ Spells (player-owned progression + runtime cooldowns)
         public List<SavedSpellEntry> spells = new List<SavedSpellEntry>();

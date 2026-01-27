@@ -237,9 +237,16 @@ public class ScreenSwapper : MonoBehaviour
         }
 
         // Build modal UI once into modal-body (no extra layer)
-        _modalContent.Clear();
-        globalModalUxml.CloneTree(_modalContent);
-        _globalModal.Bind(_modalContent);
+        if (globalModalUxml == null)
+        {
+            Debug.LogError("Global modal UXML is not assigned in ScreenSwapper.");
+        }
+        else
+        {
+            _modalContent.Clear();
+            globalModalUxml.CloneTree(_modalContent);
+            _globalModal.Bind(_modalContent);
+        }
 
         // Outside click close (same logic as overlays)
         _modalContent.RegisterCallback<PointerDownEvent>(
@@ -276,7 +283,7 @@ public class ScreenSwapper : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            const string settingsId = "settings";
+            const string settingsId = "Settings";
             if (IsOverlayOpen(settingsId))
                 CloseOverlay(settingsId);
             else

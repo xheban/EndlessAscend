@@ -32,7 +32,11 @@ namespace MyGame.Helpers
             int goldValue = def != null ? Mathf.Max(0, def.goldValue) : 0;
 
             List<RequirementEntry> reqs = null;
-            if (def != null && def.isSpellScroll && !def.usableInCombat)
+            if (
+                def != null
+                && def.itemType == ItemDefinitionType.SpellScroll
+                && !def.usableInCombat
+            )
                 reqs = BuildLearningScrollRequirements(def);
 
             var data = new TooltipData

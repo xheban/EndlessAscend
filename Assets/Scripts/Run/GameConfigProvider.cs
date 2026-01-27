@@ -37,6 +37,10 @@ namespace MyGame.Run
         [SerializeField]
         private EquipmentDatabase equipmentDatabase;
 
+        [Header("Unlocks")]
+        [SerializeField]
+        private UnlockDatabase unlockDatabase;
+
         public StartingSpellConfig StartingSpellConfig => startingSpellConfig;
 
         public SpellDatabase SpellDatabase => spellDatabase;
@@ -49,6 +53,7 @@ namespace MyGame.Run
 
         public ItemDatabase ItemDatabase => itemDatabase;
         public EquipmentDatabase EquipmentDatabase => equipmentDatabase;
+        public UnlockDatabase UnlockDatabase => unlockDatabase;
 
         private void Awake()
         {
