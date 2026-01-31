@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Unlock_City
   m_EditorClassIdentifier: 
   unlockId: unlock_city
-  displayName: Unlock City
-  description: For City to be unlocked player needs to reach level 2 First.
-  requiredLevel: 5
+  displayName: City
+  description: For City to be unlocked player needs to reach level 3 First.
+  requiredLevel: 3
   minStats:
     agility: 0
     intelligence: 0

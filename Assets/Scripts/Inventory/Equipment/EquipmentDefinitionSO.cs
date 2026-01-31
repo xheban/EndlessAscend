@@ -61,39 +61,6 @@ public sealed class EquipmentDefinitionSO : ScriptableObject
 
     public List<BaseStatRollRule> baseRollTable = new();
 
-    [Header("Rolls - Damage Kind")]
-    [Min(0)]
-    public int minDamageKindRolls = 0;
-
-    [Min(0)]
-    public int maxDamageKindRolls = 0;
-
-    public bool allowDuplicateDamageKindRolls = false;
-
-    public List<DamageKindRollRule> damageKindRollTable = new();
-
-    [Header("Rolls - Damage Range")]
-    [Min(0)]
-    public int minDamageRangeRolls = 0;
-
-    [Min(0)]
-    public int maxDamageRangeRolls = 0;
-
-    public bool allowDuplicateDamageRangeRolls = false;
-
-    public List<DamageRangeRollRule> damageRangeRollTable = new();
-
-    [Header("Rolls - Damage Type")]
-    [Min(0)]
-    public int minDamageTypeRolls = 0;
-
-    [Min(0)]
-    public int maxDamageTypeRolls = 0;
-
-    public bool allowDuplicateDamageTypeRolls = false;
-
-    public List<DamageTypeRollRule> damageTypeRollTable = new();
-
     [Header("Rolls - Combat Modifiers")]
     [Min(0)]
     public int minCombatModRolls = 0;

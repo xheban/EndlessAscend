@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MyGame.Common;
 
 namespace MyGame.Combat
@@ -14,5 +15,8 @@ namespace MyGame.Combat
         public RemoveWhenType removedWhenType;
         public int statFlatApplied;
         public int statPercentApplied;
+
+        public readonly List<EffectComponentContribution> componentContributions =
+            new List<EffectComponentContribution>();
     }
 }

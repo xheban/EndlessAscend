@@ -7,68 +7,14 @@ namespace MyGame.Combat
     public sealed class StatModifiers
     {
         // ------------------------------------------------------------
-        // More/Less multiplier bucket (the "more/less model")
-        // - Buff:  +20% => more *= 1.2
-        // - Debuff: 20% less => less *= 0.8
-        // Final = more * less
+        // Single multiplicative buckets (start at 1.0)
+        // - Buff:  +20% => mult *= 1.2
+        // - Debuff: -20% => mult *= 0.8
         // ------------------------------------------------------------
-        [Serializable]
-        public struct MoreLessMult
-        {
-            public float more; // buffs: multiply by (1 + percent)
-            public float less; // debuffs: multiply by (1 - percentLess)
-
-            public float Final => more * less;
-
-            public void Reset()
-            {
-                more = 1f;
-                less = 1f;
-            }
-
-            /// <summary>+0.20 => more *= 1.2</summary>
-            public void AddMore(float percent)
-            {
-                more *= (1f + percent);
-            }
-
-            /// <summary>Undo a previous AddMore(percent)</summary>
-            public void RemoveMore(float percent)
-            {
-                float f = 1f + percent;
-                if (f <= 0f)
-                    return;
-                more /= f;
-            }
-
-            /// <summary>0.20 => less *= 0.8</summary>
-            public void AddLess(float percentLess)
-            {
-                float f = 1f - percentLess;
-                if (f < 0f)
-                    f = 0f;
-                less *= f;
-            }
-
-            /// <summary>Undo a previous AddLess(percentLess)</summary>
-            public void RemoveLess(float percentLess)
-            {
-                float f = 1f - percentLess;
-                if (f <= 0f)
-                    return;
-                less /= f;
-            }
-        }
 
         // -------------------------
         // Generic flat bonuses
         // -------------------------
-        public int attackPowerFlat; // bonus flat attack power -> +10
-        public int magicPowerFlat; // bonus flat magic power -> +10
-
-        // NEW: generic power (both attack + magic can use)
-        public int powerFlat; // bonus flat power for both attack & magic
-
         public int spellBaseFlat;
 
         // Magic-only spells
@@ -77,16 +23,11 @@ namespace MyGame.Combat
         // Physical-only spells
         public int physicalSpellBaseFlat;
 
-        public int defenceFlat; // flat bonus to all defences
-        public int physicalDefenseFlat; // bonus flat physical defence -> +10
-        public int magicDefenseFlat; // bonus flat magic defence -> +10
-
-        public int attackSpeedFlat; // flat bonus to attack speed
-        public int castingSpeedFlat; // flat bonus to casting speed
-
         public int damageFlat; // bonus flat damage (both) attack and magic damage
         public int magicDamageFlat; // bonus damage to magic attacks flat -> +10
         public int attackDamageFlat; // bonus damage to physical attacks flat -> +10
+        public int meleeDamageBonusFlat; // bonus flat damage for melee spells
+        public int rangedDamageBonusFlat; // bonus flat damage for ranged spells
 
         // Power scaling flats
         public float powerScalingFlat; // flat power scaling general for both (magic / physical)
@@ -94,34 +35,22 @@ namespace MyGame.Combat
         public float magicPowerScalingFlat; // flat power scaling for magic attacks
 
         // -------------------------
-        // Generic multipliers (More/Less buckets)
+        // Generic multipliers (single bucket)
         // -------------------------
-        public MoreLessMult magicDamageMult; // bonus damage to magic attacks %
-        public MoreLessMult physicalDamageMult; // bonus damage to physical attacks %
-        public MoreLessMult damageMult; // bonus damage to all attacks %
+        public float magicDamageMult = 1f; // bonus damage to magic attacks %
+        public float physicalDamageMult = 1f; // bonus damage to physical attacks %
+        public float damageMult = 1f; // bonus damage to all attacks %
+        public float meleeDamageBonusMult = 1f; // bonus damage to melee attacks %
+        public float rangedDamageBonusMult = 1f; // bonus damage to ranged attacks %
 
-        public MoreLessMult physicalSpellBaseMult;
-        public MoreLessMult spellBaseMult;
-        public MoreLessMult magicSpellBaseMult;
+        public float physicalSpellBaseMult = 1f;
+        public float spellBaseMult = 1f;
+        public float magicSpellBaseMult = 1f;
 
-        // NEW: generic power multiplier (both attack + magic can use)
-        public MoreLessMult powerMult; // bonus multiplier to power for both attack & magic
+        public float attackPowerScalingMult = 1f; // power scaling % for physical attacks
+        public float magicPowerScalingMult = 1f; // power scaling % for magic attacks
+        public float powerScalingMult = 1f; // power scaling % for all attacks
 
-        // NEW: attack/magic-specific power multipliers
-        public MoreLessMult attackPowerMult;
-        public MoreLessMult magicPowerMult;
-
-        public MoreLessMult attackPowerScalingMult; // power scaling % for physical attacks
-        public MoreLessMult magicPowerScalingMult; // power scaling % for magic attacks
-        public MoreLessMult powerScalingMult; // power scaling % for all attacks
-
-        public MoreLessMult hitChanceMult;
-        public MoreLessMult castingSpeedMult;
-        public MoreLessMult attackSpeedMult;
-
-        public MoreLessMult physicalDefenceMult; // % bonus to physical defence
-        public MoreLessMult magicDefenceMult; // % bonus to magic defence
-        public MoreLessMult defenceMult; // % bonus to all defence
 
         // -------------------------
         // Type-based layers (8 fields)
@@ -156,13 +85,6 @@ namespace MyGame.Combat
         [SerializeField]
         private float[] attackerWeakenMultByType; // 30% less => *0.7
 
-        // E) Attacker buffs by range type (MORE)
-        [SerializeField]
-        private int[] attackerRangeBonusFlatByRange;
-
-        [SerializeField]
-        private float[] attackerRangeBonusMultByRange;
-
         public StatModifiers()
         {
             EnsureArrays();
@@ -180,40 +102,30 @@ namespace MyGame.Combat
         {
             EnsureArrays();
 
-            // If a MoreLessMult struct was never Reset(), it's all zeros.
-            // That makes Final = 0 and kills all math.
-            Fix(ref magicDamageMult);
-            Fix(ref physicalDamageMult);
-            Fix(ref damageMult);
+            if (magicDamageMult == 0f)
+                magicDamageMult = 1f;
+            if (physicalDamageMult == 0f)
+                physicalDamageMult = 1f;
+            if (damageMult == 0f)
+                damageMult = 1f;
+            if (meleeDamageBonusMult == 0f)
+                meleeDamageBonusMult = 1f;
+            if (rangedDamageBonusMult == 0f)
+                rangedDamageBonusMult = 1f;
 
-            Fix(ref physicalSpellBaseMult);
-            Fix(ref spellBaseMult);
-            Fix(ref magicSpellBaseMult);
+            if (physicalSpellBaseMult == 0f)
+                physicalSpellBaseMult = 1f;
+            if (spellBaseMult == 0f)
+                spellBaseMult = 1f;
+            if (magicSpellBaseMult == 0f)
+                magicSpellBaseMult = 1f;
 
-            Fix(ref powerMult);
-            Fix(ref attackPowerMult);
-            Fix(ref magicPowerMult);
-
-            Fix(ref attackPowerScalingMult);
-            Fix(ref magicPowerScalingMult);
-            Fix(ref powerScalingMult);
-
-            Fix(ref hitChanceMult);
-            Fix(ref castingSpeedMult);
-            Fix(ref attackSpeedMult);
-
-            Fix(ref physicalDefenceMult);
-            Fix(ref magicDefenceMult);
-            Fix(ref defenceMult);
-        }
-
-        private static void Fix(ref MoreLessMult m)
-        {
-            // If either is 0, treat as uninitialized and reset to identity.
-            if (m.more == 0f)
-                m.more = 1f;
-            if (m.less == 0f)
-                m.less = 1f;
+            if (attackPowerScalingMult == 0f)
+                attackPowerScalingMult = 1f;
+            if (magicPowerScalingMult == 0f)
+                magicPowerScalingMult = 1f;
+            if (powerScalingMult == 0f)
+                powerScalingMult = 1f;
         }
 
         public StatModifiers Clone()
@@ -224,24 +136,15 @@ namespace MyGame.Combat
             clone.EnsureInitialized();
 
             // ---------- Flats ----------
-            clone.attackPowerFlat = attackPowerFlat;
-            clone.magicPowerFlat = magicPowerFlat;
-            clone.powerFlat = powerFlat;
-
             clone.spellBaseFlat = spellBaseFlat;
             clone.magicSpellBaseFlat = magicSpellBaseFlat;
             clone.physicalSpellBaseFlat = physicalSpellBaseFlat;
 
-            clone.defenceFlat = defenceFlat;
-            clone.physicalDefenseFlat = physicalDefenseFlat;
-            clone.magicDefenseFlat = magicDefenseFlat;
-
-            clone.attackSpeedFlat = attackSpeedFlat;
-            clone.castingSpeedFlat = castingSpeedFlat;
-
             clone.damageFlat = damageFlat;
             clone.magicDamageFlat = magicDamageFlat;
             clone.attackDamageFlat = attackDamageFlat;
+            clone.meleeDamageBonusFlat = meleeDamageBonusFlat;
+            clone.rangedDamageBonusFlat = rangedDamageBonusFlat;
 
             clone.powerScalingFlat = powerScalingFlat;
             clone.attackPowerScalingFlat = attackPowerScalingFlat;
@@ -251,26 +154,17 @@ namespace MyGame.Combat
             clone.magicDamageMult = magicDamageMult;
             clone.physicalDamageMult = physicalDamageMult;
             clone.damageMult = damageMult;
+            clone.meleeDamageBonusMult = meleeDamageBonusMult;
+            clone.rangedDamageBonusMult = rangedDamageBonusMult;
 
             clone.spellBaseMult = spellBaseMult;
             clone.magicSpellBaseMult = magicSpellBaseMult;
             clone.physicalSpellBaseMult = physicalSpellBaseMult;
 
-            clone.powerMult = powerMult;
-            clone.attackPowerMult = attackPowerMult;
-            clone.magicPowerMult = magicPowerMult;
-
             clone.attackPowerScalingMult = attackPowerScalingMult;
             clone.magicPowerScalingMult = magicPowerScalingMult;
             clone.powerScalingMult = powerScalingMult;
 
-            clone.hitChanceMult = hitChanceMult;
-            clone.castingSpeedMult = castingSpeedMult;
-            clone.attackSpeedMult = attackSpeedMult;
-
-            clone.physicalDefenceMult = physicalDefenceMult;
-            clone.magicDefenceMult = magicDefenceMult;
-            clone.defenceMult = defenceMult;
 
             // ---------- Type-based arrays ----------
             clone.attackerBonusFlatByType = (int[])attackerBonusFlatByType.Clone();
@@ -285,9 +179,6 @@ namespace MyGame.Combat
             clone.attackerWeakenFlatByType = (int[])attackerWeakenFlatByType.Clone();
             clone.attackerWeakenMultByType = (float[])attackerWeakenMultByType.Clone();
 
-            clone.attackerRangeBonusFlatByRange = (int[])attackerRangeBonusFlatByRange.Clone();
-            clone.attackerRangeBonusMultByRange = (float[])attackerRangeBonusMultByRange.Clone();
-
             return clone;
         }
 
@@ -296,24 +187,15 @@ namespace MyGame.Combat
             EnsureInitialized();
             other.EnsureInitialized();
             // ---------- Flats ----------
-            attackPowerFlat = other.attackPowerFlat;
-            magicPowerFlat = other.magicPowerFlat;
-            powerFlat = other.powerFlat;
-
             spellBaseFlat = other.spellBaseFlat;
             magicSpellBaseFlat = other.magicSpellBaseFlat;
             physicalSpellBaseFlat = other.physicalSpellBaseFlat;
 
-            defenceFlat = other.defenceFlat;
-            physicalDefenseFlat = other.physicalDefenseFlat;
-            magicDefenseFlat = other.magicDefenseFlat;
-
-            attackSpeedFlat = other.attackSpeedFlat;
-            castingSpeedFlat = other.castingSpeedFlat;
-
             damageFlat = other.damageFlat;
             magicDamageFlat = other.magicDamageFlat;
             attackDamageFlat = other.attackDamageFlat;
+            meleeDamageBonusFlat = other.meleeDamageBonusFlat;
+            rangedDamageBonusFlat = other.rangedDamageBonusFlat;
 
             powerScalingFlat = other.powerScalingFlat;
             attackPowerScalingFlat = other.attackPowerScalingFlat;
@@ -323,26 +205,17 @@ namespace MyGame.Combat
             magicDamageMult = other.magicDamageMult;
             physicalDamageMult = other.physicalDamageMult;
             damageMult = other.damageMult;
+            meleeDamageBonusMult = other.meleeDamageBonusMult;
+            rangedDamageBonusMult = other.rangedDamageBonusMult;
 
             spellBaseMult = other.spellBaseMult;
             magicSpellBaseMult = other.magicSpellBaseMult;
             physicalSpellBaseMult = other.physicalSpellBaseMult;
 
-            powerMult = other.powerMult;
-            attackPowerMult = other.attackPowerMult;
-            magicPowerMult = other.magicPowerMult;
-
             attackPowerScalingMult = other.attackPowerScalingMult;
             magicPowerScalingMult = other.magicPowerScalingMult;
             powerScalingMult = other.powerScalingMult;
 
-            hitChanceMult = other.hitChanceMult;
-            castingSpeedMult = other.castingSpeedMult;
-            attackSpeedMult = other.attackSpeedMult;
-
-            physicalDefenceMult = other.physicalDefenceMult;
-            magicDefenceMult = other.magicDefenceMult;
-            defenceMult = other.defenceMult;
 
             // ---------- Arrays ----------
             Array.Copy(
@@ -389,52 +262,7 @@ namespace MyGame.Combat
                 attackerWeakenMultByType.Length
             );
 
-            Array.Copy(
-                other.attackerRangeBonusFlatByRange,
-                attackerRangeBonusFlatByRange,
-                attackerRangeBonusFlatByRange.Length
-            );
-            Array.Copy(
-                other.attackerRangeBonusMultByRange,
-                attackerRangeBonusMultByRange,
-                attackerRangeBonusMultByRange.Length
-            );
         }
-
-        // -------------------------
-        // Helpers for NEW power fields (NO math pipeline here)
-        // -------------------------
-        public void AddPowerFlat(int value) => powerFlat += value;
-
-        public void AddPowerMorePercent(float percent) => powerMult.AddMore(percent);
-
-        public void RemovePowerMorePercent(float percent) => powerMult.RemoveMore(percent);
-
-        public void AddPowerLessPercent(float percentLess) => powerMult.AddLess(percentLess);
-
-        public void RemovePowerLessPercent(float percentLess) => powerMult.RemoveLess(percentLess);
-
-        public void AddAttackPowerMorePercent(float percent) => attackPowerMult.AddMore(percent);
-
-        public void RemoveAttackPowerMorePercent(float percent) =>
-            attackPowerMult.RemoveMore(percent);
-
-        public void AddAttackPowerLessPercent(float percentLess) =>
-            attackPowerMult.AddLess(percentLess);
-
-        public void RemoveAttackPowerLessPercent(float percentLess) =>
-            attackPowerMult.RemoveLess(percentLess);
-
-        public void AddMagicPowerMorePercent(float percent) => magicPowerMult.AddMore(percent);
-
-        public void RemoveMagicPowerMorePercent(float percent) =>
-            magicPowerMult.RemoveMore(percent);
-
-        public void AddMagicPowerLessPercent(float percentLess) =>
-            magicPowerMult.AddLess(percentLess);
-
-        public void RemoveMagicPowerLessPercent(float percentLess) =>
-            magicPowerMult.RemoveLess(percentLess);
 
         // -------------------------
         // Flat helpers for power scaling
@@ -448,176 +276,103 @@ namespace MyGame.Combat
         // -------------------------
         // More/Less helpers for power scaling mults
         // -------------------------
-        public void AddPowerScalingMorePercent(float percent) => powerScalingMult.AddMore(percent);
+        public void AddPowerScalingPercent(float percent) =>
+            ApplyPercent(ref powerScalingMult, percent);
 
-        public void RemovePowerScalingMorePercent(float percent) =>
-            powerScalingMult.RemoveMore(percent);
+        public void RemovePowerScalingPercent(float percent) =>
+            RemovePercent(ref powerScalingMult, percent);
 
-        public void AddPowerScalingLessPercent(float percentLess) =>
-            powerScalingMult.AddLess(percentLess);
+        public void AddAttackPowerScalingPercent(float percent) =>
+            ApplyPercent(ref attackPowerScalingMult, percent);
 
-        public void RemovePowerScalingLessPercent(float percentLess) =>
-            powerScalingMult.RemoveLess(percentLess);
+        public void RemoveAttackPowerScalingPercent(float percent) =>
+            RemovePercent(ref attackPowerScalingMult, percent);
 
-        public void AddAttackPowerScalingMorePercent(float percent) =>
-            attackPowerScalingMult.AddMore(percent);
+        public void AddMagicPowerScalingPercent(float percent) =>
+            ApplyPercent(ref magicPowerScalingMult, percent);
 
-        public void RemoveAttackPowerScalingMorePercent(float percent) =>
-            attackPowerScalingMult.RemoveMore(percent);
-
-        public void AddAttackPowerScalingLessPercent(float percentLess) =>
-            attackPowerScalingMult.AddLess(percentLess);
-
-        public void RemoveAttackPowerScalingLessPercent(float percentLess) =>
-            attackPowerScalingMult.RemoveLess(percentLess);
-
-        public void AddMagicPowerScalingMorePercent(float percent) =>
-            magicPowerScalingMult.AddMore(percent);
-
-        public void RemoveMagicPowerScalingMorePercent(float percent) =>
-            magicPowerScalingMult.RemoveMore(percent);
-
-        public void AddMagicPowerScalingLessPercent(float percentLess) =>
-            magicPowerScalingMult.AddLess(percentLess);
-
-        public void RemoveMagicPowerScalingLessPercent(float percentLess) =>
-            magicPowerScalingMult.RemoveLess(percentLess);
+        public void RemoveMagicPowerScalingPercent(float percent) =>
+            RemovePercent(ref magicPowerScalingMult, percent);
 
         // -------------------------
         // Existing helpers (damage, speeds, etc.)
         // -------------------------
 
         // Damage (all)
-        public void AddDamageMorePercent(float percent) => damageMult.AddMore(percent);
+        public void AddDamagePercent(float percent) => ApplyPercent(ref damageMult, percent);
 
-        public void RemoveDamageMorePercent(float percent) => damageMult.RemoveMore(percent);
+        public void RemoveDamagePercent(float percent) => RemovePercent(ref damageMult, percent);
 
-        public void AddDamageLessPercent(float percentLess) => damageMult.AddLess(percentLess);
+        // Melee/ranged bonus damage
+        public int GetMeleeDamageBonusFlat() => meleeDamageBonusFlat;
 
-        public void RemoveDamageLessPercent(float percentLess) =>
-            damageMult.RemoveLess(percentLess);
+        public float GetMeleeDamageBonusMult() => meleeDamageBonusMult;
+
+        public void AddMeleeDamageBonusFlat(int value) => meleeDamageBonusFlat += value;
+
+        public void RemoveMeleeDamageBonusFlat(int value) => meleeDamageBonusFlat -= value;
+
+        public void AddMeleeDamageBonusPercent(float percent) =>
+            ApplyPercent(ref meleeDamageBonusMult, percent);
+
+        public void RemoveMeleeDamageBonusPercent(float percent) =>
+            RemovePercent(ref meleeDamageBonusMult, percent);
+
+        public int GetRangedDamageBonusFlat() => rangedDamageBonusFlat;
+
+        public float GetRangedDamageBonusMult() => rangedDamageBonusMult;
+
+        public void AddRangedDamageBonusFlat(int value) => rangedDamageBonusFlat += value;
+
+        public void RemoveRangedDamageBonusFlat(int value) => rangedDamageBonusFlat -= value;
+
+        public void AddRangedDamageBonusPercent(float percent) =>
+            ApplyPercent(ref rangedDamageBonusMult, percent);
+
+        public void RemoveRangedDamageBonusPercent(float percent) =>
+            RemovePercent(ref rangedDamageBonusMult, percent);
 
         // SPell BaseDamage
         // Generic spell base
         public void AddSpellBaseFlat(int value) => spellBaseFlat += value;
 
-        public void AddSpellBaseMorePercent(float percent) => spellBaseMult.AddMore(percent);
+        public void AddSpellBasePercent(float percent) =>
+            ApplyPercent(ref spellBaseMult, percent);
 
-        public void AddSpellBaseLessPercent(float percentLess) =>
-            spellBaseMult.AddLess(percentLess);
+        public void RemoveSpellBasePercent(float percent) =>
+            RemovePercent(ref spellBaseMult, percent);
 
         // Magic spell base
         public void AddMagicSpellBaseFlat(int value) => magicSpellBaseFlat += value;
 
-        public void AddMagicSpellBaseMorePercent(float percent) =>
-            magicSpellBaseMult.AddMore(percent);
+        public void AddMagicSpellBasePercent(float percent) =>
+            ApplyPercent(ref magicSpellBaseMult, percent);
 
-        public void AddMagicSpellBaseLessPercent(float percentLess) =>
-            magicSpellBaseMult.AddLess(percentLess);
+        public void RemoveMagicSpellBasePercent(float percent) =>
+            RemovePercent(ref magicSpellBaseMult, percent);
 
         // Physical spell base
         public void AddPhysicalSpellBaseFlat(int value) => physicalSpellBaseFlat += value;
 
-        public void AddPhysicalSpellBaseMorePercent(float percent) =>
-            physicalSpellBaseMult.AddMore(percent);
+        public void AddPhysicalSpellBasePercent(float percent) =>
+            ApplyPercent(ref physicalSpellBaseMult, percent);
 
-        public void AddPhysicalSpellBaseLessPercent(float percentLess) =>
-            physicalSpellBaseMult.AddLess(percentLess);
+        public void RemovePhysicalSpellBasePercent(float percent) =>
+            RemovePercent(ref physicalSpellBaseMult, percent);
 
         // Damage (physical only)
-        public void AddPhysicalDamageMorePercent(float percent) =>
-            physicalDamageMult.AddMore(percent);
+        public void AddPhysicalDamagePercent(float percent) =>
+            ApplyPercent(ref physicalDamageMult, percent);
 
-        public void RemovePhysicalDamageMorePercent(float percent) =>
-            physicalDamageMult.RemoveMore(percent);
-
-        public void AddPhysicalDamageLessPercent(float percentLess) =>
-            physicalDamageMult.AddLess(percentLess);
-
-        public void RemovePhysicalDamageLessPercent(float percentLess) =>
-            physicalDamageMult.RemoveLess(percentLess);
+        public void RemovePhysicalDamagePercent(float percent) =>
+            RemovePercent(ref physicalDamageMult, percent);
 
         // Damage (magic only)
-        public void AddMagicDamageMorePercent(float percent) => magicDamageMult.AddMore(percent);
+        public void AddMagicDamagePercent(float percent) =>
+            ApplyPercent(ref magicDamageMult, percent);
 
-        public void RemoveMagicDamageMorePercent(float percent) =>
-            magicDamageMult.RemoveMore(percent);
-
-        public void AddMagicDamageLessPercent(float percentLess) =>
-            magicDamageMult.AddLess(percentLess);
-
-        public void RemoveMagicDamageLessPercent(float percentLess) =>
-            magicDamageMult.RemoveLess(percentLess);
-
-        // Hit chance
-        public void AddHitChanceMorePercent(float percent) => hitChanceMult.AddMore(percent);
-
-        public void RemoveHitChanceMorePercent(float percent) => hitChanceMult.RemoveMore(percent);
-
-        public void AddHitChanceLessPercent(float percentLess) =>
-            hitChanceMult.AddLess(percentLess);
-
-        public void RemoveHitChanceLessPercent(float percentLess) =>
-            hitChanceMult.RemoveLess(percentLess);
-
-        // Casting speed
-        public void AddCastingSpeedMorePercent(float percent) => castingSpeedMult.AddMore(percent);
-
-        public void RemoveCastingSpeedMorePercent(float percent) =>
-            castingSpeedMult.RemoveMore(percent);
-
-        public void AddCastingSpeedLessPercent(float percentLess) =>
-            castingSpeedMult.AddLess(percentLess);
-
-        public void RemoveCastingSpeedLessPercent(float percentLess) =>
-            castingSpeedMult.RemoveLess(percentLess);
-
-        // Attack speed
-        public void AddAttackSpeedMorePercent(float percent) => attackSpeedMult.AddMore(percent);
-
-        public void RemoveAttackSpeedMorePercent(float percent) =>
-            attackSpeedMult.RemoveMore(percent);
-
-        public void AddAttackSpeedLessPercent(float percentLess) =>
-            attackSpeedMult.AddLess(percentLess);
-
-        public void RemoveAttackSpeedLessPercent(float percentLess) =>
-            attackSpeedMult.RemoveLess(percentLess);
-
-        // Defence (all)
-        public void AddDefenceMorePercent(float percent) => defenceMult.AddMore(percent);
-
-        public void RemoveDefenceMorePercent(float percent) => defenceMult.RemoveMore(percent);
-
-        public void AddDefenceLessPercent(float percentLess) => defenceMult.AddLess(percentLess);
-
-        public void RemoveDefenceLessPercent(float percentLess) =>
-            defenceMult.RemoveLess(percentLess);
-
-        // Physical defence
-        public void AddPhysicalDefenceMorePercent(float percent) =>
-            physicalDefenceMult.AddMore(percent);
-
-        public void RemovePhysicalDefenceMorePercent(float percent) =>
-            physicalDefenceMult.RemoveMore(percent);
-
-        public void AddPhysicalDefenceLessPercent(float percentLess) =>
-            physicalDefenceMult.AddLess(percentLess);
-
-        public void RemovePhysicalDefenceLessPercent(float percentLess) =>
-            physicalDefenceMult.RemoveLess(percentLess);
-
-        // Magic defence
-        public void AddMagicDefenceMorePercent(float percent) => magicDefenceMult.AddMore(percent);
-
-        public void RemoveMagicDefenceMorePercent(float percent) =>
-            magicDefenceMult.RemoveMore(percent);
-
-        public void AddMagicDefenceLessPercent(float percentLess) =>
-            magicDefenceMult.AddLess(percentLess);
-
-        public void RemoveMagicDefenceLessPercent(float percentLess) =>
-            magicDefenceMult.RemoveLess(percentLess);
+        public void RemoveMagicDamagePercent(float percent) =>
+            RemovePercent(ref magicDamageMult, percent);
 
         // -------------------------
         // Type arrays init/reset
@@ -632,15 +387,12 @@ namespace MyGame.Combat
 
         private static int Idx(DamageType t) => (int)t;
 
-        private static int Idx(DamageRangeType t) => (int)t;
-
         // Unity serialization note:
         // Constructors are not guaranteed to run for serialized instances,
         // so always ensure arrays exist before use.
         private void EnsureArrays()
         {
             int count = Enum.GetValues(typeof(DamageType)).Length;
-            int rangeCount = Enum.GetValues(typeof(DamageRangeType)).Length;
 
             attackerBonusFlatByType ??= new int[count];
             attackerBonusMultByType ??= NewMultArray(count);
@@ -654,36 +406,6 @@ namespace MyGame.Combat
             attackerWeakenFlatByType ??= new int[count];
             attackerWeakenMultByType ??= NewMultArray(count);
 
-            attackerRangeBonusFlatByRange ??= new int[rangeCount];
-            attackerRangeBonusMultByRange ??= NewMultArray(rangeCount);
-        }
-
-        // -------------------------
-        // E) Attacker buffs by range type (MORE)
-        // -------------------------
-        public int GetAttackerRangeBonusFlat(DamageRangeType t)
-        {
-            EnsureArrays();
-            return attackerRangeBonusFlatByRange[Idx(t)];
-        }
-
-        public float GetAttackerRangeBonusMult(DamageRangeType t)
-        {
-            EnsureArrays();
-            return attackerRangeBonusMultByRange[Idx(t)];
-        }
-
-        public void AddAttackerRangeBonusFlat(DamageRangeType t, int value)
-        {
-            EnsureArrays();
-            attackerRangeBonusFlatByRange[Idx(t)] += value;
-        }
-
-        /// <summary>+0.20 => *1.2 (multiplicative stacking)</summary>
-        public void AddAttackerRangeBonusMorePercent(DamageRangeType t, float percent)
-        {
-            EnsureArrays();
-            attackerRangeBonusMultByRange[Idx(t)] *= (1f + percent);
         }
 
         // -------------------------
@@ -708,20 +430,17 @@ namespace MyGame.Combat
         }
 
         /// <summary>+0.20 => *1.2 (multiplicative stacking)</summary>
-        public void AddAttackerBonusMorePercent(DamageType t, float percent)
+        public void AddAttackerBonusPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            attackerBonusMultByType[Idx(t)] *= (1f + percent);
+            ApplyPercent(ref attackerBonusMultByType[Idx(t)], percent);
         }
 
-        /// <summary>Undo a previous AddAttackerBonusMorePercent(t, percent)</summary>
-        public void RemoveAttackerBonusMorePercent(DamageType t, float percent)
+        /// <summary>Undo a previous AddAttackerBonusPercent(t, percent)</summary>
+        public void RemoveAttackerBonusPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            float f = 1f + percent;
-            if (f <= 0f)
-                return;
-            attackerBonusMultByType[Idx(t)] /= f;
+            RemovePercent(ref attackerBonusMultByType[Idx(t)], percent);
         }
 
         // -------------------------
@@ -746,20 +465,17 @@ namespace MyGame.Combat
         }
 
         /// <summary>+0.20 => target takes *1.2 (multiplicative stacking)</summary>
-        public void AddDefenderVulnMorePercent(DamageType t, float percent)
+        public void AddDefenderVulnPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            defenderVulnMultByType[Idx(t)] *= (1f + percent);
+            ApplyPercent(ref defenderVulnMultByType[Idx(t)], percent);
         }
 
-        /// <summary>Undo a previous AddDefenderVulnMorePercent(t, percent)</summary>
-        public void RemoveDefenderVulnMorePercent(DamageType t, float percent)
+        /// <summary>Undo a previous AddDefenderVulnPercent(t, percent)</summary>
+        public void RemoveDefenderVulnPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            float f = 1f + percent;
-            if (f <= 0f)
-                return;
-            defenderVulnMultByType[Idx(t)] /= f;
+            RemovePercent(ref defenderVulnMultByType[Idx(t)], percent);
         }
 
         // -------------------------
@@ -783,21 +499,18 @@ namespace MyGame.Combat
             defenderResistFlatByType[Idx(t)] += value;
         }
 
-        /// <summary>0.20 => target takes *0.8 (multiplicative stacking)</summary>
-        public void AddDefenderResistLessPercent(DamageType t, float percentLess)
+        /// <summary>-0.20 => target takes *0.8 (multiplicative stacking)</summary>
+        public void AddDefenderResistPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            defenderResistMultByType[Idx(t)] *= Clamp01Factor(1f - percentLess);
+            ApplyPercent(ref defenderResistMultByType[Idx(t)], percent);
         }
 
-        /// <summary>Undo a previous AddDefenderResistLessPercent(t, percentLess)</summary>
-        public void RemoveDefenderResistLessPercent(DamageType t, float percentLess)
+        /// <summary>Undo a previous AddDefenderResistPercent(t, percent)</summary>
+        public void RemoveDefenderResistPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            float f = Clamp01Factor(1f - percentLess);
-            if (f <= 0f)
-                return;
-            defenderResistMultByType[Idx(t)] /= f;
+            RemovePercent(ref defenderResistMultByType[Idx(t)], percent);
         }
 
         // -------------------------
@@ -821,21 +534,18 @@ namespace MyGame.Combat
             attackerWeakenFlatByType[Idx(t)] += value;
         }
 
-        /// <summary>0.20 => attacker deals *0.8 (multiplicative stacking)</summary>
-        public void AddAttackerWeakenLessPercent(DamageType t, float percentLess)
+        /// <summary>-0.20 => attacker deals *0.8 (multiplicative stacking)</summary>
+        public void AddAttackerWeakenPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            attackerWeakenMultByType[Idx(t)] *= Clamp01Factor(1f - percentLess);
+            ApplyPercent(ref attackerWeakenMultByType[Idx(t)], percent);
         }
 
-        /// <summary>Undo a previous AddAttackerWeakenLessPercent(t, percentLess)</summary>
-        public void RemoveAttackerWeakenLessPercent(DamageType t, float percentLess)
+        /// <summary>Undo a previous AddAttackerWeakenPercent(t, percent)</summary>
+        public void RemoveAttackerWeakenPercent(DamageType t, float percent)
         {
             EnsureArrays();
-            float f = Clamp01Factor(1f - percentLess);
-            if (f <= 0f)
-                return;
-            attackerWeakenMultByType[Idx(t)] /= f;
+            RemovePercent(ref attackerWeakenMultByType[Idx(t)], percent);
         }
 
         // -------------------------
@@ -865,28 +575,33 @@ namespace MyGame.Combat
             attackerWeakenFlatByType[Idx(t)] -= value;
         }
 
-        // Utility: avoid negative multipliers for "less"
-        private static float Clamp01Factor(float v) => v < 0f ? 0f : v;
+        // Utility: apply signed percent as multiplicative factor.
+        private static void ApplyPercent(ref float mult, float percent)
+        {
+            float f = 1f + percent;
+            if (f <= 0f)
+                return;
+            mult *= f;
+        }
+
+        private static void RemovePercent(ref float mult, float percent)
+        {
+            float f = 1f + percent;
+            if (f <= 0f)
+                return;
+            mult /= f;
+        }
 
         public void ResetAll()
         {
             EnsureArrays();
 
             // Flats
-            attackPowerFlat = 0;
-            magicPowerFlat = 0;
-            powerFlat = 0;
-
-            defenceFlat = 0;
-            physicalDefenseFlat = 0;
-            magicDefenseFlat = 0;
-
-            attackSpeedFlat = 0;
-            castingSpeedFlat = 0;
-
             damageFlat = 0;
             magicDamageFlat = 0;
             attackDamageFlat = 0;
+            meleeDamageBonusFlat = 0;
+            rangedDamageBonusFlat = 0;
 
             powerScalingFlat = 0f;
             attackPowerScalingFlat = 0f;
@@ -897,29 +612,20 @@ namespace MyGame.Combat
             physicalSpellBaseFlat = 0;
 
             // Mults
-            magicDamageMult.Reset();
-            physicalDamageMult.Reset();
-            damageMult.Reset();
+            magicDamageMult = 1f;
+            physicalDamageMult = 1f;
+            damageMult = 1f;
+            meleeDamageBonusMult = 1f;
+            rangedDamageBonusMult = 1f;
 
-            spellBaseMult.Reset();
-            magicSpellBaseMult.Reset();
-            physicalSpellBaseMult.Reset();
+            spellBaseMult = 1f;
+            magicSpellBaseMult = 1f;
+            physicalSpellBaseMult = 1f;
 
-            powerMult.Reset();
-            attackPowerMult.Reset();
-            magicPowerMult.Reset();
+            attackPowerScalingMult = 1f;
+            magicPowerScalingMult = 1f;
+            powerScalingMult = 1f;
 
-            attackPowerScalingMult.Reset();
-            magicPowerScalingMult.Reset();
-            powerScalingMult.Reset();
-
-            hitChanceMult.Reset();
-            castingSpeedMult.Reset();
-            attackSpeedMult.Reset();
-
-            physicalDefenceMult.Reset();
-            magicDefenceMult.Reset();
-            defenceMult.Reset();
 
             // Type-based arrays
             ClearInts(attackerBonusFlatByType);
@@ -934,8 +640,6 @@ namespace MyGame.Combat
             ClearInts(attackerWeakenFlatByType);
             ResetMults(attackerWeakenMultByType);
 
-            ClearInts(attackerRangeBonusFlatByRange);
-            ResetMults(attackerRangeBonusMultByRange);
         }
 
         private static void ClearInts(int[] arr) => Array.Clear(arr, 0, arr.Length);
@@ -947,28 +651,16 @@ namespace MyGame.Combat
         }
 
         // Convenience accessors:
-        public float DamageMultFinal => damageMult.Final;
-        public float PhysicalDamageMultFinal => physicalDamageMult.Final;
-        public float MagicDamageMultFinal => magicDamageMult.Final;
+        public float DamageMultFinal => damageMult;
+        public float PhysicalDamageMultFinal => physicalDamageMult;
+        public float MagicDamageMultFinal => magicDamageMult;
 
-        public float PowerMultFinal => powerMult.Final;
-        public float AttackPowerMultFinal => attackPowerMult.Final;
-        public float MagicPowerMultFinal => magicPowerMult.Final;
+        public float PowerScalingMultFinal => powerScalingMult;
+        public float AttackPowerScalingMultFinal => attackPowerScalingMult;
+        public float MagicPowerScalingMultFinal => magicPowerScalingMult;
 
-        public float PowerScalingMultFinal => powerScalingMult.Final;
-        public float AttackPowerScalingMultFinal => attackPowerScalingMult.Final;
-        public float MagicPowerScalingMultFinal => magicPowerScalingMult.Final;
-
-        public float HitChanceMultFinal => hitChanceMult.Final;
-        public float CastingSpeedMultFinal => castingSpeedMult.Final;
-        public float AttackSpeedMultFinal => attackSpeedMult.Final;
-
-        public float DefenceMultFinal => defenceMult.Final;
-        public float PhysicalDefenceMultFinal => physicalDefenceMult.Final;
-        public float MagicDefenceMultFinal => magicDefenceMult.Final;
-
-        public float SpellBaseMultFinal => spellBaseMult.Final;
-        public float MagicSpellBaseMultFinal => magicSpellBaseMult.Final;
-        public float PhysicalSpellBaseMultFinal => physicalSpellBaseMult.Final;
+        public float SpellBaseMultFinal => spellBaseMult;
+        public float MagicSpellBaseMultFinal => magicSpellBaseMult;
+        public float PhysicalSpellBaseMultFinal => physicalSpellBaseMult;
     }
 }

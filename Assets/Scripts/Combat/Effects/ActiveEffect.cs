@@ -30,7 +30,25 @@ namespace MyGame.Combat
             {
                 int sum = 0;
                 for (int i = 0; i < contributors.Count; i++)
-                    sum += Math.Max(1, contributors[i].totalTickValue);
+                {
+                    var c = contributors[i];
+                    if (c == null)
+                        continue;
+
+                    if (c.componentContributions != null && c.componentContributions.Count > 0)
+                    {
+                        for (int j = 0; j < c.componentContributions.Count; j++)
+                        {
+                            var comp = c.componentContributions[j];
+                            if (comp != null && comp.kind == EffectKind.DamageOverTime)
+                                sum += Math.Max(1, comp.tickValue);
+                        }
+                    }
+                    else
+                    {
+                        sum += Math.Max(1, c.totalTickValue);
+                    }
+                }
                 return sum;
             }
         }

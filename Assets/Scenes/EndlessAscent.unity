@@ -257,6 +257,7 @@ GameObject:
   - component: {fileID: 251120974}
   - component: {fileID: 251120973}
   - component: {fileID: 251120975}
+  - component: {fileID: 251120976}
   m_Layer: 5
   m_Name: Root
   m_TagString: Untagged
@@ -389,6 +390,20 @@ MonoBehaviour:
   inventoryDetailTooltipUxml: {fileID: 9197481963319205126, guid: 36fb6c1b1888bc24491de2cc90c3d0d4, type: 3}
   spellDetailTooltipUxml: {fileID: 9197481963319205126, guid: 5d85c680abfa2344fa9339f55dccc05e, type: 3}
   effectDetailTooltipUxml: {fileID: 9197481963319205126, guid: 8807c7cba21819446a88643b22e47978, type: 3}
+  arrayDetailTooltipUxml: {fileID: 9197481963319205126, guid: c4198450a2cd8f64ab1e110950a970d7, type: 3}
+--- !u!114 &251120976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251120972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604bd7be719e6fa4483e3305999974d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swapper: {fileID: 251120975}
 --- !u!1 &254522288
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,12 +894,14 @@ MonoBehaviour:
   effectDatabase: {fileID: 11400000, guid: 06e45474940100d468e8bcf1ef1f4837, type: 2}
   spellProgression: {fileID: 11400000, guid: 20ba0ea94467da746bf55cb4258bb1b4, type: 2}
   startingSpellConfig: {fileID: 11400000, guid: e4e8a20bfe9fe7943ac71ff7933c425f, type: 2}
+  arrayCoreDatabase: {fileID: 11400000, guid: 20528466145bcc34197e16007a346b85, type: 2}
+  arrayNodeDatabase: {fileID: 11400000, guid: 9328b2307669b3945aff1ecd6b86c3e9, type: 2}
   playerAvatarDatabase: {fileID: 11400000, guid: 913bd5fd613e3da44988b721a6021455, type: 2}
   playerIconDatabase: {fileID: 11400000, guid: b4b5912d2cf94564da3cd75b004f58a4, type: 2}
   playerClassDatabase: {fileID: 11400000, guid: e46449af69105dc41b503f8f75c6c2c2, type: 2}
   itemDatabase: {fileID: 11400000, guid: b8c79889e9d3b7a4bb44460dcaf8748f, type: 2}
   equipmentDatabase: {fileID: 11400000, guid: af66b00651a5ea44c929c06016a46857, type: 2}
-  unlockDatabase: {fileID: 0}
+  unlockDatabase: {fileID: 11400000, guid: bb4f862cdd0602349941aa732a108553, type: 2}
 --- !u!1 &1110039943
 GameObject:
   m_ObjectHideFlags: 0
@@ -1192,7 +1209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _houseTabUxml: {fileID: 0}
-  _spellMergeRoomTabUxml: {fileID: 0}
+  _spellMergeRoomTabUxml: {fileID: 9197481963319205126, guid: 01454b09f36df2d42929c88539e68404, type: 3}
   _smithyTabUxml: {fileID: 0}
   _alchemyRoomTabUxml: {fileID: 0}
   _tbd1TabUxml: {fileID: 0}

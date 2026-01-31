@@ -438,12 +438,12 @@ namespace MyGame.Helpers
                 }
             }
 
-            if (inst?.rolledSpellMods != null)
+            if (inst?.rolledCombatStatMods != null)
             {
-                for (int i = 0; i < inst.rolledSpellMods.Count; i++)
+                for (int i = 0; i < inst.rolledCombatStatMods.Count; i++)
                 {
-                    var m = inst.rolledSpellMods[i];
-                    var line = FormatSpellCombatModifierLine(m);
+                    var m = inst.rolledCombatStatMods[i];
+                    var line = FormatCombatStatModifierLine(m);
                     if (!string.IsNullOrWhiteSpace(line))
                         lines.Add(line);
                 }
@@ -475,62 +475,47 @@ namespace MyGame.Helpers
             return s;
         }
 
-        private static string FormatSpellCombatModifierLine(SpellCombatModifier m)
+        private static string FormatCombatStatModifierLine(CombatStatModifier m)
         {
-            var targetName = m.target.ToString();
-            if (string.IsNullOrWhiteSpace(targetName) || targetName == "None")
-                return null;
-
-            bool isLessPercent = targetName.EndsWith("LessPercent", StringComparison.Ordinal);
-
-            string baseName = targetName;
-            baseName = baseName.Replace("MorePercent", string.Empty);
-            baseName = baseName.Replace("LessPercent", string.Empty);
-            baseName = baseName.Replace("Flat", string.Empty);
-
-            baseName = baseName.Replace("Attacker", "Attack");
-            baseName = baseName.Replace("Defender", "Enemy");
-
-            string label = HumanizeStatName(NiceEnum(baseName));
-
-            if (targetName.EndsWith("ByType", StringComparison.Ordinal) && m.damageType != default)
+            string label = HumanizeStatName(NiceEnum(m.stat.ToString()));
+            if (IsTypeBasedStat(m.stat) && m.damageType != DamageType.None)
                 label += $" ({NiceEnum(m.damageType.ToString())})";
-            else if (
-                targetName.EndsWith("ByRange", StringComparison.Ordinal)
-                && m.damageRangeType != default
-            )
-                label += $" ({NiceEnum(m.damageRangeType.ToString())})";
-            else if (m.damageKind != default)
-                label += $" ({NiceEnum(m.damageKind.ToString())})";
 
-            if (isLessPercent && m.op == ModOp.Percent)
-            {
-                int abs = Mathf.Abs(m.value);
-                return $"{label} {abs}% less";
-            }
-
-            return $"{label} {FormatSpellCombatModValue(m)}";
+            return $"{label} {FormatCombatStatModValue(m)}";
         }
 
-        private static string FormatSpellCombatModValue(SpellCombatModifier m)
+        private static string FormatCombatStatModValue(CombatStatModifier m)
         {
-            // Scaling-flat targets store percent-points (x100) in an int so they can represent 0.50 as 50.
-            if (m.op == ModOp.Flat)
-            {
-                switch (m.target)
-                {
-                    case SpellCombatModifierTarget.PowerScalingFlat:
-                    case SpellCombatModifierTarget.AttackPowerScalingFlat:
-                    case SpellCombatModifierTarget.MagicPowerScalingFlat:
-                    {
-                        float scaled = m.value / 100f;
-                        string t = scaled.ToString("0.##");
-                        return (scaled > 0 ? "+" : "") + t;
-                    }
-                }
-            }
+            if (m.op == EffectOp.Flat && IsPowerScalingStat(m.stat))
+                return FormatModValue(ModOp.Percent, m.value);
 
-            return FormatModValue(m.op, m.value);
+            return m.op switch
+            {
+                EffectOp.Flat => FormatModValue(ModOp.Flat, m.value),
+                EffectOp.Percent => FormatModValue(ModOp.Percent, m.value),
+                _ => m.value.ToString(),
+            };
+        }
+
+        private static bool IsPowerScalingStat(EffectStat stat)
+        {
+            switch (stat)
+            {
+                case EffectStat.PowerScalingAll:
+                case EffectStat.PowerScalingPhysical:
+                case EffectStat.PowerScalingMagic:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsTypeBasedStat(EffectStat stat)
+        {
+            return stat == EffectStat.AttackerBonusByType
+                || stat == EffectStat.AttackerWeakenByType
+                || stat == EffectStat.DefenderResistByType
+                || stat == EffectStat.DefenderVulnerabilityByType;
         }
 
         private static string FormatSpellVariableOverrideLine(SpellVariableOverride o)
@@ -539,8 +524,6 @@ namespace MyGame.Helpers
             {
                 case SpellVariableOverrideType.DamageKind:
                     return $"Damage Kind: {NiceEnum(o.damageKind.ToString())}";
-                case SpellVariableOverrideType.DamageRangeType:
-                    return $"Range: {NiceEnum(o.damageRangeType.ToString())}";
                 case SpellVariableOverrideType.DamageType:
                     return $"Damage Type: {NiceEnum(o.damageType.ToString())}";
                 case SpellVariableOverrideType.IgnoreDefenseFlat:

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MyGame.Common;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MyGame.Combat
@@ -8,10 +9,16 @@ namespace MyGame.Combat
     public sealed class CombatEffectSystem
     {
         private readonly EffectDatabase _db;
+        private readonly ICombatEffectCallbacks _callbacks;
+        private readonly List<BaseStatModifier> _tmpBaseMods = new List<BaseStatModifier>(16);
+        private readonly List<DerivedStatModifier> _tmpDerivedMods = new List<DerivedStatModifier>(
+            16
+        );
 
-        public CombatEffectSystem(EffectDatabase db)
+        public CombatEffectSystem(EffectDatabase db, ICombatEffectCallbacks callbacks = null)
         {
             _db = db;
+            _callbacks = callbacks;
         }
 
         public readonly struct PeriodicTickResult
@@ -99,9 +106,8 @@ namespace MyGame.Combat
                 return;
             }
 
-            // Target is based on polarity (buffs go on attacker, debuffs on defender)
-            CombatActorState target =
-                inst.effect.polarity == EffectPolarity.Buff ? attacker : defender;
+            // Target is based on instance target (self or enemy)
+            CombatActorState target = inst.target == EffectTarget.Self ? attacker : defender;
 
             // Find existing effect on the target (used by multiple rules)
             ActiveEffect existing = ActiveEffect.FindEffectById(
@@ -113,6 +119,20 @@ namespace MyGame.Combat
             {
                 case EffectReapplyRule.AddOnTop:
                 {
+                    // Non-stackable & non-mergeable effects should refresh duration on reapply.
+                    if (existing != null && !inst.stackable && !inst.mergeable)
+                    {
+                        ApplyDurationStacking(
+                            existing,
+                            inst,
+                            spellLevel,
+                            null,
+                            true,
+                            inst.GetScaled(spellLevel).durationTurns
+                        );
+                        break;
+                    }
+
                     var result = AddStackMergeEffect(
                         attacker,
                         defender,
@@ -158,57 +178,54 @@ namespace MyGame.Combat
 
                         if (incomingStronger)
                         {
-                            UndoAllStatContributorsIfNeeded(target, existing);
+                            bool dirty = UndoAllStatContributorsIfNeeded(target, existing);
                             existing.contributors.Clear();
-                            var result = CreateEffectContributor(
-                                sourceSpellId: spell.spellId,
-                                sourceActor: attacker.actorType,
-                                durationTurns: inst.GetScaled(spellLevel).durationTurns,
-                                totalTickValue: CalculateEffectTick(
-                                    inst.magnitudeBasis,
-                                    inst.GetScaled(spellLevel).magnitudeFlat,
-                                    inst.GetScaled(spellLevel).magnitudePercent,
-                                    finalPower,
-                                    lastDamageDealt
-                                ),
-                                strengthRating: inst.strengthRating * spellLevel,
-                                inst.removeWhenType
+                            var contributor = BuildContributorWithComponents(
+                                attacker,
+                                target,
+                                spell,
+                                spellLevel,
+                                inst,
+                                lastDamageDealt,
+                                finalPower,
+                                out bool statsDirty
                             );
-                            existing.contributors.Add(result);
+                            existing.contributors.Add(contributor);
+
+                            if (dirty || statsDirty)
+                                RecalculateDerivedStatsIfNeeded(target);
                             break;
                         }
                     }
                     else if (inst.compareMode == EffectStrengthCompareMode.ByComputedMagnitude)
                     {
-                        bool incomingStronger =
-                            existing.TotalDamage
-                            < CalculateEffectTick(
-                                inst.magnitudeBasis,
-                                inst.GetScaled(spellLevel).magnitudeFlat,
-                                inst.GetScaled(spellLevel).magnitudePercent,
-                                finalPower,
-                                lastDamageDealt
-                            );
+                        int incomingStrength = CalculateCompositeTickSum(
+                            inst,
+                            spellLevel,
+                            finalPower,
+                            lastDamageDealt,
+                            target
+                        );
+                        bool incomingStronger = existing.TotalDamage < incomingStrength;
 
                         if (incomingStronger)
                         {
-                            UndoAllStatContributorsIfNeeded(target, existing);
+                            bool dirty = UndoAllStatContributorsIfNeeded(target, existing);
                             existing.contributors.Clear();
-                            var result = CreateEffectContributor(
-                                sourceSpellId: spell.spellId,
-                                sourceActor: attacker.actorType,
-                                durationTurns: inst.GetScaled(spellLevel).durationTurns,
-                                totalTickValue: CalculateEffectTick(
-                                    inst.magnitudeBasis,
-                                    inst.GetScaled(spellLevel).magnitudeFlat,
-                                    inst.GetScaled(spellLevel).magnitudePercent,
-                                    finalPower,
-                                    lastDamageDealt
-                                ),
-                                strengthRating: inst.strengthRating * spellLevel,
-                                inst.removeWhenType
+                            var contributor = BuildContributorWithComponents(
+                                attacker,
+                                target,
+                                spell,
+                                spellLevel,
+                                inst,
+                                lastDamageDealt,
+                                finalPower,
+                                out bool statsDirty
                             );
-                            existing.contributors.Add(result);
+                            existing.contributors.Add(contributor);
+
+                            if (dirty || statsDirty)
+                                RecalculateDerivedStatsIfNeeded(target);
                             break;
                         }
                     }
@@ -272,36 +289,20 @@ namespace MyGame.Combat
                 {
                     if (inst.stackable && contributorCount < scaledInfo.maxStacks)
                     {
-                        var contributor = CreateEffectContributor(
-                            sourceSpellId: spell.spellId,
-                            sourceActor: attacker.actorType,
-                            durationTurns: scaledInfo.durationTurns,
-                            strengthRating: inst.strengthRating * spellLevel,
-                            totalTickValue: CalculateEffectTick(
-                                inst.magnitudeBasis,
-                                inst.GetScaled(spellLevel).magnitudeFlat,
-                                inst.GetScaled(spellLevel).magnitudePercent,
-                                finalPower,
-                                lastDamageDealt
-                            ),
-                            removedWhenType: inst.removeWhenType
+                        var contributor = BuildContributorWithComponents(
+                            attacker,
+                            target,
+                            spell,
+                            spellLevel,
+                            inst,
+                            lastDamageDealt,
+                            finalPower,
+                            out bool statsDirty
                         );
 
-                        if (IsStatModifier(inst.effect))
-                        {
-                            GetSignedStatDeltas(
-                                inst.effect,
-                                inst,
-                                spellLevel,
-                                finalPower,
-                                lastDamageDealt,
-                                out int flat,
-                                out int pct
-                            );
-                            ApplyStatModifierNow(target, inst.effect, contributor, flat, pct);
-                        }
-
                         existing.contributors.Add(contributor);
+                        if (statsDirty)
+                            RecalculateDerivedStatsIfNeeded(target);
 
                         return new EffectApplyResult
                         {
@@ -309,41 +310,36 @@ namespace MyGame.Combat
                             addedContributor = contributor,
                         };
                     }
+
+                    // At max stacks (or not stackable via scaled rules) -> refresh/prolong duration only.
+                    ApplyDurationStacking(
+                        existing,
+                        inst,
+                        spellLevel,
+                        null,
+                        true,
+                        scaledInfo.durationTurns
+                    );
                 }
                 // MERGE
                 else
                 {
                     if (inst.mergeable)
                     {
-                        var contributor = CreateEffectContributor(
-                            sourceSpellId: spell.spellId,
-                            sourceActor: attacker.actorType,
-                            durationTurns: scaledInfo.durationTurns,
-                            strengthRating: inst.strengthRating * spellLevel,
-                            totalTickValue: CalculateEffectTick(
-                                inst.magnitudeBasis,
-                                inst.GetScaled(spellLevel).magnitudeFlat,
-                                inst.GetScaled(spellLevel).magnitudePercent,
-                                finalPower,
-                                lastDamageDealt
-                            ),
-                            removedWhenType: inst.removeWhenType
+                        var contributor = BuildContributorWithComponents(
+                            attacker,
+                            target,
+                            spell,
+                            spellLevel,
+                            inst,
+                            lastDamageDealt,
+                            finalPower,
+                            out bool statsDirty
                         );
-                        if (IsStatModifier(inst.effect))
-                        {
-                            GetSignedStatDeltas(
-                                inst.effect,
-                                inst,
-                                spellLevel,
-                                finalPower,
-                                lastDamageDealt,
-                                out int flat,
-                                out int pct
-                            );
-                            ApplyStatModifierNow(target, inst.effect, contributor, flat, pct);
-                        }
 
                         existing.contributors.Add(contributor);
+                        if (statsDirty)
+                            RecalculateDerivedStatsIfNeeded(target);
 
                         return new EffectApplyResult
                         {
@@ -364,10 +360,12 @@ namespace MyGame.Combat
                     attacker: attacker,
                     target: target,
                     lastDamageDealt: lastDamageDealt,
-                    finalPower: finalPower
+                    finalPower: finalPower,
+                    out bool statsDirty
                 );
-
                 effects.Add(newEffect);
+                if (statsDirty)
+                    RecalculateDerivedStatsIfNeeded(target);
 
                 return new EffectApplyResult
                 {
@@ -463,11 +461,10 @@ namespace MyGame.Combat
             }
         }
 
-        public EffectContributor CreateEffectContributor(
+        private EffectContributor CreateEffectContributor(
             string sourceSpellId,
             CombatActorType sourceActor,
             int durationTurns,
-            int totalTickValue,
             int strengthRating,
             RemoveWhenType removedWhenType
         )
@@ -477,7 +474,6 @@ namespace MyGame.Combat
                 sourceSpellId = sourceSpellId,
                 sourceActor = sourceActor,
                 remainingTurns = durationTurns,
-                totalTickValue = totalTickValue,
                 strengthRating = strengthRating,
                 removedWhenType = removedWhenType,
             };
@@ -490,38 +486,20 @@ namespace MyGame.Combat
             CombatActorState attacker,
             CombatActorState target,
             int lastDamageDealt,
-            int finalPower
+            int finalPower,
+            out bool statsDirty
         )
         {
-            var contributor = new EffectContributor
-            {
-                sourceSpellId = spell.spellId,
-                sourceActor = attacker.actorType,
-                remainingTurns = inst.GetScaled(spellLevel).durationTurns,
-                totalTickValue = CalculateEffectTick(
-                    inst.magnitudeBasis,
-                    inst.GetScaled(spellLevel).magnitudeFlat,
-                    inst.GetScaled(spellLevel).magnitudePercent,
-                    finalPower,
-                    lastDamageDealt
-                ),
-                strengthRating = inst.strengthRating * spellLevel,
-                removedWhenType = inst.removeWhenType,
-            };
-
-            if (IsStatModifier(inst.effect))
-            {
-                GetSignedStatDeltas(
-                    inst.effect,
-                    inst,
-                    spellLevel,
-                    finalPower,
-                    lastDamageDealt,
-                    out int flat,
-                    out int pct
-                );
-                ApplyStatModifierNow(target, inst.effect, contributor, flat, pct);
-            }
+            var contributor = BuildContributorWithComponents(
+                attacker,
+                target,
+                spell,
+                spellLevel,
+                inst,
+                lastDamageDealt,
+                finalPower,
+                out statsDirty
+            );
 
             var effect = new ActiveEffect
             {
@@ -530,43 +508,372 @@ namespace MyGame.Combat
                 source = attacker.actorType,
                 displayName = inst.effect.displayName,
                 polarity = inst.effect.polarity,
-                kind = inst.effect.kind,
+                kind = ResolveActiveEffectKind(inst.effect),
             };
 
             effect.contributors.Add(contributor);
             return effect;
-
-            // return new ActiveEffect
-            // {
-            //     effectId = inst.effect.effectId,
-            //     definition = inst.effect,
-            //     source = attacker.actorType,
-            //     displayName = inst.effect.displayName,
-            //     polarity = inst.effect.polarity,
-            //     kind = inst.effect.kind,
-            //     contributors =
-            //     {
-            //         new EffectContributor
-            //         {
-            //             sourceSpellId = spell.spellId,
-            //             sourceActor = attacker.actorType,
-            //             remainingTurns = inst.GetScaled(spellLevel).durationTurns,
-            //             totalTickValue = CalculateEffectTick(
-            //                 inst.magnitudeBasis,
-            //                 inst.GetScaled(spellLevel).magnitudeFlat,
-            //                 inst.GetScaled(spellLevel).magnitudePercent,
-            //                 finalPower,
-            //                 lastDamageDealt
-            //             ),
-            //             strengthRating = inst.strengthRating * spellLevel,
-            //             removedWhenType = inst.removeWhenType,
-            //         },
-            //     },
         }
 
-        private static bool IsStatModifier(EffectDefinition def)
+        private EffectContributor BuildContributorWithComponents(
+            CombatActorState attacker,
+            CombatActorState target,
+            ResolvedSpell spell,
+            int spellLevel,
+            EffectInstance inst,
+            int lastDamageDealt,
+            int finalPower,
+            out bool statsDirty
+        )
         {
-            return def != null && def.kind == EffectKind.StatModifier;
+            var scaledInfo = inst.GetScaled(spellLevel);
+            var contributor = CreateEffectContributor(
+                sourceSpellId: spell.spellId,
+                sourceActor: attacker.actorType,
+                durationTurns: scaledInfo.durationTurns,
+                strengthRating: inst.strengthRating * spellLevel,
+                removedWhenType: inst.removeWhenType
+            );
+
+            statsDirty = ApplyComponentsToContributor(
+                attacker,
+                target,
+                spell,
+                spellLevel,
+                inst,
+                lastDamageDealt,
+                finalPower,
+                contributor
+            );
+
+            return contributor;
+        }
+
+        private bool ApplyComponentsToContributor(
+            CombatActorState attacker,
+            CombatActorState target,
+            ResolvedSpell spell,
+            int spellLevel,
+            EffectInstance inst,
+            int lastDamageDealt,
+            int finalPower,
+            EffectContributor contributor
+        )
+        {
+            bool baseDerivedDirty = false;
+            int totalPeriodic = 0;
+
+            var def = inst.effect;
+            int count = def != null ? def.GetComponentCount() : 0;
+            string effectName =
+                def != null && !string.IsNullOrWhiteSpace(def.displayName) ? def.displayName
+                : def != null ? def.effectId
+                : string.Empty;
+            Sprite icon = def != null ? def.icon : null;
+
+            for (int i = 0; i < count; i++)
+            {
+                var compDef = def.GetComponent(i);
+                if (compDef == null)
+                    continue;
+
+                var scaled = inst.GetComponentScaled(spellLevel, i);
+
+                var contrib = new EffectComponentContribution
+                {
+                    componentIndex = i,
+                    kind = compDef.kind,
+                    tickTiming = compDef.tickTiming,
+                };
+
+                switch (compDef.kind)
+                {
+                    case EffectKind.StatModifier:
+                    {
+                        GetSignedStatDeltas(
+                            compDef,
+                            scaled,
+                            finalPower,
+                            lastDamageDealt,
+                            target,
+                            out int flat,
+                            out int percent
+                        );
+                        int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+                        flat *= sign;
+                        percent *= sign;
+                        ApplyStatModifierNow(target, compDef, contrib, flat, percent);
+                        break;
+                    }
+
+                    case EffectKind.BaseStatModifier:
+                    {
+                        GetSignedStatDeltas(
+                            compDef,
+                            scaled,
+                            finalPower,
+                            lastDamageDealt,
+                            target,
+                            out int flat,
+                            out int percent
+                        );
+                        int value = compDef.statOp == ModOp.Flat ? flat : percent;
+                        int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+                        value *= sign;
+
+                        if (value != 0)
+                        {
+                            contrib.hasBaseStatApplied = true;
+                            contrib.baseStatApplied = new BaseStatModifier
+                            {
+                                stat = compDef.baseStat,
+                                op = compDef.statOp,
+                                value = value,
+                            };
+                            baseDerivedDirty = true;
+                        }
+                        break;
+                    }
+
+                    case EffectKind.DerivedStatModifier:
+                    {
+                        GetSignedStatDeltas(
+                            compDef,
+                            scaled,
+                            finalPower,
+                            lastDamageDealt,
+                            target,
+                            out int flat,
+                            out int percent
+                        );
+
+                        int value = compDef.statOp == ModOp.Flat ? flat : percent;
+                        int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+                        value *= sign;
+
+                        if (value != 0)
+                        {
+                            contrib.hasDerivedStatApplied = true;
+                            contrib.derivedStatApplied = new DerivedStatModifier
+                            {
+                                stat = compDef.derivedStat,
+                                op = compDef.statOp,
+                                value = value,
+                            };
+                            baseDerivedDirty = true;
+                        }
+                        break;
+                    }
+
+                    case EffectKind.DamageOverTime:
+                    case EffectKind.HealOverTime:
+                    {
+                        int tickValue = CalculateEffectAmount(
+                            scaled.magnitudeBasis,
+                            scaled.magnitudeFlat,
+                            scaled.magnitudePercent,
+                            finalPower,
+                            lastDamageDealt,
+                            target
+                        );
+                        contrib.tickValue = tickValue;
+                        totalPeriodic += Math.Max(0, tickValue);
+                        break;
+                    }
+
+                    case EffectKind.DirectDamage:
+                    {
+                        int amount = CalculateEffectAmount(
+                            scaled.magnitudeBasis,
+                            scaled.magnitudeFlat,
+                            scaled.magnitudePercent,
+                            finalPower,
+                            lastDamageDealt,
+                            target
+                        );
+                        contrib.instantValue = amount;
+                        if (amount > 0)
+                        {
+                            _callbacks?.ApplyDirectDamage(
+                                attacker.actorType,
+                                target.actorType,
+                                amount,
+                                effectName,
+                                icon
+                            );
+                        }
+                        break;
+                    }
+
+                    case EffectKind.DirectHeal:
+                    {
+                        int amount = CalculateEffectAmount(
+                            scaled.magnitudeBasis,
+                            scaled.magnitudeFlat,
+                            scaled.magnitudePercent,
+                            finalPower,
+                            lastDamageDealt,
+                            target
+                        );
+                        contrib.instantValue = amount;
+                        if (amount > 0)
+                        {
+                            _callbacks?.ApplyDirectHeal(
+                                attacker.actorType,
+                                target.actorType,
+                                amount,
+                                effectName,
+                                icon
+                            );
+                        }
+                        break;
+                    }
+                }
+
+                contributor.componentContributions.Add(contrib);
+            }
+
+            contributor.totalTickValue = totalPeriodic;
+            return baseDerivedDirty;
+        }
+
+        private int CalculateCompositeTickSum(
+            EffectInstance inst,
+            int spellLevel,
+            int finalPower,
+            int lastDamageDealt,
+            CombatActorState target
+        )
+        {
+            if (inst == null || inst.effect == null)
+                return 0;
+
+            int total = 0;
+            int count = inst.effect.GetComponentCount();
+            for (int i = 0; i < count; i++)
+            {
+                var compDef = inst.effect.GetComponent(i);
+                if (compDef == null)
+                    continue;
+
+                if (compDef.kind != EffectKind.DamageOverTime)
+                    continue;
+
+                var scaled = inst.GetComponentScaled(spellLevel, i);
+                int tickValue = CalculateEffectAmount(
+                    scaled.magnitudeBasis,
+                    scaled.magnitudeFlat,
+                    scaled.magnitudePercent,
+                    finalPower,
+                    lastDamageDealt,
+                    target
+                );
+                total += Math.Max(0, tickValue);
+            }
+
+            return total;
+        }
+
+        private static EffectKind ResolveActiveEffectKind(EffectDefinition def)
+        {
+            if (def == null)
+                return EffectKind.StatModifier;
+
+            int count = def.GetComponentCount();
+            if (count > 1)
+                return EffectKind.Composite;
+            if (count == 1)
+            {
+                var comp = def.GetComponent(0);
+                return comp != null ? comp.kind : EffectKind.StatModifier;
+            }
+            return EffectKind.StatModifier;
+        }
+
+        private void RecalculateDerivedStatsIfNeeded(CombatActorState actor)
+        {
+            if (actor == null)
+                return;
+            int oldHp = actor.hp;
+            int oldMana = actor.mana;
+            int oldMaxHp = actor.derived.maxHp;
+            int oldMaxMana = actor.derived.maxMana;
+
+            _tmpBaseMods.Clear();
+            _tmpDerivedMods.Clear();
+
+            if (actor.activeEffects != null && actor.activeEffects.Count > 0)
+            {
+                for (int i = 0; i < actor.activeEffects.Count; i++)
+                {
+                    var e = actor.activeEffects[i];
+                    if (e == null || e.contributors == null || e.contributors.Count == 0)
+                        continue;
+
+                    for (int c = 0; c < e.contributors.Count; c++)
+                    {
+                        var contrib = e.contributors[c];
+                        if (contrib == null || contrib.componentContributions == null)
+                            continue;
+
+                        for (int j = 0; j < contrib.componentContributions.Count; j++)
+                        {
+                            var comp = contrib.componentContributions[j];
+                            if (comp == null)
+                                continue;
+
+                            if (comp.hasBaseStatApplied)
+                                _tmpBaseMods.Add(comp.baseStatApplied);
+
+                            if (comp.hasDerivedStatApplied)
+                                _tmpDerivedMods.Add(comp.derivedStatApplied);
+                        }
+                    }
+                }
+            }
+
+            var baseStats = actor.baseStatsBase;
+            if (_tmpBaseMods.Count > 0)
+                baseStats = BaseStatModifierApplier.ApplyAll(baseStats, _tmpBaseMods);
+            actor.baseStats = baseStats;
+
+            var derived = CombatStatCalculator.CalculateAll(baseStats, actor.level, actor.tier);
+            if (actor.baseDerivedStatMods != null && actor.baseDerivedStatMods.Count > 0)
+                DerivedModifierApplier.ApplyAll(ref derived, actor.baseDerivedStatMods);
+            if (_tmpDerivedMods.Count > 0)
+                DerivedModifierApplier.ApplyAll(ref derived, _tmpDerivedMods);
+
+            actor.derived = derived;
+
+            float hpPct = oldMaxHp > 0 ? (float)oldHp / oldMaxHp : 1f;
+            float manaPct = oldMaxMana > 0 ? (float)oldMana / oldMaxMana : 1f;
+
+            int newHp = Mathf.Clamp(
+                Mathf.RoundToInt(derived.maxHp * hpPct),
+                0,
+                Math.Max(1, derived.maxHp)
+            );
+            int newMana = Mathf.Clamp(
+                Mathf.RoundToInt(derived.maxMana * manaPct),
+                0,
+                Math.Max(0, derived.maxMana)
+            );
+
+            actor.hp = newHp;
+            actor.mana = newMana;
+
+            if (
+                _callbacks != null
+                && (
+                    oldHp != newHp
+                    || oldMana != newMana
+                    || oldMaxHp != derived.maxHp
+                    || oldMaxMana != derived.maxMana
+                )
+            )
+            {
+                _callbacks.NotifyDerivedStatsChanged(actor, oldHp, oldMaxHp, oldMana, oldMaxMana);
+            }
         }
 
         public List<PeriodicTickResult> TickOnActionChosen(
@@ -593,7 +900,9 @@ namespace MyGame.Combat
                     continue;
                 }
 
-                int total = 0;
+                int totalDamage = 0;
+                int totalHeal = 0;
+                bool statsDirty = false;
 
                 // Tick contributors
                 for (int c = effect.contributors.Count - 1; c >= 0; c--)
@@ -609,11 +918,24 @@ namespace MyGame.Combat
                     if (contrib.remainingTurns > 0)
                     {
                         if (
-                            effect.kind == EffectKind.DamageOverTime
-                            || effect.kind == EffectKind.HealOverTime
+                            contrib.componentContributions != null
+                            && contrib.componentContributions.Count > 0
                         )
                         {
-                            total += Math.Max(0, contrib.totalTickValue);
+                            for (int j = 0; j < contrib.componentContributions.Count; j++)
+                            {
+                                var comp = contrib.componentContributions[j];
+                                if (comp == null)
+                                    continue;
+
+                                if (comp.tickTiming != EffectTickTiming.OnOwnerAction)
+                                    continue;
+
+                                if (comp.kind == EffectKind.DamageOverTime)
+                                    totalDamage += Math.Max(0, comp.tickValue);
+                                else if (comp.kind == EffectKind.HealOverTime)
+                                    totalHeal += Math.Max(0, comp.tickValue);
+                            }
                         }
                     }
 
@@ -623,40 +945,71 @@ namespace MyGame.Combat
                     // 3) Expire contributor -> undo stat mods if needed
                     if (contrib.remainingTurns <= 0)
                     {
-                        if (
-                            effect.kind == EffectKind.StatModifier
-                            && owner.modifiers != null
-                            && effect.definition != null
-                        )
+                        if (owner.modifiers != null && effect.definition != null)
                         {
-                            // Undo exactly what was applied for THIS contributor
-                            UndoModifierDelta(
-                                owner.modifiers,
-                                effect.definition,
-                                contrib.statFlatApplied,
-                                contrib.statPercentApplied
-                            );
+                            if (
+                                contrib.componentContributions != null
+                                && contrib.componentContributions.Count > 0
+                            )
+                            {
+                                for (int j = 0; j < contrib.componentContributions.Count; j++)
+                                {
+                                    var comp = contrib.componentContributions[j];
+                                    if (comp == null)
+                                        continue;
+
+                                    if (comp.kind == EffectKind.StatModifier)
+                                    {
+                                        var compDef = effect.definition.GetComponent(
+                                            comp.componentIndex
+                                        );
+                                        if (compDef != null)
+                                        {
+                                            UndoModifierDelta(
+                                                owner.modifiers,
+                                                compDef,
+                                                comp.statFlatApplied,
+                                                comp.statPercentApplied
+                                            );
+                                        }
+                                    }
+
+                                    if (comp.hasBaseStatApplied || comp.hasDerivedStatApplied)
+                                        statsDirty = true;
+                                }
+                            }
                         }
 
                         effect.contributors.RemoveAt(c);
                     }
                 }
 
-                // Emit tick result for DOT/HOT
-                if (
-                    total > 0
-                    && (
-                        effect.kind == EffectKind.DamageOverTime
-                        || effect.kind == EffectKind.HealOverTime
-                    )
-                )
+                if (statsDirty)
+                    RecalculateDerivedStatsIfNeeded(owner);
+
+                // Emit tick results for DOT/HOT (can be both)
+                if (totalDamage > 0)
                 {
                     results.Add(
                         new PeriodicTickResult(
-                            source: effect.source, // who applied originally (good enough for logging)
+                            source: effect.source,
                             target: owner.actorType,
-                            kind: effect.kind,
-                            amount: total,
+                            kind: EffectKind.DamageOverTime,
+                            amount: totalDamage,
+                            effectId: effect.effectId,
+                            effectName: effect.displayName,
+                            icon: effect.definition != null ? effect.definition.icon : null
+                        )
+                    );
+                }
+                if (totalHeal > 0)
+                {
+                    results.Add(
+                        new PeriodicTickResult(
+                            source: effect.source,
+                            target: owner.actorType,
+                            kind: EffectKind.HealOverTime,
+                            amount: totalHeal,
                             effectId: effect.effectId,
                             effectName: effect.displayName,
                             icon: effect.definition != null ? effect.definition.icon : null
@@ -673,74 +1026,59 @@ namespace MyGame.Combat
         }
 
         private static void GetSignedStatDeltas(
-            EffectDefinition def,
-            EffectInstance inst,
-            int spellLevel,
+            EffectComponentDefinition comp,
+            EffectComponentScaledIntValues scaled,
             int finalPower,
             int lastDamageDealt,
+            CombatActorState target,
             out int flat,
             out int percent
         )
         {
-            var scaled = inst.GetScaled(spellLevel);
-
-            // Start from raw config
             flat = scaled.magnitudeFlat;
             percent = scaled.magnitudePercent;
 
-            // ✅ If this is a StatModifier and it uses a basis, materialize into FLAT.
-            // Example: 50% of Power -> flat += finalPower * 50 / 100, percent = 0
-            if (
-                def != null
-                && def.kind == EffectKind.StatModifier
-                && scaled.magnitudeBasis != EffectMagnitudeBasis.None
-            )
+            // If basis is set, materialize percent into flat.
+            if (scaled.magnitudeBasis != EffectMagnitudeBasis.None)
             {
-                int basisValue = 0;
-                switch (scaled.magnitudeBasis)
-                {
-                    case EffectMagnitudeBasis.Power:
-                        basisValue = finalPower;
-                        break;
-
-                    case EffectMagnitudeBasis.DamageDealt:
-                        basisValue = lastDamageDealt;
-                        break;
-                }
-
+                int basisValue = ResolveBasisValue(
+                    scaled.magnitudeBasis,
+                    target,
+                    finalPower,
+                    lastDamageDealt
+                );
                 flat += (basisValue * percent) / 100;
-                percent = 0; // consumed into flat
+                percent = 0;
             }
         }
 
         private static void ApplyStatModifierNow(
             CombatActorState target,
-            EffectDefinition def,
-            EffectContributor contributor,
+            EffectComponentDefinition comp,
+            EffectComponentContribution contribution,
             int flat,
             int percent
         )
         {
-            if (target?.modifiers == null || def == null || contributor == null)
+            if (target?.modifiers == null || comp == null || contribution == null)
                 return;
 
-            // Store what we applied so it can be undone per-contributor
-            contributor.statFlatApplied = flat;
-            contributor.statPercentApplied = percent;
+            // Store what we applied so it can be undone per-component
+            contribution.statFlatApplied = flat;
+            contribution.statPercentApplied = percent;
 
-            ApplyModifierDelta(target.modifiers, def, flat, percent);
+            ApplyModifierDelta(target.modifiers, comp, flat, percent);
         }
 
-        private static void UndoAllStatContributorsIfNeeded(
+        private static bool UndoAllStatContributorsIfNeeded(
             CombatActorState target,
             ActiveEffect effect
         )
         {
             if (target?.modifiers == null || effect?.definition == null)
-                return;
+                return false;
 
-            if (!IsStatModifier(effect.definition))
-                return;
+            bool baseDerivedDirty = false;
 
             for (int i = 0; i < effect.contributors.Count; i++)
             {
@@ -748,28 +1086,50 @@ namespace MyGame.Combat
                 if (c == null)
                     continue;
 
-                UndoModifierDelta(
-                    target.modifiers,
-                    effect.definition,
-                    c.statFlatApplied,
-                    c.statPercentApplied
-                );
+                if (c.componentContributions != null && c.componentContributions.Count > 0)
+                {
+                    for (int j = 0; j < c.componentContributions.Count; j++)
+                    {
+                        var comp = c.componentContributions[j];
+                        if (comp == null)
+                            continue;
+
+                        if (comp.kind == EffectKind.StatModifier)
+                        {
+                            var compDef = effect.definition.GetComponent(comp.componentIndex);
+                            if (compDef != null)
+                            {
+                                UndoModifierDelta(
+                                    target.modifiers,
+                                    compDef,
+                                    comp.statFlatApplied,
+                                    comp.statPercentApplied
+                                );
+                            }
+                        }
+
+                        if (comp.hasBaseStatApplied || comp.hasDerivedStatApplied)
+                            baseDerivedDirty = true;
+                    }
+                }
             }
+
+            return baseDerivedDirty;
         }
 
         private static void ApplyModifierDelta(
             StatModifiers mods,
-            EffectDefinition def,
+            EffectComponentDefinition comp,
             int addFlat,
             int addPercent
         )
         {
-            if (mods == null || def == null)
+            if (mods == null || comp == null)
                 return;
 
             float pct = addPercent / 100f; // allow negative for debuffs
 
-            switch (def.stat)
+            switch (comp.stat)
             {
                 case EffectStat.None:
                     return;
@@ -778,216 +1138,184 @@ namespace MyGame.Combat
                 // Damage
                 // -------------------------
                 case EffectStat.DamageAll:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.damageFlat += v,
-                        addMoreAction: p => mods.AddDamageMorePercent(p),
-                        addLessAction: p => mods.AddDamageLessPercent(p)
+                        addPercentAction: p => mods.AddDamagePercent(p)
                     );
                     return;
 
                 case EffectStat.DamagePhysical:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.attackDamageFlat += v,
-                        addMoreAction: p => mods.AddPhysicalDamageMorePercent(p),
-                        addLessAction: p => mods.AddPhysicalDamageLessPercent(p)
+                        addPercentAction: p => mods.AddPhysicalDamagePercent(p)
                     );
                     return;
 
                 case EffectStat.DamageMagic:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.magicDamageFlat += v,
-                        addMoreAction: p => mods.AddMagicDamageMorePercent(p),
-                        addLessAction: p => mods.AddMagicDamageLessPercent(p)
+                        addPercentAction: p => mods.AddMagicDamagePercent(p)
                     );
                     return;
 
                 // -------------------------
                 // Power
                 // -------------------------
-                case EffectStat.PowerAll:
-                    ApplyFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingAll:
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
-                        addFlatAction: v => mods.powerFlat += v,
-                        addMoreAction: p => mods.AddPowerMorePercent(p),
-                        addLessAction: p => mods.AddPowerLessPercent(p)
+                        addFlatAction: v => mods.AddPowerScalingFlat(v / 100f),
+                        addPercentAction: p => mods.AddPowerScalingPercent(p)
                     );
                     return;
 
-                case EffectStat.PowerAttack:
-                    ApplyFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingPhysical:
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
-                        addFlatAction: v => mods.attackPowerFlat += v,
-                        addMoreAction: p => mods.AddAttackPowerMorePercent(p),
-                        addLessAction: p => mods.AddAttackPowerLessPercent(p)
+                        addFlatAction: v => mods.AddAttackPowerScalingFlat(v / 100f),
+                        addPercentAction: p => mods.AddAttackPowerScalingPercent(p)
                     );
                     return;
 
-                case EffectStat.PowerMagic:
-                    ApplyFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingMagic:
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
-                        addFlatAction: v => mods.magicPowerFlat += v,
-                        addMoreAction: p => mods.AddMagicPowerMorePercent(p),
-                        addLessAction: p => mods.AddMagicPowerLessPercent(p)
+                        addFlatAction: v => mods.AddMagicPowerScalingFlat(v / 100f),
+                        addPercentAction: p => mods.AddMagicPowerScalingPercent(p)
                     );
                     return;
-
                 // -------------------------
                 // Spell base
                 // -------------------------
                 case EffectStat.SpellBaseAll:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.AddSpellBaseFlat(v),
-                        addMoreAction: p => mods.AddSpellBaseMorePercent(p),
-                        addLessAction: p => mods.AddSpellBaseLessPercent(p)
+                        addPercentAction: p => mods.AddSpellBasePercent(p)
                     );
                     return;
 
                 case EffectStat.SpellBasePhysical:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.AddPhysicalSpellBaseFlat(v),
-                        addMoreAction: p => mods.AddPhysicalSpellBaseMorePercent(p),
-                        addLessAction: p => mods.AddPhysicalSpellBaseLessPercent(p)
+                        addPercentAction: p => mods.AddPhysicalSpellBasePercent(p)
                     );
                     return;
 
                 case EffectStat.SpellBaseMagic:
-                    ApplyFlatOrMult(
-                        def.op,
+                    ApplyFlatOrPercent(
+                        comp.op,
                         addFlat,
                         pct,
                         addFlatAction: v => mods.AddMagicSpellBaseFlat(v),
-                        addMoreAction: p => mods.AddMagicSpellBaseMorePercent(p),
-                        addLessAction: p => mods.AddMagicSpellBaseLessPercent(p)
+                        addPercentAction: p => mods.AddMagicSpellBasePercent(p)
                     );
                     return;
 
                 // -------------------------
                 // Hit / speeds
                 // -------------------------
-                case EffectStat.HitChance:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: null,
-                        addMoreAction: p => mods.AddHitChanceMorePercent(p),
-                        addLessAction: p => mods.AddHitChanceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.AttackSpeed:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: v => mods.attackSpeedFlat += v,
-                        addMoreAction: p => mods.AddAttackSpeedMorePercent(p),
-                        addLessAction: p => mods.AddAttackSpeedLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.CastingSpeed:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: v => mods.castingSpeedFlat += v,
-                        addMoreAction: p => mods.AddCastingSpeedMorePercent(p),
-                        addLessAction: p => mods.AddCastingSpeedLessPercent(p)
-                    );
-                    return;
-
                 // -------------------------
                 // Defence
                 // -------------------------
-                case EffectStat.DefenceAll:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: v => mods.defenceFlat += v,
-                        addMoreAction: p => mods.AddDefenceMorePercent(p),
-                        addLessAction: p => mods.AddDefenceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.DefencePhysical:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: v => mods.physicalDefenseFlat += v,
-                        addMoreAction: p => mods.AddPhysicalDefenceMorePercent(p),
-                        addLessAction: p => mods.AddPhysicalDefenceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.DefenceMagic:
-                    ApplyFlatOrMult(
-                        def.op,
-                        addFlat,
-                        pct,
-                        addFlatAction: v => mods.magicDefenseFlat += v,
-                        addMoreAction: p => mods.AddMagicDefenceMorePercent(p),
-                        addLessAction: p => mods.AddMagicDefenceLessPercent(p)
-                    );
-                    return;
-
                 // -------------------------
-                // Type layers (uses def.damageType[])
+                // Type layers (uses comp.damageType[])
                 // -------------------------
                 case EffectStat.AttackerBonusByType:
-                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.AttackerBonus);
+                    ApplyTypeBased(comp, mods, addFlat, pct, TypeMode.AttackerBonus);
                     return;
 
                 case EffectStat.DefenderVulnerabilityByType:
-                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.DefenderVuln);
+                    ApplyTypeBased(comp, mods, addFlat, pct, TypeMode.DefenderVuln);
                     return;
 
                 case EffectStat.AttackerWeakenByType:
-                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.AttackerWeaken);
+                    ApplyTypeBased(comp, mods, addFlat, pct, TypeMode.AttackerWeaken);
                     return;
 
                 case EffectStat.DefenderResistByType:
-                    ApplyTypeBased(def, mods, addFlat, pct, TypeMode.DefenderResist);
+                    ApplyTypeBased(comp, mods, addFlat, pct, TypeMode.DefenderResist);
+                    return;
+
+                case EffectStat.MeleeDamageBonus:
+                    ApplyFlatOrPercent(
+                        comp.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.AddMeleeDamageBonusFlat(v),
+                        addPercentAction: p => mods.AddMeleeDamageBonusPercent(p)
+                    );
+                    return;
+
+                case EffectStat.RangedDamageBonus:
+                    ApplyFlatOrPercent(
+                        comp.op,
+                        addFlat,
+                        pct,
+                        addFlatAction: v => mods.AddRangedDamageBonusFlat(v),
+                        addPercentAction: p => mods.AddRangedDamageBonusPercent(p)
+                    );
                     return;
             }
+        }
+
+        public static void ApplyCombatStatModifier(
+            StatModifiers mods,
+            EffectStat stat,
+            EffectOp op,
+            int value,
+            DamageType damageType = DamageType.None
+        )
+        {
+            if (mods == null)
+                return;
+
+            var comp = new EffectComponentDefinition
+            {
+                kind = EffectKind.StatModifier,
+                stat = stat,
+                op = op,
+                damageType = damageType == DamageType.None ? null : new[] { damageType },
+            };
+
+            int flat = op == EffectOp.Flat ? value : 0;
+            int percent = op == EffectOp.Percent ? value : 0;
+            ApplyModifierDelta(mods, comp, flat, percent);
         }
 
         private static void UndoModifierDelta(
             StatModifiers mods,
-            EffectDefinition def,
+            EffectComponentDefinition comp,
             int oldFlat,
             int oldPercent
         )
         {
-            if (mods == null || def == null)
+            if (mods == null || comp == null)
                 return;
 
             float pct = oldPercent / 100f; // allow negative
 
-            switch (def.stat)
+            switch (comp.stat)
             {
                 case EffectStat.None:
                     return;
@@ -996,210 +1324,153 @@ namespace MyGame.Combat
                 // Damage
                 // -------------------------
                 case EffectStat.DamageAll:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.damageFlat -= v,
-                        removeMoreAction: p => mods.RemoveDamageMorePercent(p),
-                        removeLessAction: p => mods.RemoveDamageLessPercent(p)
+                        removePercentAction: p => mods.RemoveDamagePercent(p)
                     );
                     return;
 
                 case EffectStat.DamagePhysical:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.attackDamageFlat -= v,
-                        removeMoreAction: p => mods.RemovePhysicalDamageMorePercent(p),
-                        removeLessAction: p => mods.RemovePhysicalDamageLessPercent(p)
+                        removePercentAction: p => mods.RemovePhysicalDamagePercent(p)
                     );
                     return;
 
                 case EffectStat.DamageMagic:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.magicDamageFlat -= v,
-                        removeMoreAction: p => mods.RemoveMagicDamageMorePercent(p),
-                        removeLessAction: p => mods.RemoveMagicDamageLessPercent(p)
+                        removePercentAction: p => mods.RemoveMagicDamagePercent(p)
                     );
                     return;
 
                 // -------------------------
                 // Power
                 // -------------------------
-                case EffectStat.PowerAll:
-                    UndoFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingAll:
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
-                        removeFlatAction: v => mods.powerFlat -= v,
-                        removeMoreAction: p => mods.RemovePowerMorePercent(p),
-                        removeLessAction: p => mods.RemovePowerLessPercent(p)
+                        removeFlatAction: v => mods.AddPowerScalingFlat(-(v / 100f)),
+                        removePercentAction: p => mods.RemovePowerScalingPercent(p)
                     );
                     return;
 
-                case EffectStat.PowerAttack:
-                    UndoFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingPhysical:
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
-                        removeFlatAction: v => mods.attackPowerFlat -= v,
-                        removeMoreAction: p => mods.RemoveAttackPowerMorePercent(p),
-                        removeLessAction: p => mods.RemoveAttackPowerLessPercent(p)
+                        removeFlatAction: v => mods.AddAttackPowerScalingFlat(-(v / 100f)),
+                        removePercentAction: p => mods.RemoveAttackPowerScalingPercent(p)
                     );
                     return;
 
-                case EffectStat.PowerMagic:
-                    UndoFlatOrMult(
-                        def.op,
+                case EffectStat.PowerScalingMagic:
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
-                        removeFlatAction: v => mods.magicPowerFlat -= v,
-                        removeMoreAction: p => mods.RemoveMagicPowerMorePercent(p),
-                        removeLessAction: p => mods.RemoveMagicPowerLessPercent(p)
+                        removeFlatAction: v => mods.AddMagicPowerScalingFlat(-(v / 100f)),
+                        removePercentAction: p => mods.RemoveMagicPowerScalingPercent(p)
                     );
                     return;
-
                 // -------------------------
                 // Spell base
                 // -------------------------
                 case EffectStat.SpellBaseAll:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.AddSpellBaseFlat(-v),
-                        removeMoreAction: p => mods.spellBaseMult.RemoveMore(p),
-                        removeLessAction: p => mods.spellBaseMult.RemoveLess(p)
+                        removePercentAction: p => mods.RemoveSpellBasePercent(p)
                     );
                     return;
 
                 case EffectStat.SpellBasePhysical:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.AddPhysicalSpellBaseFlat(-v),
-                        removeMoreAction: p => mods.physicalSpellBaseMult.RemoveMore(p),
-                        removeLessAction: p => mods.physicalSpellBaseMult.RemoveLess(p)
+                        removePercentAction: p => mods.RemovePhysicalSpellBasePercent(p)
                     );
                     return;
 
                 case EffectStat.SpellBaseMagic:
-                    UndoFlatOrMult(
-                        def.op,
+                    UndoFlatOrPercent(
+                        comp.op,
                         oldFlat,
                         pct,
                         removeFlatAction: v => mods.AddMagicSpellBaseFlat(-v),
-                        removeMoreAction: p => mods.magicSpellBaseMult.RemoveMore(p),
-                        removeLessAction: p => mods.magicSpellBaseMult.RemoveLess(p)
+                        removePercentAction: p => mods.RemoveMagicSpellBasePercent(p)
                     );
                     return;
 
                 // -------------------------
                 // Hit / speeds
                 // -------------------------
-                case EffectStat.HitChance:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: null,
-                        removeMoreAction: p => mods.RemoveHitChanceMorePercent(p),
-                        removeLessAction: p => mods.RemoveHitChanceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.AttackSpeed:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: v => mods.attackSpeedFlat -= v,
-                        removeMoreAction: p => mods.RemoveAttackSpeedMorePercent(p),
-                        removeLessAction: p => mods.RemoveAttackSpeedLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.CastingSpeed:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: v => mods.castingSpeedFlat -= v,
-                        removeMoreAction: p => mods.RemoveCastingSpeedMorePercent(p),
-                        removeLessAction: p => mods.RemoveCastingSpeedLessPercent(p)
-                    );
-                    return;
-
                 // -------------------------
                 // Defence
                 // -------------------------
-                case EffectStat.DefenceAll:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: v => mods.defenceFlat -= v,
-                        removeMoreAction: p => mods.RemoveDefenceMorePercent(p),
-                        removeLessAction: p => mods.RemoveDefenceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.DefencePhysical:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: v => mods.physicalDefenseFlat -= v,
-                        removeMoreAction: p => mods.RemovePhysicalDefenceMorePercent(p),
-                        removeLessAction: p => mods.RemovePhysicalDefenceLessPercent(p)
-                    );
-                    return;
-
-                case EffectStat.DefenceMagic:
-                    UndoFlatOrMult(
-                        def.op,
-                        oldFlat,
-                        pct,
-                        removeFlatAction: v => mods.magicDefenseFlat -= v,
-                        removeMoreAction: p => mods.RemoveMagicDefenceMorePercent(p),
-                        removeLessAction: p => mods.RemoveMagicDefenceLessPercent(p)
-                    );
-                    return;
-
                 // -------------------------
-                // Type layers (uses def.damageType[])
+                // Type layers (uses comp.damageType[])
                 // -------------------------
                 case EffectStat.AttackerBonusByType:
-                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.AttackerBonus);
+                    UndoTypeBased(comp, mods, oldFlat, pct, TypeMode.AttackerBonus);
                     return;
 
                 case EffectStat.DefenderVulnerabilityByType:
-                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.DefenderVuln);
+                    UndoTypeBased(comp, mods, oldFlat, pct, TypeMode.DefenderVuln);
                     return;
 
                 case EffectStat.AttackerWeakenByType:
-                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.AttackerWeaken);
+                    UndoTypeBased(comp, mods, oldFlat, pct, TypeMode.AttackerWeaken);
                     return;
 
                 case EffectStat.DefenderResistByType:
-                    UndoTypeBased(def, mods, oldFlat, pct, TypeMode.DefenderResist);
+                    UndoTypeBased(comp, mods, oldFlat, pct, TypeMode.DefenderResist);
+                    return;
+
+                case EffectStat.MeleeDamageBonus:
+                    UndoFlatOrPercent(
+                        comp.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.RemoveMeleeDamageBonusFlat(v),
+                        removePercentAction: p => mods.RemoveMeleeDamageBonusPercent(p)
+                    );
+                    return;
+
+                case EffectStat.RangedDamageBonus:
+                    UndoFlatOrPercent(
+                        comp.op,
+                        oldFlat,
+                        pct,
+                        removeFlatAction: v => mods.RemoveRangedDamageBonusFlat(v),
+                        removePercentAction: p => mods.RemoveRangedDamageBonusPercent(p)
+                    );
                     return;
             }
         }
 
-        private static void ApplyFlatOrMult(
+        private static void ApplyFlatOrPercent(
             EffectOp op,
             int addFlat,
             float pct,
             System.Action<int> addFlatAction,
-            System.Action<float> addMoreAction,
-            System.Action<float> addLessAction
+            System.Action<float> addPercentAction
         )
         {
             switch (op)
@@ -1207,22 +1478,18 @@ namespace MyGame.Combat
                 case EffectOp.Flat:
                     addFlatAction?.Invoke(addFlat);
                     return;
-                case EffectOp.MorePercent:
-                    addMoreAction?.Invoke(pct);
-                    return;
-                case EffectOp.LessPercent:
-                    addLessAction?.Invoke(pct);
+                case EffectOp.Percent:
+                    addPercentAction?.Invoke(pct);
                     return;
             }
         }
 
-        private static void UndoFlatOrMult(
+        private static void UndoFlatOrPercent(
             EffectOp op,
             int oldFlat,
             float pct,
             System.Action<int> removeFlatAction,
-            System.Action<float> removeMoreAction,
-            System.Action<float> removeLessAction
+            System.Action<float> removePercentAction
         )
         {
             switch (op)
@@ -1230,11 +1497,8 @@ namespace MyGame.Combat
                 case EffectOp.Flat:
                     removeFlatAction?.Invoke(oldFlat);
                     return;
-                case EffectOp.MorePercent:
-                    removeMoreAction?.Invoke(pct);
-                    return;
-                case EffectOp.LessPercent:
-                    removeLessAction?.Invoke(pct);
+                case EffectOp.Percent:
+                    removePercentAction?.Invoke(pct);
                     return;
             }
         }
@@ -1251,121 +1515,139 @@ namespace MyGame.Combat
         }
 
         private static void ApplyTypeBased(
-            EffectDefinition def,
+            EffectComponentDefinition comp,
             StatModifiers mods,
             int addFlat,
             float pct,
             TypeMode mode
         )
         {
-            if (def.damageType == null || def.damageType.Length == 0)
+            if (comp == null || comp.damageType == null || comp.damageType.Length == 0)
                 return;
 
-            for (int i = 0; i < def.damageType.Length; i++)
+            for (int i = 0; i < comp.damageType.Length; i++)
             {
-                var t = def.damageType[i];
+                var t = comp.damageType[i];
 
                 switch (mode)
                 {
                     case TypeMode.AttackerBonus:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.AddAttackerBonusFlat(t, addFlat);
-                        else if (def.op == EffectOp.MorePercent)
-                            mods.AddAttackerBonusMorePercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.AddAttackerBonusPercent(t, pct);
                         break;
 
                     case TypeMode.DefenderVuln:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.AddDefenderVulnFlat(t, addFlat);
-                        else if (def.op == EffectOp.MorePercent)
-                            mods.AddDefenderVulnMorePercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.AddDefenderVulnPercent(t, pct);
                         break;
 
                     case TypeMode.DefenderResist:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.AddDefenderResistFlat(t, addFlat);
-                        else if (def.op == EffectOp.LessPercent)
-                            mods.AddDefenderResistLessPercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.AddDefenderResistPercent(t, pct);
                         break;
 
                     case TypeMode.AttackerWeaken:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.AddAttackerWeakenFlat(t, addFlat);
-                        else if (def.op == EffectOp.LessPercent)
-                            mods.AddAttackerWeakenLessPercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.AddAttackerWeakenPercent(t, pct);
                         break;
                 }
             }
         }
 
         private static void UndoTypeBased(
-            EffectDefinition def,
+            EffectComponentDefinition comp,
             StatModifiers mods,
             int oldFlat,
             float pct,
             TypeMode mode
         )
         {
-            if (def.damageType == null || def.damageType.Length == 0)
+            if (comp == null || comp.damageType == null || comp.damageType.Length == 0)
                 return;
 
-            for (int i = 0; i < def.damageType.Length; i++)
+            for (int i = 0; i < comp.damageType.Length; i++)
             {
-                var t = def.damageType[i];
+                var t = comp.damageType[i];
 
                 switch (mode)
                 {
                     case TypeMode.AttackerBonus:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.RemoveAttackerBonusFlat(t, oldFlat);
-                        else if (def.op == EffectOp.MorePercent)
-                            mods.RemoveAttackerBonusMorePercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.RemoveAttackerBonusPercent(t, pct);
                         break;
 
                     case TypeMode.DefenderVuln:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.RemoveDefenderVulnFlat(t, oldFlat);
-                        else if (def.op == EffectOp.MorePercent)
-                            mods.RemoveDefenderVulnMorePercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.RemoveDefenderVulnPercent(t, pct);
                         break;
 
                     case TypeMode.DefenderResist:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.RemoveDefenderResistFlat(t, oldFlat);
-                        else if (def.op == EffectOp.LessPercent)
-                            mods.RemoveDefenderResistLessPercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.RemoveDefenderResistPercent(t, pct);
                         break;
 
                     case TypeMode.AttackerWeaken:
-                        if (def.op == EffectOp.Flat)
+                        if (comp.op == EffectOp.Flat)
                             mods.RemoveAttackerWeakenFlat(t, oldFlat);
-                        else if (def.op == EffectOp.LessPercent)
-                            mods.RemoveAttackerWeakenLessPercent(t, pct);
+                        else if (comp.op == EffectOp.Percent)
+                            mods.RemoveAttackerWeakenPercent(t, pct);
                         break;
                 }
             }
         }
 
-        public int CalculateEffectTick(
+        private static int ResolveBasisValue(
             EffectMagnitudeBasis basis,
-            int baseFlat,
-            int basePercent,
-            int power,
+            CombatActorState target,
+            int finalPower,
             int lastDamageDealt
         )
         {
-            int magnitude = 0;
             switch (basis)
             {
-                case EffectMagnitudeBasis.None:
-                    magnitude += baseFlat;
-                    break;
                 case EffectMagnitudeBasis.Power:
-                    magnitude += power * basePercent / 100;
-                    break;
+                    return Math.Max(0, finalPower);
                 case EffectMagnitudeBasis.DamageDealt:
-                    magnitude += lastDamageDealt * basePercent / 100;
-                    break;
+                    return Math.Max(0, lastDamageDealt);
+                case EffectMagnitudeBasis.MaxHealth:
+                    return target != null ? Math.Max(0, target.derived.maxHp) : 0;
+                case EffectMagnitudeBasis.MaxMana:
+                    return target != null ? Math.Max(0, target.derived.maxMana) : 0;
+                case EffectMagnitudeBasis.LastDamageTaken:
+                    return target != null ? Math.Max(0, target.lastDamageTaken) : 0;
+                default:
+                    return 0;
+            }
+        }
+
+        private int CalculateEffectAmount(
+            EffectMagnitudeBasis basis,
+            int baseFlat,
+            int basePercent,
+            int finalPower,
+            int lastDamageDealt,
+            CombatActorState target
+        )
+        {
+            int magnitude = baseFlat;
+            if (basis != EffectMagnitudeBasis.None)
+            {
+                int basisValue = ResolveBasisValue(basis, target, finalPower, lastDamageDealt);
+                magnitude += (basisValue * basePercent) / 100;
             }
             return Math.Max(0, magnitude);
         }

@@ -12,8 +12,12 @@
         <engine:VisualElement name="Info" style="flex-grow: 0; margin-bottom: 0;">
             <engine:Label text="Info" name="InfoTitle" class="label-sm" style="-unity-text-align: upper-center;" />
             <engine:VisualElement name="RolledStatsList" style="flex-grow: 1;">
+                <engine:VisualElement name="Type" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
+                    <engine:Label text="Type" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Damage" name="TypeValue" class="label-sm" />
+                </engine:VisualElement>
                 <engine:VisualElement name="Damage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
-                    <engine:Label text="Damage" name="Label" class="label-sm" style="margin-right: 8px;" />
+                    <engine:Label text="Value" name="Label" class="label-sm" style="margin-right: 8px;" />
                     <engine:Label text="138" name="DamageValue" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="BaseDamage" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">

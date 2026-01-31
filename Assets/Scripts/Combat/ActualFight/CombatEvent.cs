@@ -138,4 +138,18 @@ namespace MyGame.Combat
             SpellId = spellId;
         }
     }
+
+    public sealed class ItemQueuedEvent : CombatEvent
+    {
+        public CombatActorType Actor { get; }
+        public string CasterName { get; }
+        public string ItemId { get; }
+
+        public ItemQueuedEvent(CombatActorType actor, string casterName, string itemId)
+        {
+            Actor = actor;
+            CasterName = casterName;
+            ItemId = itemId;
+        }
+    }
 }

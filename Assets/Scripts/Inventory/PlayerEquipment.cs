@@ -17,7 +17,8 @@ namespace MyGame.Inventory
             public List<BaseStatModifier> rolledBaseStatMods = new List<BaseStatModifier>();
             public List<DerivedStatModifier> rolledDerivedStatMods =
                 new List<DerivedStatModifier>();
-            public List<SpellCombatModifier> rolledSpellMods = new List<SpellCombatModifier>();
+            public List<CombatStatModifier> rolledCombatStatMods =
+                new List<CombatStatModifier>();
             public List<SpellVariableOverride> rolledSpellOverrides =
                 new List<SpellVariableOverride>();
         }

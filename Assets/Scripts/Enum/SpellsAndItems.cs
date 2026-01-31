@@ -32,12 +32,11 @@ namespace MyGame.Combat
         Ranged,
     }
 
-    public enum SpellIntent
+    public enum SpellType
     {
-        Damage, // deals damage, may also apply effects
-        Heal, // restores HP (or mana), may also apply effects
-        Buff, // applies positive effects, no damage/heal
-        Debuff, // applies negative effects, no damage/heal
-        Utility, // later: cleanse, dispel, swap, shield-only etc.
+        Damage,
+        Heal,
+        Buff,
+        Debuff,
     }
 }

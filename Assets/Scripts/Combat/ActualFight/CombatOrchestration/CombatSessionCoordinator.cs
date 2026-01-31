@@ -21,6 +21,7 @@ public sealed class CombatSessionCoordinator
     public event Action OnPlayerSpellFired;
     public event Action OnPlayerSpellQueued;
     public event Action OnEnemySpellQueued;
+    public event Action OnPlayerItemQueued;
 
     private ICombatLogSink _logSink;
     private ICombatUiSink _uiSink;
@@ -131,11 +132,35 @@ public sealed class CombatSessionCoordinator
                 );
                 if (string.IsNullOrWhiteSpace(spellName))
                     spellName = q.SpellId;
-                string text = $"{q.CasterName} casting {spellName}…";
+                string text = $"{q.CasterName} casts {spellName}…";
                 if (q.Actor == CombatActorType.Player)
                     OnPlayerSpellQueued?.Invoke();
                 else
                     OnEnemySpellQueued?.Invoke();
+                _uiSink?.SetActionText(q.Actor, text);
+                break;
+            }
+            case ItemQueuedEvent q:
+            {
+                string itemName = GameConfigProvider.Instance?.ItemDatabase.GetDisplayName(
+                    q.ItemId
+                );
+                if (string.IsNullOrWhiteSpace(itemName))
+                    itemName = q.ItemId;
+                string text = $"{q.CasterName} uses {itemName}â€¦";
+                if (q.Actor == CombatActorType.Player)
+                    OnPlayerItemQueued?.Invoke();
+                var itemDef = GameConfigProvider.Instance?.ItemDatabase.GetById(q.ItemId);
+                bool isScroll =
+                    itemDef != null
+                    && (
+                        itemDef.itemType == ItemDefinitionType.SpellScroll
+                        || (
+                            itemDef.scrollData != null
+                            && !string.IsNullOrWhiteSpace(itemDef.scrollData.spellId)
+                        )
+                    );
+                _logSink?.LogLine($"{q.CasterName} uses {itemName}.");
                 _uiSink?.SetActionText(q.Actor, text);
                 break;
             }

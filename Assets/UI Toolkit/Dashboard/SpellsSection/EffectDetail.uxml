@@ -16,7 +16,6 @@
                 <engine:VisualElement name="Value" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
                     <engine:Label text="Value" name="Label" class="label-sm" style="margin-right: 8px;" />
                     <engine:Label text="200" name="ValueValue" class="label-sm" style="margin-right: 8px;" />
-                    <engine:Label text="of MP" name="ValueFrom" class="label-sm" />
                 </engine:VisualElement>
                 <engine:VisualElement name="Chance" style="flex-grow: 1; flex-direction: row; margin-bottom: 2px;">
                     <engine:Label text="Chance" name="Label" class="label-sm" style="margin-right: 8px;" />
@@ -51,6 +50,11 @@
                     <engine:Label text="duration of last stack end" name="RemoveWhenValue" class="label-sm" />
                 </engine:VisualElement>
             </engine:VisualElement>
+            <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Bonuses" style="flex-grow: 0; margin-bottom: 0;">
+            <engine:Label text="Bonuses" name="BonusesTitle" class="label-sm" style="-unity-text-align: upper-center;" />
+            <engine:VisualElement name="BonusesList" style="flex-grow: 1;" />
             <engine:VisualElement name="DecoratorLine" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Decor_description_line&apos;); height: 8px; margin-bottom: 8px; margin-top: 8px;" />
         </engine:VisualElement>
         <engine:VisualElement name="Detail" style="flex-grow: 0;">

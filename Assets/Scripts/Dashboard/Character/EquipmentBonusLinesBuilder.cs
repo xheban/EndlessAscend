@@ -96,12 +96,6 @@ public static class EquipmentBonusLinesBuilder
                             );
                             break;
 
-                        case SpellVariableOverrideType.DamageRangeType:
-                            damageOverrideLines.Add(
-                                $"- {FormatSlotPrefix(slots[s])}Range: {o.damageRangeType}"
-                            );
-                            break;
-
                         case SpellVariableOverrideType.DamageType:
                             damageOverrideLines.Add(
                                 $"- {FormatSlotPrefix(slots[s])}Damage Type: {o.damageType}"
@@ -121,27 +115,27 @@ public static class EquipmentBonusLinesBuilder
                 }
             }
 
-            if (inst?.rolledSpellMods != null && inst.rolledSpellMods.Count > 0)
+            if (inst?.rolledCombatStatMods != null && inst.rolledCombatStatMods.Count > 0)
             {
-                for (int i = 0; i < inst.rolledSpellMods.Count; i++)
+                for (int i = 0; i < inst.rolledCombatStatMods.Count; i++)
                 {
-                    var mod = inst.rolledSpellMods[i];
-                    if (!IsPositiveSpellRoll(mod))
+                    var mod = inst.rolledCombatStatMods[i];
+                    if (!IsPositiveCombatStatRoll(mod))
                         continue;
 
-                    string name = GetNormalizedCombatModName(mod);
-                    string selector = FormatSelector(mod);
+                    string name = GetCombatModName(mod);
+                    string selector = FormatCombatSelector(mod);
                     var key = new CombatModLineKey(name, selector);
 
                     totalsByKey.TryGetValue(key, out var totals);
 
-                    if (mod.op == ModOp.Flat)
+                    if (mod.op == EffectOp.Flat)
                     {
                         int add = Mathf.RoundToInt(mod.value);
                         if (add > 0)
                             totals.flat += add;
                     }
-                    else if (mod.op == ModOp.Percent)
+                    else if (mod.op == EffectOp.Percent)
                     {
                         if (mod.value > 0.0001f)
                             totals.pct += mod.value;
@@ -178,7 +172,13 @@ public static class EquipmentBonusLinesBuilder
                 continue;
 
             otherCombatLines.Add(
-                FormatCombinedFlatAndPctLine(kvp.Key.name, kvp.Key.selector, flat, pct)
+                FormatCombinedFlatAndPctLine(
+                    kvp.Key.name,
+                    kvp.Key.selector,
+                    flat,
+                    pct,
+                    flatIsPercentPoints: IsPowerScalingName(kvp.Key.name)
+                )
             );
         }
 
@@ -198,10 +198,15 @@ public static class EquipmentBonusLinesBuilder
         string name,
         string selector,
         int flat,
-        float pct
+        float pct,
+        bool flatIsPercentPoints = false
     )
     {
-        string left = flat > 0 ? $"+{flat}" : null;
+        string left = flat > 0
+            ? flatIsPercentPoints
+                ? $"+{flat}%"
+                : $"+{flat}"
+            : null;
         string right = pct > 0.0001f ? $"{pct:0.##}%" : null;
 
         string values;
@@ -216,68 +221,47 @@ public static class EquipmentBonusLinesBuilder
         return $"{name} {values}";
     }
 
-    private static string GetNormalizedCombatModName(SpellCombatModifier m)
+    private static string GetCombatModName(CombatStatModifier m)
     {
-        if (m.target == SpellCombatModifierTarget.None)
-            return CharacterDashboardText.NiceEnum(m.scope.ToString());
-
-        switch (m.target)
+        switch (m.stat)
         {
-            case SpellCombatModifierTarget.DamageFlat:
-            case SpellCombatModifierTarget.DamageMorePercent:
-            case SpellCombatModifierTarget.DamageLessPercent:
+            case EffectStat.DamageAll:
                 return "Damage";
-
-            // Flat physical uses AttackDamageFlat; percent uses PhysicalDamageMorePercent.
-            case SpellCombatModifierTarget.AttackDamageFlat:
-            case SpellCombatModifierTarget.PhysicalDamageMorePercent:
+            case EffectStat.DamagePhysical:
                 return "Physical Damage";
-
-            case SpellCombatModifierTarget.MagicDamageFlat:
-            case SpellCombatModifierTarget.MagicDamageMorePercent:
+            case EffectStat.DamageMagic:
                 return "Magic Damage";
-
-            case SpellCombatModifierTarget.SpellBaseFlat:
-            case SpellCombatModifierTarget.SpellBaseMorePercent:
-            case SpellCombatModifierTarget.SpellBaseLessPercent:
+            case EffectStat.SpellBaseAll:
                 return "Spell Base";
-
-            case SpellCombatModifierTarget.PhysicalSpellBaseFlat:
-            case SpellCombatModifierTarget.PhysicalSpellBaseMorePercent:
-            case SpellCombatModifierTarget.PhysicalSpellBaseLessPercent:
+            case EffectStat.SpellBasePhysical:
                 return "Physical Spell Base";
-
-            case SpellCombatModifierTarget.MagicSpellBaseFlat:
-            case SpellCombatModifierTarget.MagicSpellBaseMorePercent:
-            case SpellCombatModifierTarget.MagicSpellBaseLessPercent:
+            case EffectStat.SpellBaseMagic:
                 return "Magic Spell Base";
-
-            case SpellCombatModifierTarget.PowerScalingFlat:
-            case SpellCombatModifierTarget.PowerScalingMorePercent:
-            case SpellCombatModifierTarget.PowerScalingLessPercent:
+            case EffectStat.PowerScalingAll:
                 return "Power Scaling";
-
-            case SpellCombatModifierTarget.AttackPowerScalingFlat:
-            case SpellCombatModifierTarget.AttackPowerScalingMorePercent:
-            case SpellCombatModifierTarget.AttackPowerScalingLessPercent:
+            case EffectStat.PowerScalingPhysical:
                 return "Attack Power Scaling";
-
-            case SpellCombatModifierTarget.MagicPowerScalingFlat:
-            case SpellCombatModifierTarget.MagicPowerScalingMorePercent:
-            case SpellCombatModifierTarget.MagicPowerScalingLessPercent:
+            case EffectStat.PowerScalingMagic:
                 return "Magic Power Scaling";
+            case EffectStat.AttackerBonusByType:
+                return "Attacker Bonus";
+            case EffectStat.DefenderVulnerabilityByType:
+                return "Defender Vulnerability";
+            case EffectStat.DefenderResistByType:
+                return "Defender Resist";
+            case EffectStat.AttackerWeakenByType:
+                return "Attacker Weaken";
+            case EffectStat.MeleeDamageBonus:
+                return "Melee Damage Bonus";
+            case EffectStat.RangedDamageBonus:
+                return "Ranged Damage Bonus";
+            case EffectStat.DefenceAll:
+                return "Defence";
+            case EffectStat.PowerAll:
+                return "Power";
         }
 
-        // Fallback: strip common suffixes so Flat and Percent variants combine.
-        string raw = m.target.ToString();
-        if (raw.EndsWith("MorePercent", StringComparison.Ordinal))
-            raw = raw.Substring(0, raw.Length - "MorePercent".Length);
-        else if (raw.EndsWith("LessPercent", StringComparison.Ordinal))
-            raw = raw.Substring(0, raw.Length - "LessPercent".Length);
-        else if (raw.EndsWith("Flat", StringComparison.Ordinal))
-            raw = raw.Substring(0, raw.Length - "Flat".Length);
-
-        return CharacterDashboardText.NiceEnum(raw);
+        return CharacterDashboardText.NiceEnum(m.stat.ToString());
     }
 
     public static List<string> BuildEquipmentBonusLines(PlayerEquipment equipment)
@@ -325,26 +309,20 @@ public static class EquipmentBonusLinesBuilder
 
             string slotPrefix = FormatSlotPrefix(slots[s]);
 
-            if (inst?.rolledSpellMods != null && inst.rolledSpellMods.Count > 0)
+            if (inst?.rolledCombatStatMods != null && inst.rolledCombatStatMods.Count > 0)
             {
-                for (int i = 0; i < inst.rolledSpellMods.Count; i++)
+                for (int i = 0; i < inst.rolledCombatStatMods.Count; i++)
                 {
-                    var mod = inst.rolledSpellMods[i];
+                    var mod = inst.rolledCombatStatMods[i];
 
                     // 1) Don't show penalties in the "spell rolls" list.
-                    if (!IsPositiveSpellRoll(mod))
+                    if (!IsPositiveCombatStatRoll(mod))
                         continue;
 
-                    // 2) Exclude spell rolls that duplicate derived-stat rolls (ex: Magic Power flat/%).
-                    if (IsDuplicateWithDerivedStats(mod))
-                        continue;
+                    string line = $"- {slotPrefix}{FormatCombatStatRoll(mod)}";
 
-                    string line = $"- {slotPrefix}{FormatSpellRoll(mod)}";
-
-                    if (IsDamageTypeRelated(mod))
+                    if (IsCombatStatTypeRelated(mod))
                         damageTypeLines.Add(line);
-                    else if (IsDamageRangeRelated(mod))
-                        otherCombatRollLines.Add(line);
                     else
                         otherCombatRollLines.Add(line);
                 }
@@ -381,12 +359,6 @@ public static class EquipmentBonusLinesBuilder
                     case SpellVariableOverrideType.DamageKind:
                         otherCombatRollLines.Add(
                             $"- {slotPrefix}Damage Kind override: {o.damageKind}"
-                        );
-                        break;
-
-                    case SpellVariableOverrideType.DamageRangeType:
-                        otherCombatRollLines.Add(
-                            $"- {slotPrefix}Range override: {o.damageRangeType}"
                         );
                         break;
 
@@ -440,161 +412,81 @@ public static class EquipmentBonusLinesBuilder
         return $"[{nice}] ";
     }
 
-    private static bool IsPositiveSpellRoll(SpellCombatModifier m)
+    private static bool IsPositiveCombatStatRoll(CombatStatModifier m)
     {
-        // Only show "bonuses" in the UI.
-        if (m.op == ModOp.Flat)
-            return m.value > 0.0001f;
+        if (m.op == EffectOp.Flat)
+            return m.value > 0;
+        if (m.op == EffectOp.Percent)
+            return m.value > 0;
+        return true;
+    }
 
-        if (m.op == ModOp.Percent)
+    private static bool IsCombatStatTypeRelated(CombatStatModifier m)
+    {
+        switch (m.stat)
         {
-            if (m.value <= 0.0001f)
+            case EffectStat.AttackerBonusByType:
+            case EffectStat.DefenderVulnerabilityByType:
+            case EffectStat.DefenderResistByType:
+            case EffectStat.AttackerWeakenByType:
+                return true;
+            default:
                 return false;
-
-            // By default treat Less% targets as penalties (don't show), except "Resistance" which is beneficial.
-            if (IsLessPercentTarget(m.target))
-                return m.target == SpellCombatModifierTarget.DefenderResistanceLessPercentByType;
-
-            return true;
         }
-
-        return false;
     }
 
-    private static bool IsDuplicateWithDerivedStats(SpellCombatModifier m)
+    private static string FormatCombatStatRoll(CombatStatModifier m)
     {
-        // These targets overlap with derived stats displayed above (Attack/Magic Power, Speed, Defence).
-        // Showing them again under spell rolls feels like a duplicate.
-        switch (m.target)
-        {
-            case SpellCombatModifierTarget.PowerFlat:
-            case SpellCombatModifierTarget.PowerMorePercent:
-            case SpellCombatModifierTarget.PowerLessPercent:
-
-            case SpellCombatModifierTarget.AttackPowerFlat:
-            case SpellCombatModifierTarget.AttackPowerMorePercent:
-            case SpellCombatModifierTarget.AttackPowerLessPercent:
-
-            case SpellCombatModifierTarget.MagicPowerFlat:
-            case SpellCombatModifierTarget.MagicPowerMorePercent:
-            case SpellCombatModifierTarget.MagicPowerLessPercent:
-
-            case SpellCombatModifierTarget.AttackSpeedFlat:
-            case SpellCombatModifierTarget.AttackSpeedMorePercent:
-            case SpellCombatModifierTarget.AttackSpeedLessPercent:
-
-            case SpellCombatModifierTarget.CastingSpeedFlat:
-            case SpellCombatModifierTarget.CastingSpeedMorePercent:
-            case SpellCombatModifierTarget.CastingSpeedLessPercent:
-
-            case SpellCombatModifierTarget.DefenceFlat:
-            case SpellCombatModifierTarget.DefenceMorePercent:
-            case SpellCombatModifierTarget.DefenceLessPercent:
-
-            case SpellCombatModifierTarget.PhysicalDefenseFlat:
-            case SpellCombatModifierTarget.PhysicalDefenceMorePercent:
-            case SpellCombatModifierTarget.PhysicalDefenceLessPercent:
-
-            case SpellCombatModifierTarget.MagicDefenseFlat:
-            case SpellCombatModifierTarget.MagicDefenceMorePercent:
-            case SpellCombatModifierTarget.MagicDefenceLessPercent:
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsDamageTypeRelated(SpellCombatModifier m)
-    {
-        if (m.scope == SpellModifierScope.DamageType)
-            return true;
-
-        switch (m.target)
-        {
-            case SpellCombatModifierTarget.AttackerBonusFlatByType:
-            case SpellCombatModifierTarget.AttackerBonusMorePercentByType:
-            case SpellCombatModifierTarget.DefenderVulnerabilityFlatByType:
-            case SpellCombatModifierTarget.DefenderVulnerabilityMorePercentByType:
-            case SpellCombatModifierTarget.DefenderResistanceFlatByType:
-            case SpellCombatModifierTarget.DefenderResistanceLessPercentByType:
-            case SpellCombatModifierTarget.AttackerWeakenFlatByType:
-            case SpellCombatModifierTarget.AttackerWeakenLessPercentByType:
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsDamageRangeRelated(SpellCombatModifier m)
-    {
-        if (m.scope == SpellModifierScope.DamageRangeType)
-            return true;
-
-        switch (m.target)
-        {
-            case SpellCombatModifierTarget.AttackerRangeBonusFlatByRange:
-            case SpellCombatModifierTarget.AttackerRangeBonusMorePercentByRange:
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsLessPercentTarget(SpellCombatModifierTarget t)
-    {
-        // Covers all generic *LessPercent targets plus type-based *LessPercent.
-        return t.ToString().EndsWith("LessPercent", StringComparison.Ordinal);
-    }
-
-    private static string FormatSpellRoll(SpellCombatModifier m)
-    {
-        // Prefer new target naming; fall back to legacy scope naming.
-        string name =
-            m.target != SpellCombatModifierTarget.None
-                ? CharacterDashboardText.NiceEnum(m.target.ToString())
-                : CharacterDashboardText.NiceEnum(m.scope.ToString());
-
-        string selector = FormatSelector(m);
-        string value = FormatSpellRollValue(m);
+        string name = GetCombatModName(m);
+        string selector = FormatCombatSelector(m);
+        string value = FormatCombatStatValue(m);
 
         if (!string.IsNullOrWhiteSpace(selector))
             return $"{name} ({selector}): {value}";
         return $"{name}: {value}";
     }
 
-    private static string FormatSelector(SpellCombatModifier m)
+    private static string FormatCombatSelector(CombatStatModifier m)
     {
-        // New target-based rules still store the selector in damageType/damageRangeType.
-        if (m.scope == SpellModifierScope.DamageKind)
-            return CharacterDashboardText.NiceEnum(m.damageKind.ToString());
-        if (m.scope == SpellModifierScope.DamageType)
-            return CharacterDashboardText.NiceEnum(m.damageType.ToString());
-        if (m.scope == SpellModifierScope.DamageRangeType)
-            return CharacterDashboardText.NiceEnum(m.damageRangeType.ToString());
-
-        if (IsDamageTypeRelated(m))
-            return CharacterDashboardText.NiceEnum(m.damageType.ToString());
-        if (IsDamageRangeRelated(m))
-            return CharacterDashboardText.NiceEnum(m.damageRangeType.ToString());
-
-        return null;
+        if (!IsCombatStatTypeRelated(m))
+            return null;
+        if (m.damageType == DamageType.None)
+            return null;
+        return CharacterDashboardText.NiceEnum(m.damageType.ToString());
     }
 
-    private static string FormatSpellRollValue(SpellCombatModifier m)
+    private static string FormatCombatStatValue(CombatStatModifier m)
     {
-        if (m.op == ModOp.Flat)
+        if (m.op == EffectOp.Flat)
         {
-            int flat = Mathf.RoundToInt(m.value);
-            return $"+{flat}";
+            string suffix = IsPowerScalingStat(m.stat) ? "%" : string.Empty;
+            return $"{(m.value >= 0 ? "+" : "")}{m.value}{suffix}";
         }
 
-        // Percent stored as "10" => 10%.
-        float pct = m.value;
+        if (m.op == EffectOp.Percent)
+            return $"{(m.value >= 0 ? "+" : "")}{m.value:0.##}%";
 
-        if (m.target == SpellCombatModifierTarget.DefenderResistanceLessPercentByType)
-            return $"+{pct:0.##}% (resist)";
+        return m.value.ToString();
+    }
 
-        return $"+{pct:0.##}%";
+    private static bool IsPowerScalingStat(EffectStat stat)
+    {
+        switch (stat)
+        {
+            case EffectStat.PowerScalingAll:
+            case EffectStat.PowerScalingPhysical:
+            case EffectStat.PowerScalingMagic:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static bool IsPowerScalingName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return false;
+        return name.IndexOf("Power Scaling", StringComparison.Ordinal) >= 0;
     }
 
     private static void AccumulateBaseStatMods(

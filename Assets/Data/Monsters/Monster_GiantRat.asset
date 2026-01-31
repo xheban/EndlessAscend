@@ -24,9 +24,11 @@ MonoBehaviour:
     intelligence: 1
     strength: 3
     spirit: 1
-    endurance: 200
+    endurance: 50000
   baseExp: 4
   baseGold: 2
+  goldMin: 2
+  goldMax: 2
   spells:
   - spellId: scratch
     level: 1
@@ -34,5 +36,6 @@ MonoBehaviour:
   - spellId: bite
     level: 1
     weight: 3
+  baseLoot: {fileID: 0}
   lootTable: []
   tags: 1

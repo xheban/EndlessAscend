@@ -18,6 +18,9 @@ namespace MyGame.Helpers
 
             var def = inst.effect;
             var scaled = inst.GetScaled(spellLevel);
+            int componentCount = def.GetComponentCount();
+            bool isComposite = componentCount > 1;
+            var primaryComponent = def.GetComponent(0);
 
             var icon = tooltip.Q<VisualElement>("Icon");
             var name = tooltip.Q<Label>("Name");
@@ -28,7 +31,6 @@ namespace MyGame.Helpers
             var damageRow = tooltip.Q<VisualElement>("Value");
             var valueLabel = damageRow?.Q<Label>("Label");
             var valueValue = tooltip.Q<Label>("ValueValue");
-            var valueFrom = tooltip.Q<Label>("ValueFrom");
 
             var chanceRow = tooltip.Q<VisualElement>("Chance");
             var chanceValue = tooltip.Q<Label>("ChanceValue");
@@ -54,6 +56,9 @@ namespace MyGame.Helpers
             var removeWhenRow = tooltip.Q<VisualElement>("RemoveWhen");
             var removeWhenValue = tooltip.Q<Label>("RemoveWhenValue");
 
+            var bonusesRow = tooltip.Q<VisualElement>("Bonuses");
+            var bonusesList = bonusesRow?.Q<VisualElement>("BonusesList");
+
             var detailText = tooltip.Q<Label>("DetailText");
 
             if (icon != null)
@@ -67,17 +72,41 @@ namespace MyGame.Helpers
 
             var tagParts = new List<string>();
 
-            if (def.damageType != null && def.damageType.Length > 0)
-                tagParts.Add(
-                    string.Join(
-                        ", ",
-                        System.Array.ConvertAll(def.damageType, d => NiceEnum(d.ToString()))
-                    )
-                );
-
-            if (def.kind == EffectKind.StatModifier && def.stat != EffectStat.None)
+            var typeSet = new HashSet<string>();
+            for (int i = 0; i < componentCount; i++)
             {
-                SetLabelText(stat, NiceEnum(def.stat.ToString()));
+                var compDef = def.GetComponent(i);
+                if (
+                    compDef?.damageType == null
+                    || compDef.damageType.Length == 0
+                    || !IsTypeBasedStat(compDef.stat)
+                )
+                    continue;
+
+                for (int j = 0; j < compDef.damageType.Length; j++)
+                    typeSet.Add(NiceEnum(compDef.damageType[j].ToString()));
+            }
+
+            if (typeSet.Count > 0)
+                tagParts.Add(string.Join(", ", typeSet));
+
+            if (!isComposite && primaryComponent != null)
+            {
+                switch (primaryComponent.kind)
+                {
+                    case EffectKind.StatModifier:
+                        SetLabelText(stat, NiceEnum(primaryComponent.stat.ToString()));
+                        break;
+                    case EffectKind.BaseStatModifier:
+                        SetLabelText(stat, NiceEnum(primaryComponent.baseStat.ToString()));
+                        break;
+                    case EffectKind.DerivedStatModifier:
+                        SetLabelText(stat, NiceEnum(primaryComponent.derivedStat.ToString()));
+                        break;
+                    default:
+                        SetRowVisible(stat, false);
+                        break;
+                }
             }
             else
             {
@@ -89,29 +118,45 @@ namespace MyGame.Helpers
             else
                 SetRowVisible(tags, false);
 
-            SetLabelText(
-                kindAndPolarity,
-                NiceEnum(def.kind.ToString()) + " " + def.polarity.ToString()
-            );
-
-            string magnitudeText = BuildMagnitudeText(def, scaled);
-
-            if (valueLabel != null)
-                valueLabel.text = def.kind switch
-                {
-                    EffectKind.HealOverTime => "Healing",
-                    EffectKind.DamageOverTime => "Damage",
-                    _ => "Magnitude",
-                };
-
-            SetLabelText(valueValue, magnitudeText);
-            if (valueFrom != null)
+            if (isComposite)
             {
-                string from = BuildMagnitudeFromText(def, inst);
-                valueFrom.text = from;
-                valueFrom.style.display = string.IsNullOrWhiteSpace(from)
-                    ? DisplayStyle.None
-                    : DisplayStyle.Flex;
+                SetLabelText(kindAndPolarity, "Composite " + def.polarity.ToString());
+                SetRowVisible(damageRow, false);
+            }
+            else
+            {
+                var kindLabel =
+                    primaryComponent != null
+                        ? NiceEnum(primaryComponent.kind.ToString())
+                        : string.Empty;
+                SetLabelText(kindAndPolarity, kindLabel + " " + def.polarity.ToString());
+
+                var primaryScaled =
+                    primaryComponent != null ? inst.GetComponentScaled(spellLevel, 0) : default;
+
+                string magnitudeText =
+                    primaryComponent != null
+                        ? BuildMagnitudeText(primaryComponent, primaryScaled, def)
+                        : null;
+
+                if (valueLabel != null)
+                    valueLabel.text =
+                        primaryComponent != null
+                            ? primaryComponent.kind switch
+                            {
+                                EffectKind.HealOverTime => "Healing",
+                                EffectKind.DirectHeal => "Healing",
+                                EffectKind.DamageOverTime => "Damage",
+                                EffectKind.DirectDamage => "Damage",
+                                EffectKind.StatModifier => "Modifier",
+                                EffectKind.BaseStatModifier => "Modifier",
+                                EffectKind.DerivedStatModifier => "Modifier",
+                                _ => "Magnitude",
+                            }
+                            : "Magnitude";
+
+                SetLabelText(valueValue, magnitudeText);
+                SetRowVisible(damageRow, primaryComponent != null);
             }
 
             if (chanceValue != null)
@@ -147,9 +192,70 @@ namespace MyGame.Helpers
                 removeWhenValue.text = NiceEnum(inst.removeWhenType.ToString());
             SetRowVisible(removeWhenRow, removeWhenValue != null);
 
+            // Bonuses list: only for composite buffs
+            bool showBonuses = isComposite && def.polarity == EffectPolarity.Buff;
+            if (bonusesList != null)
+                bonusesList.Clear();
+            if (showBonuses && bonusesList != null)
+            {
+                for (int i = 0; i < componentCount; i++)
+                {
+                    var compDef = def.GetComponent(i);
+                    if (compDef == null)
+                        continue;
+
+                    var compScaled = inst.GetComponentScaled(spellLevel, i);
+                    string line = BuildBonusLine(compDef, compScaled, def);
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    var label = new Label(line);
+                    label.AddToClassList("label-sm");
+                    bonusesList.Add(label);
+                }
+            }
+            SetRowVisible(
+                bonusesRow,
+                showBonuses && bonusesList != null && bonusesList.childCount > 0
+            );
+
             if (detailText != null)
             {
-                detailText.text = def.description;
+                if (isComposite && def.polarity == EffectPolarity.Buff)
+                {
+                    detailText.text = def.description;
+                }
+                else
+                {
+                    if (isComposite)
+                    {
+                        var sb = new StringBuilder();
+
+                        if (!string.IsNullOrWhiteSpace(def.description))
+                        {
+                            sb.AppendLine(def.description.Trim());
+                        }
+
+                        for (int i = 0; i < componentCount; i++)
+                        {
+                            var compDef = def.GetComponent(i);
+                            if (compDef == null)
+                                continue;
+
+                            var compScaled = inst.GetComponentScaled(spellLevel, i);
+                            string line = BuildComponentLine(compDef, compScaled, def);
+                            if (!string.IsNullOrWhiteSpace(line))
+                                sb.AppendLine(line);
+                        }
+
+                        detailText.text = sb.ToString().Trim();
+                    }
+                    else
+                    {
+                        detailText.text = def.description;
+                    }
+                }
+
                 detailText.style.display = string.IsNullOrWhiteSpace(detailText.text)
                     ? DisplayStyle.None
                     : DisplayStyle.Flex;
@@ -178,37 +284,235 @@ namespace MyGame.Helpers
         }
 
         private static string BuildMagnitudeText(
-            EffectDefinition def,
-            EffectInstanceScaledIntValues scaled
+            EffectComponentDefinition comp,
+            EffectComponentScaledIntValues scaled,
+            EffectDefinition def
         )
         {
-            if (def == null)
+            if (comp == null)
                 return null;
 
-            return def.op switch
+            switch (comp.kind)
             {
-                EffectOp.Flat => scaled.magnitudeFlat > 0 ? scaled.magnitudeFlat.ToString() : null,
-                EffectOp.MorePercent => scaled.magnitudePercent > 0
-                    ? $"+{scaled.magnitudePercent}%"
-                    : null,
-                EffectOp.LessPercent => scaled.magnitudePercent > 0
-                    ? $"-{scaled.magnitudePercent}%"
-                    : null,
+                case EffectKind.StatModifier:
+                {
+                    int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+                    bool powerScaling =
+                        comp.stat == EffectStat.PowerScalingAll
+                        || comp.stat == EffectStat.PowerScalingPhysical
+                        || comp.stat == EffectStat.PowerScalingMagic;
+                    return comp.op switch
+                    {
+                        EffectOp.Flat => FormatSigned(scaled.magnitudeFlat * sign, powerScaling),
+                        EffectOp.Percent => FormatSigned(scaled.magnitudePercent * sign, true),
+                        _ => null,
+                    };
+                }
+
+                case EffectKind.BaseStatModifier:
+                case EffectKind.DerivedStatModifier:
+                {
+                    int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+                    if (comp.statOp == ModOp.Flat)
+                        return FormatSigned(scaled.magnitudeFlat * sign, false);
+                    if (comp.statOp == ModOp.Percent)
+                        return FormatSigned(scaled.magnitudePercent * sign, true);
+                    return null;
+                }
+
+                case EffectKind.DamageOverTime:
+                case EffectKind.HealOverTime:
+                case EffectKind.DirectDamage:
+                case EffectKind.DirectHeal:
+                    return BuildDamageMagnitudeText(scaled);
+            }
+
+            return null;
+        }
+
+        private static string BuildMagnitudeFromText(
+            EffectComponentDefinition comp,
+            EffectComponentScaledIntValues scaled
+        )
+        {
+            if (comp == null)
+                return null;
+
+            if (comp.kind == EffectKind.StatModifier && comp.op == EffectOp.Flat)
+                return "Flat";
+
+            if (scaled.magnitudeBasis == EffectMagnitudeBasis.None)
+                return string.Empty;
+
+            return BuildBasisText(scaled.magnitudeBasis);
+        }
+
+        private static string BuildDamageMagnitudeText(EffectComponentScaledIntValues scaled)
+        {
+            var parts = new List<string>(2);
+
+            if (scaled.magnitudeFlat > 0)
+                parts.Add(scaled.magnitudeFlat.ToString());
+
+            if (scaled.magnitudeBasis != EffectMagnitudeBasis.None && scaled.magnitudePercent > 0)
+                parts.Add($"{scaled.magnitudePercent}% of {BuildBasisText(scaled.magnitudeBasis)}");
+
+            return parts.Count > 0 ? string.Join(" + ", parts) : null;
+        }
+
+        private static string BuildBonusLine(
+            EffectComponentDefinition comp,
+            EffectComponentScaledIntValues scaled,
+            EffectDefinition def
+        )
+        {
+            if (comp == null)
+                return null;
+
+            int sign = def != null && def.polarity == EffectPolarity.Debuff ? -1 : 1;
+
+            switch (comp.kind)
+            {
+                case EffectKind.StatModifier:
+                {
+                    if (comp.stat == EffectStat.None)
+                        return null;
+
+                    bool percent = comp.op == EffectOp.Percent || IsPowerScalingStat(comp.stat);
+                    int value =
+                        comp.op == EffectOp.Percent
+                            ? scaled.magnitudePercent
+                            : scaled.magnitudeFlat;
+
+                    if (value == 0)
+                        return null;
+
+                    string label = NiceEnum(comp.stat.ToString());
+                    if (
+                        IsTypeBasedStat(comp.stat)
+                        && comp.damageType != null
+                        && comp.damageType.Length > 0
+                    )
+                    {
+                        var types = new List<string>(comp.damageType.Length);
+                        for (int i = 0; i < comp.damageType.Length; i++)
+                            types.Add(NiceEnum(comp.damageType[i].ToString()));
+                        label += $" ({string.Join(", ", types)})";
+                    }
+
+                    return $"{label} {FormatSigned(value * sign, percent)}";
+                }
+
+                case EffectKind.BaseStatModifier:
+                {
+                    int value =
+                        comp.statOp == ModOp.Percent
+                            ? scaled.magnitudePercent
+                            : scaled.magnitudeFlat;
+                    if (value == 0)
+                        return null;
+                    return $"{NiceEnum(comp.baseStat.ToString())} {FormatSigned(value * sign, comp.statOp == ModOp.Percent)}";
+                }
+
+                case EffectKind.DerivedStatModifier:
+                {
+                    int value =
+                        comp.statOp == ModOp.Percent
+                            ? scaled.magnitudePercent
+                            : scaled.magnitudeFlat;
+                    if (value == 0)
+                        return null;
+                    return $"{NiceEnum(comp.derivedStat.ToString())} {FormatSigned(value * sign, comp.statOp == ModOp.Percent)}";
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsPowerScalingStat(EffectStat stat)
+        {
+            return stat == EffectStat.PowerScalingAll
+                || stat == EffectStat.PowerScalingPhysical
+                || stat == EffectStat.PowerScalingMagic;
+        }
+
+        private static bool IsTypeBasedStat(EffectStat stat)
+        {
+            return stat == EffectStat.AttackerBonusByType
+                || stat == EffectStat.AttackerWeakenByType
+                || stat == EffectStat.DefenderResistByType
+                || stat == EffectStat.DefenderVulnerabilityByType;
+        }
+
+        private static string BuildComponentLine(
+            EffectComponentDefinition comp,
+            EffectComponentScaledIntValues scaled,
+            EffectDefinition def
+        )
+        {
+            if (comp == null)
+                return null;
+
+            string kindLabel = NiceEnum(comp.kind.ToString());
+
+            string statLabel = comp.kind switch
+            {
+                EffectKind.StatModifier => NiceEnum(comp.stat.ToString()),
+                EffectKind.BaseStatModifier => NiceEnum(comp.baseStat.ToString()),
+                EffectKind.DerivedStatModifier => NiceEnum(comp.derivedStat.ToString()),
                 _ => null,
+            };
+
+            string magnitude = BuildMagnitudeText(comp, scaled, def);
+            string from = BuildMagnitudeFromText(comp, scaled);
+
+            var sb = new StringBuilder();
+            sb.Append("- ");
+            sb.Append(kindLabel);
+
+            if (!string.IsNullOrWhiteSpace(statLabel))
+            {
+                sb.Append(" (");
+                sb.Append(statLabel);
+                sb.Append(')');
+            }
+
+            if (!string.IsNullOrWhiteSpace(magnitude))
+            {
+                sb.Append(": ");
+                sb.Append(magnitude);
+            }
+
+            if (!string.IsNullOrWhiteSpace(from))
+            {
+                sb.Append(" [");
+                sb.Append(from);
+                sb.Append(']');
+            }
+
+            return sb.ToString();
+        }
+
+        private static string BuildBasisText(EffectMagnitudeBasis basis)
+        {
+            return basis switch
+            {
+                EffectMagnitudeBasis.Power => "Current Power",
+                EffectMagnitudeBasis.DamageDealt => "Last Damage Dealt",
+                EffectMagnitudeBasis.LastDamageTaken => "Last Damage Taken",
+                EffectMagnitudeBasis.MaxHealth => "Max HP",
+                EffectMagnitudeBasis.MaxMana => "Max Mana",
+                _ => string.Empty,
             };
         }
 
-        private static string BuildMagnitudeFromText(EffectDefinition def, EffectInstance inst)
+        private static string FormatSigned(int value, bool percent)
         {
-            return def.op == EffectOp.Flat
-                ? "Flat"
-                : "Percent of"
-                    + inst.magnitudeBasis switch
-                    {
-                        EffectMagnitudeBasis.DamageDealt => " Last Damage Dealt",
-                        EffectMagnitudeBasis.Power => " Current Power",
-                        _ => string.Empty,
-                    };
+            if (value == 0)
+                return null;
+
+            string sign = value > 0 ? "+" : string.Empty;
+            return percent ? $"{sign}{value}%" : $"{sign}{value}";
         }
 
         private static string FormatTurns(int turns)

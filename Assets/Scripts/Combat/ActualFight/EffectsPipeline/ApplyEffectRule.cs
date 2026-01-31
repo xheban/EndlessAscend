@@ -35,21 +35,7 @@ namespace MyGame.Combat
                 ctx.spell.damageKind == DamageKind.Magical
                     ? ctx.attacker.derived.magicPower
                     : ctx.attacker.derived.attackPower;
-
-            float bonusFlatPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? attackerModifiers.magicPowerFlat
-                    : attackerModifiers.attackPowerFlat;
-            bonusFlatPower += attackerModifiers.powerFlat;
-
-            float bonusMultPower =
-                ctx.spell.damageKind == DamageKind.Magical
-                    ? attackerModifiers.MagicPowerMultFinal
-                    : attackerModifiers.AttackPowerMultFinal;
-
-            bonusMultPower *= attackerModifiers.PowerMultFinal;
-
-            int finalPower = Mathf.FloorToInt((basePower + bonusFlatPower) * bonusMultPower);
+            int finalPower = Mathf.FloorToInt(basePower);
 
             _effects.ApplyEffects(
                 attacker: ctx.attacker,

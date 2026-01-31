@@ -27,7 +27,9 @@ namespace MyGame.Combat
             }
 
             for (int i = 0; i < _rules.Count; i++)
+            {
                 _rules[i]?.Apply(ctx, attackerModifiers);
+            }
         }
     }
 }

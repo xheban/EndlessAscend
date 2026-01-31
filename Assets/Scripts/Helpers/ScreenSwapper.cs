@@ -95,6 +95,9 @@ public class ScreenSwapper : MonoBehaviour
 
     [SerializeField]
     private VisualTreeAsset effectDetailTooltipUxml;
+
+    [SerializeField]
+    private VisualTreeAsset arrayDetailTooltipUxml;
     private VisualElement _tooltipHost;
     private VisualElement _tooltipContent;
     private VisualElement _customTooltipHost;
@@ -233,6 +236,23 @@ public class ScreenSwapper : MonoBehaviour
                 detail3.pickingMode = PickingMode.Ignore;
                 detail3.style.display = DisplayStyle.None;
                 _customTooltipHost.Add(detail3);
+            }
+        }
+
+        // Optional: create the array detail tooltip in the global host.
+        if (arrayDetailTooltipUxml != null)
+        {
+            var temp4 = new VisualElement();
+            arrayDetailTooltipUxml.CloneTree(temp4);
+
+            if (temp4.childCount > 0)
+            {
+                var detail4 = temp4[0];
+                detail4.RemoveFromHierarchy();
+                detail4.name = "ArrayDetailTooltip";
+                detail4.pickingMode = PickingMode.Ignore;
+                detail4.style.display = DisplayStyle.None;
+                _customTooltipHost.Add(detail4);
             }
         }
 
@@ -567,7 +587,8 @@ public class ScreenSwapper : MonoBehaviour
         Action onSecondary = null,
         bool closeOnOutsideClick = false,
         VisualElement customContent = null,
-        bool replaceCustomContent = true
+        bool replaceCustomContent = true,
+        bool centerMessage = false
     )
     {
         SetGlobalModalOpen(true);
@@ -580,7 +601,8 @@ public class ScreenSwapper : MonoBehaviour
             onPrimary,
             secondaryText,
             onSecondary,
-            onClose: () => SetGlobalModalOpen(false)
+            onClose: () => SetGlobalModalOpen(false),
+            centerMessage: centerMessage
         );
 
         if (customContent != null)

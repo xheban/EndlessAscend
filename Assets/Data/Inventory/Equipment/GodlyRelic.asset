@@ -36,22 +36,17 @@ MonoBehaviour:
   maxBaseRolls: 0
   allowDuplicateBaseRolls: 0
   baseRollTable: []
-  minDamageKindRolls: 0
-  maxDamageKindRolls: 0
-  allowDuplicateDamageKindRolls: 0
-  damageKindRollTable: []
-  minDamageRangeRolls: 0
-  maxDamageRangeRolls: 0
-  allowDuplicateDamageRangeRolls: 0
-  damageRangeRollTable: []
-  minDamageTypeRolls: 0
-  maxDamageTypeRolls: 0
-  allowDuplicateDamageTypeRolls: 0
-  damageTypeRollTable: []
   minCombatModRolls: 0
   maxCombatModRolls: 0
   allowDuplicateCombatModRolls: 0
-  combatModRollTable: []
+  combatModRollTable:
+  - stat: 0
+    op: 0
+    damageType: 0
+    min: 0
+    max: 0
+    weight: 0
+    roundFlatToInt: 0
   minDerivedRolls: 0
   maxDerivedRolls: 0
   allowDuplicateDerivedRolls: 0

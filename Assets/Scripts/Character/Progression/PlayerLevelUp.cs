@@ -11,6 +11,8 @@ namespace MyGame.Progression
 {
     public static class PlayerLevelUp
     {
+        public static event Action<int, List<string>> PlayerLeveledUp;
+
         // Replace with your real formula or config table later
         public static long GetXpRequiredForLevel(int level)
         {
@@ -39,6 +41,7 @@ namespace MyGame.Progression
                 return 0;
 
             int gained = 0;
+            List<string> newlyUnlocked = null;
 
             int pointsPerLevel = 4 * HelperFunctions.TierToFlatBonusMultiplier(save.tier);
             pointsPerLevel = Mathf.Max(0, pointsPerLevel);
@@ -61,21 +64,29 @@ namespace MyGame.Progression
                 save.currentHp = Mathf.Max(1, derived.maxHp);
                 save.currentMana = Mathf.Max(0, derived.maxMana);
 
-                ApplyLevelUnlocks(save);
+                var unlockedThisLevel = ApplyLevelUnlocks(save);
+                if (unlockedThisLevel != null && unlockedThisLevel.Count > 0)
+                {
+                    newlyUnlocked ??= new List<string>();
+                    newlyUnlocked.AddRange(unlockedThisLevel);
+                }
             }
+            if (gained > 0)
+                PlayerLeveledUp?.Invoke(gained, newlyUnlocked);
             return gained;
         }
 
-        private static void ApplyLevelUnlocks(SaveData save)
+        private static List<string> ApplyLevelUnlocks(SaveData save)
         {
             if (save == null)
-                return;
+                return null;
 
             var db = GameConfigProvider.Instance?.UnlockDatabase;
             if (db == null || db.All == null)
-                return;
+                return null;
 
             save.unlockedIds ??= new List<string>();
+            List<string> added = null;
 
             var all = db.All;
             for (int i = 0; i < all.Count; i++)
@@ -91,7 +102,10 @@ namespace MyGame.Progression
                     continue;
 
                 save.unlockedIds.Add(def.unlockId);
+                added ??= new List<string>();
+                added.Add(def.unlockId);
             }
+            return added;
         }
 
         private static bool HasUnlockId(List<string> ids, string unlockId)

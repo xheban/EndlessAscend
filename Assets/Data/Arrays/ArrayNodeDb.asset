@@ -9,16 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7370e9d609c9afa4ba4c78cc1208e2e6, type: 3}
-  m_Name: FireExpansion
+  m_Script: {fileID: 11500000, guid: a024dc77dc566db439de548c4a8f9139, type: 3}
+  m_Name: ArrayNodeDb
   m_EditorClassIdentifier: 
-  effectId: 
-  displayName: 
-  icon: {fileID: 0}
-  description: 
-  kind: 0
-  polarity: 1
-  stat: 1
-  op: 1
-  damageType: 
-  tickTiming: 1
+  entries:
+  - {fileID: 11400000, guid: 33bd1cb94033c2c40a22bff56ecb0fa7, type: 2}

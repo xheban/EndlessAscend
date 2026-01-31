@@ -10,8 +10,14 @@ namespace MyGame.Common
         // % based on the actual damage dealt by the triggering hit
         DamageDealt,
 
+        // % based on target max values
+        MaxHealth,
+        MaxMana,
+
+        // % based on target's most recent damage taken
+        LastDamageTaken,
+
         // Optional future bases:
-        // MaxHealth,
         // CurrentHealth,
         // SpellBaseDamage,
     }
@@ -63,9 +69,8 @@ namespace MyGame.Common
 
     public enum EffectOp
     {
-        Flat, // uses EffectInstance magnitudeFlat
-        MorePercent, // uses magnitudePercent: +20 => *1.2
-        LessPercent, // uses magnitudePercent: 20 => *0.8
+        Flat, // uses component magnitudeFlat
+        Percent, // uses component magnitudePercent: +20 => *1.2
     }
 
     public enum EffectKind
@@ -73,6 +78,11 @@ namespace MyGame.Common
         StatModifier, // modifies StatModifiers
         DamageOverTime, // periodic damage ticks
         HealOverTime, // periodic heal ticks
+        DirectDamage, // immediate damage on apply
+        DirectHeal, // immediate heal on apply
+        BaseStatModifier, // modifies base stats (STR/AGI/etc)
+        DerivedStatModifier, // modifies derived stats (maxHP, power, speeds, etc)
+        Composite, // multiple components bundled under one icon
         // later: Stun, Silence, Shield, Dispel, etc.
     }
 
@@ -86,34 +96,35 @@ namespace MyGame.Common
     public enum EffectStat
     {
         // Generic damage buckets
-        None,
-        DamageAll,
-        DamagePhysical,
-        DamageMagic,
+        None = 0,
+        DamageAll = 1,
+        DamagePhysical = 2,
+        DamageMagic = 3,
 
         // Generic power buckets (if you use them in damage calc)
-        PowerAll,
-        PowerAttack,
-        PowerMagic,
+        PowerAll = 4,
 
         // Spell base damage buckets
-        SpellBaseAll,
-        SpellBasePhysical,
-        SpellBaseMagic,
+        SpellBaseAll = 5,
+        SpellBasePhysical = 6,
+        SpellBaseMagic = 7,
 
         // Common combat buckets
-        HitChance,
-        AttackSpeed,
-        CastingSpeed,
-
-        DefenceAll,
-        DefencePhysical,
-        DefenceMagic,
+        DefenceAll = 8,
 
         // Type-based layers (uses EffectDefinition.damageType)
-        AttackerBonusByType, // outgoing MORE by type (your attackerBonus arrays)
-        AttackerWeakenByType, // outgoing LESS by type (your attackerWeaken arrays)
-        DefenderVulnerabilityByType, // damage taken MORE by type (your defenderVuln arrays)
-        DefenderResistByType, // damage taken LESS by type (your defenderResist arrays)
+        AttackerBonusByType = 9, // outgoing MORE by type (your attackerBonus arrays)
+        AttackerWeakenByType = 10, // outgoing LESS by type (your attackerWeaken arrays)
+        DefenderVulnerabilityByType = 11, // damage taken MORE by type (your defenderVuln arrays)
+        DefenderResistByType = 12, // damage taken LESS by type (your defenderResist arrays)
+
+        // Power scaling (flat uses percent-points, e.g. 20 => +0.20)
+        PowerScalingAll = 13,
+        PowerScalingPhysical = 14,
+        PowerScalingMagic = 15,
+
+        // Range-based flat/% bonuses (applied by spell damage range)
+        MeleeDamageBonus = 16,
+        RangedDamageBonus = 17,
     }
 }

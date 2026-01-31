@@ -35,35 +35,24 @@ MonoBehaviour:
     max: 5
     weight: 20
     roundFlatToInt: 0
-  minDamageKindRolls: 0
-  maxDamageKindRolls: 0
-  allowDuplicateDamageKindRolls: 0
-  damageKindRollTable: []
-  minDamageRangeRolls: 0
-  maxDamageRangeRolls: 0
-  allowDuplicateDamageRangeRolls: 0
-  damageRangeRollTable: []
-  minDamageTypeRolls: 0
-  maxDamageTypeRolls: 0
-  allowDuplicateDamageTypeRolls: 0
-  damageTypeRollTable: []
   minCombatModRolls: 0
   maxCombatModRolls: 0
   allowDuplicateCombatModRolls: 0
   combatModRollTable:
-  - target: 0
+  - stat: 17
     op: 0
-    min: 0
-    max: 0
-    weight: 0
-    roundFlatToInt: 0
+    damageType: 0
+    min: 100
+    max: 500
+    weight: 500
+    roundFlatToInt: 1
   minDerivedRolls: 0
   maxDerivedRolls: 0
   allowDuplicateDerivedRolls: 0
   derivedRollTable:
-  - stat: 9
+  - stat: 8
     op: 0
-    min: 0
-    max: 0
-    weight: 0
+    min: 20
+    max: 50
+    weight: 50
     roundFlatToInt: 0

@@ -1,0 +1,60 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="Separator" src="project://database/Assets/UI%20Toolkit/Components/Utils/Separator.uxml?fileID=9197481963319205126&amp;guid=0455613e7a8639a42a23c1a0065e009a&amp;type=3#Separator" />
+    <Style src="project://database/Assets/UI%20Toolkit/Homestead/SpellMerge.uss?fileID=7433441132597879392&amp;guid=9822568af0527a8409d65da15978fbbc&amp;type=3#SpellMerge" />
+    <engine:VisualElement name="SpellMerging" style="flex-grow: 1; padding-top: 8px; padding-right: 24px; padding-bottom: 12px; padding-left: 24px; flex-direction: row;">
+        <engine:VisualElement name="Info" style="flex-grow: 0; flex-basis: auto; width: 480px; flex-shrink: 0;">
+            <engine:Label text="Spell Merging" name="Title" class="header-md" style="-unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-items: center;" />
+            <engine:Label text="Spell merging is the art of weaving multiple spells into a single working. The caster begins by selecting an Array Core, the foundation that anchors and defines the merge. Around the core, two to four learned nodes may be placed, each representing a spell to be bound into the array.&#10;&#10;Merging exacts a price: the caster must sacrifice mastery levels from the spells being merged. The greater the mastery offered, the higher the chance of success. Only known array components may be used — and whether the magic is reborn or lost depends on how much power the caster is willing to give up. Even then, not every combination creates something new.&#10;&#10;You can select cores,nodes and spells by right clicking on them inside the table or drag and dropping them. You can unselect them by rightclicking the spell,node and core on the array." class="label-sm" style="white-space: normal; margin-top: 16px; margin-bottom: 16px;" />
+            <engine:Button text="Show Cores" name="Cores" class="btn btn-violet btn-lg" />
+            <engine:Button text="Show Nodes" name="Nodes" class="btn btn-violet btn-lg" />
+            <engine:Button text="Show Spells" name="Spells" class="btn btn-violet btn-lg" />
+        </engine:VisualElement>
+        <engine:VisualElement name="Arrays" style="flex-grow: 0; justify-content: flex-start; margin-right: 64px; margin-left: 64px;">
+            <engine:VisualElement name="MergeLayout" class="merge-layout" style="width: 572px; height: 572px; align-self: center; justify-content: flex-start; align-items: center; align-content: auto; flex-grow: 1;">
+                <engine:VisualElement name="Top" style="flex-grow: 0; height: 142px;">
+                    <engine:VisualElement name="NodeTop" style="width: 96px; height: 142px; background-image: none; rotate: 180deg; align-self: center; align-content: auto; align-items: auto; justify-content: flex-end; display: flex;">
+                        <engine:VisualElement name="AddButtonTop" style="width: 40px; height: 40px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Map_icon_plus&apos;); align-self: center; top: auto; bottom: 26px; rotate: 180deg;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Middle" style="flex-grow: 0; height: 288px; flex-direction: row;">
+                    <engine:VisualElement name="NodeLeft" style="width: 142px; height: 96px; background-image: none; rotate: 180deg; align-items: center; align-self: center; align-content: auto; justify-content: center;">
+                        <engine:VisualElement name="AddButtonLeft" style="width: 40px; height: 40px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Map_icon_plus&apos;); align-self: center; top: auto; bottom: auto; left: 26px; rotate: 180deg;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="Core" style="width: 288px; height: 288px; background-color: rgba(0, 0, 0, 0); background-image: none; justify-content: center; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;">
+                        <engine:VisualElement name="AddButtonCore" style="width: 40px; height: 40px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Map_icon_plus&apos;); align-self: center; top: auto; bottom: auto;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="NodeRight" style="width: 142px; height: 96px; background-image: none; align-self: center; justify-content: center; align-content: auto; align-items: flex-end;">
+                        <engine:VisualElement name="AddButtonRight" style="width: 40px; height: 40px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Map_icon_plus&apos;); align-self: auto; top: auto; bottom: auto; right: 26px;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:VisualElement name="Bottom" style="flex-grow: 0; height: 142px;">
+                    <engine:VisualElement name="NodeBottom" style="width: 96px; height: 142px; background-image: none; rotate: 0; align-self: center; justify-content: flex-end;">
+                        <engine:VisualElement name="AddButtonBottom" style="width: 40px; height: 40px; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Map_icon_plus&apos;); align-self: center; top: auto; bottom: 26px;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="PartsToChoose" style="flex-grow: 1;">
+            <engine:Label text="Array Cores" name="PartsLabel" class="header-md" style="-unity-text-align: upper-center;" />
+            <engine:Instance template="Separator" style="align-items: center;" />
+            <engine:VisualElement name="EquipmentFilter" style="flex-grow: 0; flex-direction: row; flex-shrink: 0; margin-top: 8px;">
+                <engine:Label text="Search &#10;" name="Label" class="label-sm" style="height: 32px; margin-right: 8px; justify-content: flex-start; align-content: auto; -unity-text-align: lower-left;" />
+                <engine:TextField name="EquipmentSearch" style="height: 32px; width: auto; flex-grow: 1;" />
+                <engine:Button text="Open filter" name="FilterSettings" class="btn btn-small btn-violet" style="height: 32px;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="PartsHolder" style="flex-grow: 1; background-image: resource(&apos;Sprites/DarkPixelRPGUI/Artwok/UI/Frame_bg_big_2&apos;); padding-top: 12px; padding-right: 12px; padding-bottom: 12px; padding-left: 12px;" />
+            <engine:VisualElement name="BottomPanel" style="flex-grow: 0; justify-content: center; flex-direction: row; margin-top: 8px;">
+                <engine:VisualElement class="label-sm" style="flex-grow: 0; flex-direction: row; align-self: auto; align-items: center; margin-right: 32px;">
+                    <engine:Label text="Final cost" name="CostLabel" />
+                    <engine:Label text="124" name="CostValue" />
+                    <engine:VisualElement style="flex-grow: 0; width: 24px; height: 24px; justify-content: center; align-content: center; background-image: resource(&apos;UI_Own/ManaStone&apos;); margin-right: 16px;" />
+                    <engine:Label text="Final chance" name="ChanceLabel" />
+                    <engine:Label text="48%" name="ChanceValue" />
+                </engine:VisualElement>
+                <engine:Button text="Merge" name="Merge" class="btn btn-violet btn-sm" style="margin-top: 0; margin-right: 16px; margin-bottom: 0; margin-left: 0;" />
+                <engine:Button text="Reset" name="Reset" class="btn btn-orange btn-sm" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

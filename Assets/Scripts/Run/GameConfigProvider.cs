@@ -20,6 +20,13 @@ namespace MyGame.Run
         [SerializeField]
         private StartingSpellConfig startingSpellConfig;
 
+        [Header("Arrays")]
+        [SerializeField]
+        private ArrayCoreDatabaseSO arrayCoreDatabase;
+
+        [SerializeField]
+        private ArrayNodeDatabaseSO arrayNodeDatabase;
+
         [Header("Player")]
         [SerializeField]
         private PlayerAvatarDatabase playerAvatarDatabase;
@@ -46,6 +53,9 @@ namespace MyGame.Run
         public SpellDatabase SpellDatabase => spellDatabase;
         public EffectDatabase EffectDatabase => effectDatabase;
         public SpellProgressionConfig SpellProgression => spellProgression;
+
+        public ArrayCoreDatabaseSO ArrayCoreDatabase => arrayCoreDatabase;
+        public ArrayNodeDatabaseSO ArrayNodeDatabase => arrayNodeDatabase;
 
         public PlayerAvatarDatabase PlayerAvatarDatabase => playerAvatarDatabase;
         public PlayerIconDatabase PlayerIconDatabase => playerIconDatabase;

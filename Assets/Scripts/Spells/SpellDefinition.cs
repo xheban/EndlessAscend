@@ -34,8 +34,8 @@ public class SpellDefinition : ScriptableObject
     [Header("Damage Range Type")]
     public DamageRangeType damageRangeType = DamageRangeType.Melee;
 
-    [Header("Type")]
-    public SpellIntent intent = SpellIntent.Damage;
+    [Header("Types")]
+    public SpellType[] spellTypes = { SpellType.Damage };
 
     [Header("Damage Type")]
     public DamageType[] damageTag;

@@ -21,3 +21,47 @@
 .footer-active {
     -unity-background-image-tint-color: var(--color-item-selected);
 }
+
+.footer-disabled {
+    -unity-background-image-tint-color: rgb(80, 80, 80);
+}
+
+.footer-panel.footer-disabled:hover {
+    -unity-background-image-tint-color: rgb(80, 80, 80);
+}
+
+.footer-disabled .footer-image {
+    opacity: 0.3;
+}
+
+.footer-disabled .header-sm {
+    opacity: 0.3;
+}
+
+.footer-lock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 52px;
+    align-items: center;
+    flex-direction: column;
+    display: none;
+}
+
+.footer-lock-icon {
+    width: 80px;
+    height: 80px;
+    background-image: resource('Icons/lock');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.footer-lock-title {
+    margin-top: 8px;
+    -unity-text-align: middle-center;
+}
+
+.footer-lock-req {
+    margin-top: 2px;
+    -unity-text-align: middle-center;
+}

@@ -4,18 +4,38 @@
         <engine:VisualElement name="Character" class="footer-panel" style="flex-grow: 1; margin-right: 32px; -unity-slice-scale: 1.5px; height: auto; background-image: resource(&apos;UI_Own/FooterFrame&apos;);">
             <engine:VisualElement name="Image" class="footer-image" style="height: 150px; width: 342px; background-image: resource(&apos;Sprites/Footer/CharacterTab&apos;); position: absolute; top: 48px; left: 50px;" />
             <engine:Label text="Character" double-click-selects-word="false" class="m-0 p-0 header-sm" style="-unity-text-align: middle-center; margin-top: 0; position: absolute; top: 232px; left: 129px;" />
+            <engine:VisualElement name="LockOverlay" class="footer-lock">
+                <engine:VisualElement name="LockIcon" class="footer-lock-icon" />
+                <engine:Label name="LockTitle" text="Unlocks at" class="label-md footer-lock-title" />
+                <engine:Label name="LockRequirement" text="Level 0" class="label-md footer-lock-req" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Tower" class="footer-panel" style="flex-grow: 1; margin-right: 32px; -unity-slice-scale: 1.5px; height: auto; background-image: resource(&apos;UI_Own/FooterFrame&apos;);">
             <engine:VisualElement name="Image" class="footer-image" style="height: 150px; width: 342px; margin-top: 0; background-image: resource(&apos;Sprites/Footer/TowerTab&apos;); position: absolute; top: 48px; left: 50px;" />
             <engine:Label text="Tower" double-click-selects-word="false" class="m-0 p-0 header-sm" style="-unity-text-align: middle-center; margin-top: 0; position: absolute; top: 231px; left: 172px;" />
+            <engine:VisualElement name="LockOverlay" class="footer-lock">
+                <engine:VisualElement name="LockIcon" class="footer-lock-icon" />
+                <engine:Label name="LockTitle" text="Unlocks at" class="label-md footer-lock-title" />
+                <engine:Label name="LockRequirement" text="Level 0" class="label-md footer-lock-req" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="City" class="footer-panel" style="flex-grow: 1; margin-right: 32px; -unity-slice-scale: 1.5px; height: auto; background-image: resource(&apos;UI_Own/FooterFrame&apos;);">
             <engine:VisualElement name="Image" class="footer-image" style="height: 150px; width: 342px; margin-top: 0; background-image: resource(&apos;Sprites/Footer/CityTab&apos;); position: absolute; top: 48px; left: 50px;" />
             <engine:Label text="City" double-click-selects-word="false" class="m-0 p-0 header-sm" style="-unity-text-align: middle-center; margin-top: 0; position: absolute; top: 233px; left: 191px;" />
+            <engine:VisualElement name="LockOverlay" class="footer-lock">
+                <engine:VisualElement name="LockIcon" class="footer-lock-icon" />
+                <engine:Label name="LockTitle" text="Unlocks at" class="label-md footer-lock-title" />
+                <engine:Label name="LockRequirement" text="Level 0" class="label-md footer-lock-req" />
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="Homestead" class="footer-panel" style="flex-grow: 1; -unity-slice-scale: 1.5px; height: auto; background-image: resource(&apos;UI_Own/FooterFrame&apos;);">
             <engine:Label text="Homestead" double-click-selects-word="false" class="m-0 p-0 header-sm" style="-unity-text-align: middle-center; margin-top: 0; position: absolute; top: 230px; left: 145px;" />
             <engine:VisualElement name="Image" class="footer-image" style="height: 150px; width: 342px; margin-top: 0; background-image: resource(&apos;Sprites/Footer/HouseholdTab&apos;); position: absolute; top: 48px; left: 50px;" />
+            <engine:VisualElement name="LockOverlay" class="footer-lock">
+                <engine:VisualElement name="LockIcon" class="footer-lock-icon" />
+                <engine:Label name="LockTitle" text="Unlocks at" class="label-md footer-lock-title" />
+                <engine:Label name="LockRequirement" text="Level 0" class="label-md footer-lock-req" />
+            </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

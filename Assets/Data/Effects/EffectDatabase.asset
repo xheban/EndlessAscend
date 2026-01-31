@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: EffectDatabase
   m_EditorClassIdentifier: 
   effects:
-  - {fileID: 11400000, guid: f7b94d16f1700794c95564bc3dfdbd25, type: 2}
+  - {fileID: 11400000, guid: b0217ca3de9faae4697eb3c0decec973, type: 2}

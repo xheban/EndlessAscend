@@ -31,7 +31,7 @@ namespace MyGame.Combat
         public DamageType[] damageTypes;
         public EffectInstance[] onHitEffects;
         public EffectInstance[] onCastEffects;
-        public SpellIntent intent;
+        public SpellType[] spellTypes;
         public Sprite icon;
 
         public ResolvedSpell(
@@ -51,7 +51,7 @@ namespace MyGame.Combat
             DamageType[] damageTypes,
             EffectInstance[] onHitEffects,
             EffectInstance[] onCastEffects,
-            SpellIntent intent,
+            SpellType[] spellTypes,
             Sprite icon
         )
         {
@@ -70,7 +70,7 @@ namespace MyGame.Combat
             this.baseUseSpeed = baseUseSpeed;
             this.onHitEffects = onHitEffects;
             this.onCastEffects = onCastEffects;
-            this.intent = intent;
+            this.spellTypes = spellTypes;
             this.level = level;
             this.castTimeValue = castTimeValue;
             this.icon = icon;

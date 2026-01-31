@@ -8,6 +8,7 @@ public sealed class FooterSectionController
     // Classes used on the BG element (CharacterBg/TowerBg/CityBg)
     private const string ActiveClass = "footer-active";
     private const string HoveringClass = "footer-hovering";
+    private const string DisabledClass = "footer-disabled";
 
     private VisualElement _screenRoot;
     private VisualElement _footerRoot;
@@ -20,6 +21,10 @@ public sealed class FooterSectionController
         public string screenId;
 
         public VisualElement tileRoot; // "Character", "Tower", "City"
+        public bool enabled = true;
+        public VisualElement lockRoot;
+        public Label lockTitle;
+        public Label lockRequirement;
 
         public EventCallback<PointerDownEvent> onDown;
         public EventCallback<PointerEnterEvent> onEnter;
@@ -112,9 +117,18 @@ public sealed class FooterSectionController
                 tileRoot = tileRoot,
             };
 
+            b.lockRoot = tileRoot.Q<VisualElement>("LockOverlay");
+            if (b.lockRoot != null)
+            {
+                b.lockTitle = b.lockRoot.Q<Label>("LockTitle");
+                b.lockRequirement = b.lockRoot.Q<Label>("LockRequirement");
+            }
+
             // Click: navigate + set active
             b.onDown = _ =>
             {
+                if (!b.enabled)
+                    return;
                 SetActive(tileName);
                 _swapper.ShowScreen(screenId);
             };
@@ -122,13 +136,13 @@ public sealed class FooterSectionController
             // Hover: add/remove class on BG (not on tile root)
             b.onEnter = _ =>
             {
-                if (b != null)
+                if (b != null && b.enabled)
                     b.tileRoot.AddToClassList(HoveringClass);
             };
 
             b.onLeave = _ =>
             {
-                if (b.tileRoot != null)
+                if (b.tileRoot != null && b.enabled)
                     b.tileRoot.RemoveFromClassList(HoveringClass);
             };
 
@@ -165,10 +179,78 @@ public sealed class FooterSectionController
             if (b.tileRoot == null)
                 continue;
 
+            if (!b.enabled)
+            {
+                b.tileRoot.RemoveFromClassList(ActiveClass);
+                b.tileRoot.RemoveFromClassList(HoveringClass);
+                continue;
+            }
+
             if (string.Equals(b.tileName, tileName, StringComparison.OrdinalIgnoreCase))
                 b.tileRoot.AddToClassList(ActiveClass);
             else
                 b.tileRoot.RemoveFromClassList(ActiveClass);
+        }
+    }
+
+    public void SetEnabled(string tileName, bool enabled)
+    {
+        for (int i = 0; i < _bindings.Count; i++)
+        {
+            var b = _bindings[i];
+            if (b.tileRoot == null)
+                continue;
+
+            if (!string.Equals(b.tileName, tileName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            b.enabled = enabled;
+            b.tileRoot.pickingMode = enabled ? PickingMode.Position : PickingMode.Ignore;
+
+            if (enabled)
+            {
+                b.tileRoot.RemoveFromClassList(DisabledClass);
+                if (b.lockRoot != null)
+                    b.lockRoot.style.display = DisplayStyle.None;
+            }
+            else
+            {
+                b.tileRoot.AddToClassList(DisabledClass);
+                b.tileRoot.RemoveFromClassList(ActiveClass);
+                b.tileRoot.RemoveFromClassList(HoveringClass);
+                if (b.lockRoot != null)
+                    b.lockRoot.style.display = DisplayStyle.Flex;
+            }
+            break;
+        }
+    }
+
+    public void SetLockInfo(string tileName, bool visible, string titleText, string requirementText)
+    {
+        for (int i = 0; i < _bindings.Count; i++)
+        {
+            var b = _bindings[i];
+            if (b.tileRoot == null || b.lockRoot == null)
+                continue;
+
+            if (!string.Equals(b.tileName, tileName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            b.lockRoot.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (b.lockTitle != null && titleText != null)
+                b.lockTitle.text = titleText;
+
+            if (b.lockRequirement != null && requirementText != null)
+            {
+                b.lockRequirement.text = requirementText;
+                b.lockRequirement.style.display =
+                    string.IsNullOrWhiteSpace(requirementText)
+                        ? DisplayStyle.None
+                        : DisplayStyle.Flex;
+            }
+
+            break;
         }
     }
 

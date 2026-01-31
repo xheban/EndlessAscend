@@ -17,48 +17,48 @@ public static class CombatBonusesSummaryBuilder
             lines,
             name: "Attack Power",
             baseValue: derived.attackPower,
-            flatBonus: m.attackPowerFlat + m.powerFlat,
-            pctBonus: MultToPct(m.AttackPowerMultFinal * m.PowerMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         AddDerivedWithMods(
             lines,
             name: "Magic Power",
             baseValue: derived.magicPower,
-            flatBonus: m.magicPowerFlat + m.powerFlat,
-            pctBonus: MultToPct(m.MagicPowerMultFinal * m.PowerMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         AddDerivedWithMods(
             lines,
             name: "Attack Speed",
             baseValue: derived.attackSpeed,
-            flatBonus: m.attackSpeedFlat,
-            pctBonus: MultToPct(m.AttackSpeedMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         AddDerivedWithMods(
             lines,
             name: "Casting Speed",
             baseValue: derived.castSpeed,
-            flatBonus: m.castingSpeedFlat,
-            pctBonus: MultToPct(m.CastingSpeedMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         AddDerivedWithMods(
             lines,
             name: "Physical Defence",
             baseValue: derived.physicalDefense,
-            flatBonus: m.physicalDefenseFlat + m.defenceFlat,
-            pctBonus: MultToPct(m.PhysicalDefenceMultFinal * m.DefenceMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         AddDerivedWithMods(
             lines,
             name: "Magic Defence",
             baseValue: derived.magicalDefense,
-            flatBonus: m.magicDefenseFlat + m.defenceFlat,
-            pctBonus: MultToPct(m.MagicDefenceMultFinal * m.DefenceMultFinal)
+            flatBonus: 0,
+            pctBonus: 0f
         );
 
         // Other combat modifiers (not part of derived stats)
@@ -67,6 +67,20 @@ public static class CombatBonusesSummaryBuilder
             "Damage",
             flatBonus: m.damageFlat,
             pctBonus: MultToPct(m.DamageMultFinal)
+        );
+
+        AddModsOnly(
+            lines,
+            "Melee Damage Bonus",
+            flatBonus: m.meleeDamageBonusFlat,
+            pctBonus: MultToPct(m.meleeDamageBonusMult)
+        );
+
+        AddModsOnly(
+            lines,
+            "Ranged Damage Bonus",
+            flatBonus: m.rangedDamageBonusFlat,
+            pctBonus: MultToPct(m.rangedDamageBonusMult)
         );
 
         AddModsOnly(
@@ -177,8 +191,20 @@ public static class CombatBonusesSummaryBuilder
             if (!equipment.TryGetEquippedInstance(slots[s], out var inst))
                 continue;
 
-            if (inst?.rolledSpellMods != null && inst.rolledSpellMods.Count > 0)
-                SpellCombatModifierApplier.ApplyAll(modifiers, inst.rolledSpellMods);
+            if (inst?.rolledCombatStatMods != null && inst.rolledCombatStatMods.Count > 0)
+            {
+                for (int i = 0; i < inst.rolledCombatStatMods.Count; i++)
+                {
+                    var mod = inst.rolledCombatStatMods[i];
+                    CombatEffectSystem.ApplyCombatStatModifier(
+                        modifiers,
+                        mod.stat,
+                        mod.op,
+                        mod.value,
+                        mod.damageType
+                    );
+                }
+            }
 
             if (inst?.rolledSpellOverrides == null || inst.rolledSpellOverrides.Count == 0)
                 continue;

@@ -1,11 +1,10 @@
 using System;
-using MyGame.Common;
 
 namespace MyGame.Common
 {
     /// <summary>
     /// Runtime-ready snapshot produced by EffectInstance.GetScaled(spellLevel).
-    /// Contains final integer magnitudes PLUS per-instance behavior settings
+    /// Contains final integer values and per-instance behavior settings
     /// (merge/stack/reapply/duration/strength compare).
     /// </summary>
     [Serializable]
@@ -16,13 +15,6 @@ namespace MyGame.Common
         // -------------------------
         public int chancePercent; // 0..100
         public int durationTurns; // >= 1
-        public int magnitudeFlat; // >= 0
-        public int magnitudePercent; // 0..100
-
-        // -------------------------
-        // Magnitude basis
-        // -------------------------
-        public EffectMagnitudeBasis magnitudeBasis;
 
         // -------------------------
         // Target selection (per instance)

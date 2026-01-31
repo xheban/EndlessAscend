@@ -58,7 +58,7 @@ namespace MyGame.Combat
                 baseUseSpeed: def.baseUseSpeed,
                 onHitEffects: def.onHitEffects,
                 onCastEffects: def.onCastEffects,
-                intent: def.intent,
+                spellTypes: def.spellTypes,
                 level: spellLevel,
                 castTimeValue: def.castTimeValue,
                 icon: def.icon

@@ -1,0 +1,15 @@
+﻿/* Parts list */
+.parts-scroll {
+    flex-grow: 1;
+}
+
+.parts-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.part-icon {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}

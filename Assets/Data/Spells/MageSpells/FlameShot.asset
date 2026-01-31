@@ -20,12 +20,12 @@ MonoBehaviour:
   allowedSpecs: -1
   rarity: 1
   manaCost: 25
-  cooldownTurns: 2
+  cooldownTurns: 0
   maxLevel: 20
   baseDamage: 40
   damageKind: 1
   damageRangeType: 1
-  intent: 0
+  spellTypes: 00000000
   damageTag: 01000000
   tier: 0
   ignoreDefenseFlat: 0
@@ -33,7 +33,85 @@ MonoBehaviour:
   hitChance: 100
   castTimeValue: 100
   baseUseSpeed: 100
+  value: 100
   damageScalingType: 0
   damageScalingValue: 10
-  onHitEffects: []
+  onHitEffects:
+  - effect: {fileID: 11400000, guid: f7b94d16f1700794c95564bc3dfdbd25, type: 2}
+    chancePercent: 100
+    durationTurns: 2
+    componentMagnitudes:
+    - magnitudeFlat: 0
+      magnitudePercent: 30
+      magnitudeBasis: 1
+      magnitudeFlatScaling:
+        type: 0
+        step:
+          mode: 0
+          startAtLevel: 0
+          stepLevels: 0
+          amountPerStep: 0
+        milestone:
+          milestones: []
+        useMinMax: 0
+        minValue: 0
+        maxValue: 0
+      magnitudePercentScaling:
+        type: 0
+        step:
+          mode: 0
+          startAtLevel: 0
+          stepLevels: 0
+          amountPerStep: 0
+        milestone:
+          milestones: []
+        useMinMax: 0
+        minValue: 0
+        maxValue: 0
+    stackable: 1
+    maxStacks: 5
+    mergeable: 0
+    reapplyRule: 1
+    durationStackMode: 1
+    refreshOverridesRemaining: 0
+    compareMode: 0
+    strengthRating: 0
+    removeWhenType: 0
+    target: 0
+    chanceScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    durationScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
+    maxStacksScaling:
+      type: 0
+      step:
+        mode: 0
+        startAtLevel: 0
+        stepLevels: 0
+        amountPerStep: 0
+      milestone:
+        milestones: []
+      useMinMax: 0
+      minValue: 0
+      maxValue: 0
   onCastEffects: []

@@ -23,7 +23,7 @@
                     <engine:VisualElement name="Separator" style="flex-grow: 0; background-image: url(&quot;project://database/Assets/Resources/Sprites/DarkPixelRPGUI/Artwok/UI/Frame_title_dots.png?fileID=21300000&amp;guid=004de00204ca41a4abd9b5946b7292f6&amp;type=3#Frame_title_dots&quot;); width: 20px; height: 20px; align-items: center; justify-content: center; align-content: center; align-self: center; margin-top: 2px; margin-right: 16px; margin-left: 16px;" />
                 </engine:VisualElement>
                 <engine:VisualElement name="Body" style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; min-height: 0;">
-                    <engine:VisualElement name="ContentHost" style="flex-grow: 1;" />
+                    <engine:VisualElement name="ContentHost" style="flex-grow: 1; height: 640px; width: 1856px;" />
                 </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>

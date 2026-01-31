@@ -37,12 +37,37 @@ MonoBehaviour:
   damageScalingType: 0
   damageScalingValue: 5
   onHitEffects:
-  - effect: {fileID: 11400000, guid: 4053abdb9a144a14fa47fd83875d9e5b, type: 2}
+  - effect: {fileID: 0}
     chancePercent: 0
-    durationTurns: 2
-    magnitudeFlat: 500
-    magnitudePercent: 50
-    magnitudeBasis: 1
+    durationTurns: 0
+    componentMagnitudes:
+    - magnitudeFlat: 0
+      magnitudePercent: 0
+      magnitudeBasis: 0
+      magnitudeFlatScaling:
+        type: 0
+        step:
+          mode: 0
+          startAtLevel: 0
+          stepLevels: 0
+          amountPerStep: 0
+        milestone:
+          milestones: []
+        useMinMax: 0
+        minValue: 0
+        maxValue: 0
+      magnitudePercentScaling:
+        type: 0
+        step:
+          mode: 0
+          startAtLevel: 0
+          stepLevels: 0
+          amountPerStep: 0
+        milestone:
+          milestones: []
+        useMinMax: 0
+        minValue: 0
+        maxValue: 0
     stackable: 0
     maxStacks: 0
     mergeable: 0
@@ -52,7 +77,7 @@ MonoBehaviour:
     compareMode: 0
     strengthRating: 0
     removeWhenType: 0
-    target: 1
+    target: 0
     chanceScaling:
       type: 0
       step:
@@ -77,30 +102,6 @@ MonoBehaviour:
       useMinMax: 0
       minValue: 0
       maxValue: 0
-    magnitudeFlatScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
-    magnitudePercentScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
     maxStacksScaling:
       type: 0
       step:
@@ -113,80 +114,4 @@ MonoBehaviour:
       useMinMax: 0
       minValue: 0
       maxValue: 0
-  onCastEffects:
-  - effect: {fileID: 11400000, guid: 4eed9c06357180f428fe6222b0bf37f4, type: 2}
-    chancePercent: 0
-    durationTurns: 3
-    magnitudeFlat: 0
-    magnitudePercent: 220
-    magnitudeBasis: 1
-    stackable: 0
-    maxStacks: 0
-    mergeable: 0
-    reapplyRule: 0
-    durationStackMode: 2
-    refreshOverridesRemaining: 0
-    compareMode: 0
-    strengthRating: 0
-    removeWhenType: 1
-    target: 1
-    chanceScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
-    durationScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
-    magnitudeFlatScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
-    magnitudePercentScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
-    maxStacksScaling:
-      type: 0
-      step:
-        mode: 0
-        startAtLevel: 0
-        stepLevels: 0
-        amountPerStep: 0
-      milestone:
-        milestones: []
-      useMinMax: 0
-      minValue: 0
-      maxValue: 0
+  onCastEffects: []

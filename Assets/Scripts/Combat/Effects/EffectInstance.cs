@@ -3,6 +3,53 @@ using MyGame.Common;
 using UnityEngine;
 
 [Serializable]
+public class EffectComponentInstance
+{
+    [Header("Magnitude (component)")]
+    public int magnitudeFlat = 0;
+
+    [Range(0, 10000)]
+    public int magnitudePercent = 0;
+
+    public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
+
+    [Header("Scaling (component)")]
+    public IntScalingChoice magnitudeFlatScaling;
+    public IntScalingChoice magnitudePercentScaling;
+
+    public EffectComponentScaledIntValues GetScaled(int spellLevel)
+    {
+        int flat =
+            magnitudeFlatScaling != null
+                ? magnitudeFlatScaling.Evaluate(spellLevel, magnitudeFlat)
+                : magnitudeFlat;
+
+        int percent =
+            magnitudePercentScaling != null
+                ? magnitudePercentScaling.Evaluate(spellLevel, magnitudePercent)
+                : magnitudePercent;
+
+        flat = Mathf.Max(0, flat);
+        percent = Mathf.Clamp(percent, 0, 10000);
+
+        return new EffectComponentScaledIntValues
+        {
+            magnitudeFlat = flat,
+            magnitudePercent = percent,
+            magnitudeBasis = magnitudeBasis,
+        };
+    }
+}
+
+[Serializable]
+public struct EffectComponentScaledIntValues
+{
+    public int magnitudeFlat;
+    public int magnitudePercent;
+    public EffectMagnitudeBasis magnitudeBasis;
+}
+
+[Serializable]
 public class EffectInstance
 {
     [Header("Effect")]
@@ -18,12 +65,8 @@ public class EffectInstance
     [Min(1)]
     public int durationTurns = 2;
 
-    public int magnitudeFlat = 0; // e.g. +20 flat
-
-    [Range(0, 10000)]
-    public int magnitudePercent = 0; // e.g. 50 = 50%
-
-    public EffectMagnitudeBasis magnitudeBasis = EffectMagnitudeBasis.None;
+    [Header("Component Magnitudes (Composite)")]
+    public EffectComponentInstance[] componentMagnitudes;
 
     // -------------------------
     // Stacking / merging behavior (per spell instance)
@@ -73,8 +116,6 @@ public class EffectInstance
     [Header("Scaling (choose one per field)")]
     public IntScalingChoice chanceScaling;
     public IntScalingChoice durationScaling;
-    public IntScalingChoice magnitudeFlatScaling;
-    public IntScalingChoice magnitudePercentScaling;
     public IntScalingChoice maxStacksScaling;
 
     /// <summary>
@@ -93,16 +134,6 @@ public class EffectInstance
                 ? durationScaling.Evaluate(spellLevel, durationTurns)
                 : durationTurns;
 
-        int flat =
-            magnitudeFlatScaling != null
-                ? magnitudeFlatScaling.Evaluate(spellLevel, magnitudeFlat)
-                : magnitudeFlat;
-
-        int percent =
-            magnitudePercentScaling != null
-                ? magnitudePercentScaling.Evaluate(spellLevel, magnitudePercent)
-                : magnitudePercent;
-
         int stacks =
             maxStacksScaling != null ? maxStacksScaling.Evaluate(spellLevel, maxStacks) : maxStacks;
 
@@ -111,8 +142,6 @@ public class EffectInstance
         // -------------------------
         chance = Mathf.Clamp(chance, 0, 100);
         duration = Mathf.Max(1, duration);
-        flat = Mathf.Max(0, flat);
-        percent = Mathf.Clamp(percent, 0, 10000);
 
         if (!stackable)
             stacks = 1;
@@ -124,11 +153,6 @@ public class EffectInstance
             // numeric result
             chancePercent = chance,
             durationTurns = duration,
-            magnitudeFlat = flat,
-            magnitudePercent = percent,
-
-            // basis / flags
-            magnitudeBasis = magnitudeBasis,
             stackable = stackable,
             maxStacks = stacks,
             mergeable = mergeable,
@@ -142,6 +166,25 @@ public class EffectInstance
 
             // targeting
             target = target,
+        };
+    }
+
+    public EffectComponentScaledIntValues GetComponentScaled(int spellLevel, int componentIndex)
+    {
+        if (componentMagnitudes != null && componentIndex >= 0)
+        {
+            if (
+                componentIndex < componentMagnitudes.Length
+                && componentMagnitudes[componentIndex] != null
+            )
+                return componentMagnitudes[componentIndex].GetScaled(spellLevel);
+        }
+
+        return new EffectComponentScaledIntValues
+        {
+            magnitudeFlat = 0,
+            magnitudePercent = 0,
+            magnitudeBasis = EffectMagnitudeBasis.None,
         };
     }
 }

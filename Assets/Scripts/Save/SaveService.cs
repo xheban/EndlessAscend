@@ -162,7 +162,7 @@ namespace MyGame.Save
 
                             e.rolledBaseStatMods ??= new List<BaseStatModifier>();
                             e.rolledDerivedStatMods ??= new List<DerivedStatModifier>();
-                            e.rolledSpellMods ??= new List<SpellCombatModifier>();
+                            e.rolledCombatStatMods ??= new List<CombatStatModifier>();
                             e.rolledSpellOverrides ??= new List<SpellVariableOverride>();
                         }
                     }
@@ -301,7 +301,7 @@ namespace MyGame.Save
 
                 e.rolledBaseStatMods ??= new List<BaseStatModifier>();
                 e.rolledDerivedStatMods ??= new List<DerivedStatModifier>();
-                e.rolledSpellMods ??= new List<SpellCombatModifier>();
+                e.rolledCombatStatMods ??= new List<CombatStatModifier>();
                 e.rolledSpellOverrides ??= new List<SpellVariableOverride>();
             }
         }

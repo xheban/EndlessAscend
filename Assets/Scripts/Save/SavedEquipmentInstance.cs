@@ -18,9 +18,9 @@ namespace MyGame.Save
         public List<DerivedStatModifier> rolledDerivedStatMods = new();
 
         // Rolled spell-combat modifiers (damage kind/type/range bonuses)
-        public List<SpellCombatModifier> rolledSpellMods = new();
+        public List<CombatStatModifier> rolledCombatStatMods = new();
 
-        // Rolled spell-variable overrides (DamageKind / DamageRangeType / DamageType)
+        // Rolled spell-variable overrides (DamageKind / DamageType / IgnoreDefense)
         public List<SpellVariableOverride> rolledSpellOverrides = new();
     }
 }

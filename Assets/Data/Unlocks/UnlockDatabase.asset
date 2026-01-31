@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unlocks:
   - {fileID: 11400000, guid: b3070f1fc7828b947b9ae0baf7e88aea, type: 2}
+  - {fileID: 11400000, guid: 926df9e0b70612a4dafa8a9cea417b7b, type: 2}

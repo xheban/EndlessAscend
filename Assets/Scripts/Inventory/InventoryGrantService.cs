@@ -48,7 +48,7 @@ namespace MyGame.Inventory
                 equipmentId = equipmentId,
                 rolledBaseStatMods = new List<BaseStatModifier>(),
                 rolledDerivedStatMods = new List<DerivedStatModifier>(),
-                rolledSpellMods = new List<SpellCombatModifier>(),
+                rolledCombatStatMods = new List<CombatStatModifier>(),
                 rolledSpellOverrides = new List<SpellVariableOverride>(),
             };
 
@@ -62,7 +62,7 @@ namespace MyGame.Inventory
                     rng,
                     inst.rolledBaseStatMods,
                     inst.rolledDerivedStatMods,
-                    inst.rolledSpellMods,
+                    inst.rolledCombatStatMods,
                     inst.rolledSpellOverrides
                 );
             }
@@ -94,7 +94,7 @@ namespace MyGame.Inventory
                 equipmentId = equipmentId,
                 rolledBaseStatMods = new List<BaseStatModifier>(),
                 rolledDerivedStatMods = new List<DerivedStatModifier>(),
-                rolledSpellMods = new List<SpellCombatModifier>(),
+                rolledCombatStatMods = new List<CombatStatModifier>(),
                 rolledSpellOverrides = new List<SpellVariableOverride>(),
             };
 
@@ -107,7 +107,7 @@ namespace MyGame.Inventory
                     rng,
                     inst.rolledBaseStatMods,
                     inst.rolledDerivedStatMods,
-                    inst.rolledSpellMods,
+                    inst.rolledCombatStatMods,
                     inst.rolledSpellOverrides
                 );
             }

@@ -54,12 +54,12 @@ namespace MyGame.Inventory
                                     s.rolledDerivedStatMods
                                 )
                                 : new System.Collections.Generic.List<MyGame.Common.DerivedStatModifier>(),
-                        rolledSpellMods =
-                            s.rolledSpellMods != null
-                                ? new System.Collections.Generic.List<MyGame.Combat.SpellCombatModifier>(
-                                    s.rolledSpellMods
+                        rolledCombatStatMods =
+                            s.rolledCombatStatMods != null
+                                ? new System.Collections.Generic.List<MyGame.Combat.CombatStatModifier>(
+                                    s.rolledCombatStatMods
                                 )
-                                : new System.Collections.Generic.List<MyGame.Combat.SpellCombatModifier>(),
+                                : new System.Collections.Generic.List<MyGame.Combat.CombatStatModifier>(),
                         rolledSpellOverrides =
                             s.rolledSpellOverrides != null
                                 ? new System.Collections.Generic.List<MyGame.Combat.SpellVariableOverride>(
@@ -149,12 +149,12 @@ namespace MyGame.Inventory
                                         inst.rolledDerivedStatMods
                                     )
                                     : new System.Collections.Generic.List<MyGame.Common.DerivedStatModifier>(),
-                            rolledSpellMods =
-                                inst.rolledSpellMods != null
-                                    ? new System.Collections.Generic.List<MyGame.Combat.SpellCombatModifier>(
-                                        inst.rolledSpellMods
+                            rolledCombatStatMods =
+                                inst.rolledCombatStatMods != null
+                                    ? new System.Collections.Generic.List<MyGame.Combat.CombatStatModifier>(
+                                        inst.rolledCombatStatMods
                                     )
-                                    : new System.Collections.Generic.List<MyGame.Combat.SpellCombatModifier>(),
+                                    : new System.Collections.Generic.List<MyGame.Combat.CombatStatModifier>(),
                             rolledSpellOverrides =
                                 inst.rolledSpellOverrides != null
                                     ? new System.Collections.Generic.List<MyGame.Combat.SpellVariableOverride>(

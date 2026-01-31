@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using MyGame.Combat;
 using MyGame.Common;
 using MyGame.Run;
 using MyGame.Spells;
@@ -49,6 +51,15 @@ namespace MyGame.Helpers
             var tags = tooltip.Q<Label>("Tags");
             var mastery = tooltip.Q<Label>("MasteryLevel");
 
+            var damage = tooltip.Q<VisualElement>("Damage");
+            var baseDamage = tooltip.Q<VisualElement>("BaseDamage");
+            var bonusDamage = tooltip.Q<VisualElement>("BonusDamage");
+            var scalingTypeDamage = tooltip.Q<VisualElement>("ScalingTypeDamage");
+            var rangeType = tooltip.Q<VisualElement>("RangeType");
+            var damageType = tooltip.Q<VisualElement>("DamageType");
+            var ignoreDefence = tooltip.Q<VisualElement>("IgnoreDefence");
+
+            var typeValue = tooltip.Q<Label>("TypeValue");
             var damageValue = tooltip.Q<Label>("DamageValue");
             var baseDamageValue = tooltip.Q<Label>("BaseDamageValue");
             var bonusDamageValue = tooltip.Q<Label>("BonusDamageValue");
@@ -119,15 +130,42 @@ namespace MyGame.Helpers
                     : DisplayStyle.Flex;
             }
 
-            int actualDamage = def.GetDamageAtLevel(playerSpell?.level ?? 1);
-            if (damageValue != null)
-                damageValue.text = actualDamage.ToString();
-            if (baseDamageValue != null)
-                baseDamageValue.text = def.baseDamage.ToString();
-            if (bonusDamageValue != null)
-                bonusDamageValue.text = def.damageScalingValue.ToString();
-            if (scalingTypeValue != null)
-                scalingTypeValue.text = NiceEnum(def.damageScalingType.ToString());
+            if (typeValue != null)
+                typeValue.text = string.Join(
+                    ", ",
+                    Array.ConvertAll(def.spellTypes, t => NiceEnum(t.ToString()))
+                );
+            SpellType[] wanted = { SpellType.Damage, SpellType.Heal };
+
+            if (def.spellTypes.Any(t => wanted.Contains(t)))
+            {
+                SetRowVisible(damage, true);
+                SetRowVisible(baseDamage, true);
+                SetRowVisible(bonusDamage, true);
+                SetRowVisible(scalingTypeDamage, true);
+                SetRowVisible(rangeType, true);
+                SetRowVisible(damageType, true);
+                SetRowVisible(ignoreDefence, true);
+                int actualDamage = def.GetDamageAtLevel(playerSpell?.level ?? 1);
+                if (damageValue != null)
+                    damageValue.text = actualDamage.ToString();
+                if (baseDamageValue != null)
+                    baseDamageValue.text = def.baseDamage.ToString();
+                if (bonusDamageValue != null)
+                    bonusDamageValue.text = def.damageScalingValue.ToString();
+                if (scalingTypeValue != null)
+                    scalingTypeValue.text = NiceEnum(def.damageScalingType.ToString());
+            }
+            else
+            {
+                SetRowVisible(damage, false);
+                SetRowVisible(baseDamage, false);
+                SetRowVisible(bonusDamage, false);
+                SetRowVisible(scalingTypeDamage, false);
+                SetRowVisible(rangeType, false);
+                SetRowVisible(damageType, false);
+                SetRowVisible(ignoreDefence, false);
+            }
 
             if (manaCostValue != null)
                 manaCostValue.text = def.manaCost.ToString();
@@ -379,6 +417,14 @@ namespace MyGame.Helpers
                 return false;
 
             return tooltip.worldBound.Contains(pointerPosition);
+        }
+
+        private static void SetRowVisible(VisualElement row, bool visible)
+        {
+            if (row == null)
+                return;
+
+            row.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private static string NiceEnum(string raw)

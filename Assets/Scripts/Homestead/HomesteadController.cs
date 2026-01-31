@@ -71,12 +71,18 @@ public class HomesteadController : MonoBehaviour, IScreenController
 
     private ScreenSwapper _swapper;
     private object _context;
+    private HomesteadTabContext _tabContext;
 
     public void Bind(VisualElement screenHost, ScreenSwapper swapper, object context)
     {
         _root = screenHost;
         _swapper = swapper;
         _context = context;
+        _tabContext = new HomesteadTabContext
+        {
+            Swapper = swapper,
+            ScreenContext = context,
+        };
 
         _footer = FooterBinding.BindFooter(_root, swapper, activeTileName: "Homestead");
 
@@ -152,7 +158,7 @@ public class HomesteadController : MonoBehaviour, IScreenController
                 Name = "SpellMergeRoom",
                 Header = _hSpellMergeRoom,
                 Template = _spellMergeRoomTabUxml,
-                Controller = new PlaceholderHomesteadTabController("Spell Merge Room"),
+                Controller = new SpellMergeRoomHomesteadTabController(),
             }
         );
         _tabs.Add(
@@ -249,6 +255,7 @@ public class HomesteadController : MonoBehaviour, IScreenController
 
         _context = null;
         _swapper = null;
+        _tabContext = null;
         _root = null;
     }
 
@@ -276,7 +283,7 @@ public class HomesteadController : MonoBehaviour, IScreenController
             tab.View.style.minHeight = 0;
 
             _contentHost.Add(tab.View);
-            tab.Controller?.Bind(tab.View, _context);
+            tab.Controller?.Bind(tab.View, _tabContext);
 
             tab.View.style.display = DisplayStyle.None;
         }

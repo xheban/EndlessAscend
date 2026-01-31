@@ -9,8 +9,17 @@ namespace MyGame.Combat
 
             var range = ctx.spell.damageRangeType;
 
-            ctx.flatDamageBonus += attackerModifiers.GetAttackerRangeBonusFlat(range);
-            ctx.damageMult *= attackerModifiers.GetAttackerRangeBonusMult(range);
+            switch (range)
+            {
+                case DamageRangeType.Melee:
+                    ctx.flatDamageBonus += attackerModifiers.GetMeleeDamageBonusFlat();
+                    ctx.damageMult *= attackerModifiers.GetMeleeDamageBonusMult();
+                    break;
+                case DamageRangeType.Ranged:
+                    ctx.flatDamageBonus += attackerModifiers.GetRangedDamageBonusFlat();
+                    ctx.damageMult *= attackerModifiers.GetRangedDamageBonusMult();
+                    break;
+            }
         }
     }
 }

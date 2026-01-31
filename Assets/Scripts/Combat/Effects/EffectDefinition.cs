@@ -1,4 +1,5 @@
-using MyGame.Combat;
+using System;
+using System.Collections.Generic;
 using MyGame.Common;
 using UnityEngine;
 
@@ -17,28 +18,25 @@ public class EffectDefinition : ScriptableObject
     // What the effect IS (stable meaning)
     // -------------------------
 
-    [Header("Kind (what this effect is)")]
-    public EffectKind kind = EffectKind.StatModifier;
-
     [Tooltip("Used for UI/cleanse rules.")]
     public EffectPolarity polarity = EffectPolarity.Debuff;
 
     // -------------------------
-    // Stat modifier mapping (only if Kind == StatModifier)
-    // This stays in definition so effectId always means the same stat/op.
+    // Composite components (preferred)
     // -------------------------
-    [Header("Stat Modifier Mapping (only if Kind = StatModifier)")]
-    public EffectStat stat = EffectStat.DamageAll;
+    [Header("Components (required)")]
+    public List<EffectComponentDefinition> components = new List<EffectComponentDefinition>();
 
-    public EffectOp op = EffectOp.MorePercent;
+    public int GetComponentCount()
+    {
+        return components != null ? components.Count : 0;
+    }
 
-    [Tooltip("Used only for *ByType stats.")]
-    public DamageType[] damageType;
+    public EffectComponentDefinition GetComponent(int index)
+    {
+        if (components == null || index < 0 || index >= components.Count)
+            return null;
 
-    // -------------------------
-    // Periodic configuration (only if Kind == DOT/HOT)
-    // This stays in definition so Burn always ticks the same way.
-    // -------------------------
-    [Header("Periodic (only if Kind = DOT/HOT)")]
-    public EffectTickTiming tickTiming = EffectTickTiming.OnOwnerAction;
+        return components[index];
+    }
 }

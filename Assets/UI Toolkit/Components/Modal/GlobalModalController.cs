@@ -93,11 +93,13 @@ public sealed class GlobalModalController
         string secondaryText = null,
         Action onSecondary = null,
         Action onClose = null,
-        bool clearCustomContent = true
+        bool clearCustomContent = true,
+        bool centerMessage = false
     )
     {
         SetTitle(title);
         SetMessage(message);
+        SetMessageAlignment(centerMessage ? TextAnchor.MiddleCenter : TextAnchor.UpperLeft);
 
         SetPrimary(primaryText, onPrimary);
         SetSecondary(secondaryText, onSecondary);
@@ -124,6 +126,13 @@ public sealed class GlobalModalController
         if (_message == null)
             return;
         _message.text = message ?? "";
+    }
+
+    public void SetMessageAlignment(TextAnchor alignment)
+    {
+        if (_message == null)
+            return;
+        _message.style.unityTextAlign = alignment;
     }
 
     public void SetPrimary(string text, Action onPrimary)
